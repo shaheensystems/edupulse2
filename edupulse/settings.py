@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django_browser_reload",  # For django-browser-reload
     # Apps
     "home",
+    "user",
 ]
 
 MIDDLEWARE = [
