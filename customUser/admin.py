@@ -2,7 +2,7 @@ from django.contrib import admin
 from customUser.models import NewUser,Staff,Student
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
-from program.models import ProgramOffering
+from program.models import ProgramOffering,CourseOffering
 
 # Register your models here.
 # Extend the UserAdmin class
@@ -32,16 +32,21 @@ class StaffAdmin(admin.ModelAdmin):
 
 
 class ProgramOfferingInline(admin.StackedInline):
-    model=Student.programs.through
+    model=Student.program_offering.through
     extra=1
 
+class CourseOfferingInline(admin.StackedInline):
+    model=Student.course_offering.through
+    # model=CourseOffering
+    extra=1
 
 
 
 class StudentAdmin(admin.ModelAdmin):
     list_display=('id','student','joining_date','international_student','remark')
-    inlines=[ProgramOfferingInline]
+    inlines=[ProgramOfferingInline,CourseOfferingInline]
 
 admin.site.register(Staff, StaffAdmin)  
 admin.site.register(ProgramOffering)
+admin.site.register(CourseOffering)
 admin.site.register(Student,StudentAdmin)
