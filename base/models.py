@@ -18,7 +18,7 @@ class BaseModel(models.Model):
     updated_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,related_name='%(class)s_updated',null=True,blank=True)
     created_at=models.DateTimeField(auto_now_add=True,verbose_name='Created At')
     updated_at=models.DateTimeField(auto_now=True,verbose_name='Updated At')
-    active_status=models.BooleanField()
+    active_status=models.BooleanField(default=True)
 
     class Meta:
         abstract=True
