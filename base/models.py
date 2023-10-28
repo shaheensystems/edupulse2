@@ -12,7 +12,7 @@ from django.urls import reverse
 pytz.timezone('Pacific/Auckland')
 
 class BaseModel(models.Model):
-    id=models.UUIDField(primary_key=True,editable=False)
+    id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     temp_id=models.CharField(max_length=255,null=True, blank=True)
     created_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,related_name='%(class)s_created',null=True,blank=True)
     updated_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,related_name='%(class)s_updated',null=True,blank=True)

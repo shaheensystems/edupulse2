@@ -23,7 +23,7 @@ from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('upload_file/',include('uploadFile.urls')),
+    path('upload_file/',include('uploadFile.urls',namespace='upload_file')), #namespace is the same name mentioned in urls.py file app_name 
     path('',views.home),
 ]
 

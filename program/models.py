@@ -58,3 +58,7 @@ class ProgramOffering(BaseModel):
     end_date=models.DateField( auto_now=False, auto_now_add=False)
     remark=models.TextField(max_length=255,blank=True,null=True)
     student=models.ManyToManyField(Student,blank=True,related_name='program_offering')
+
+
+   
+    

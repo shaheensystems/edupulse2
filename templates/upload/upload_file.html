@@ -1,6 +1,18 @@
+
+{% extends "base.html" %}
 <!-- upload.html -->
-<form method="post" enctype="multipart/form-data">
+{% comment %} <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Upload CSV</button>
+</form> {% endcomment %}
+{% block content %}
+<h1> drop file to uplaod </h1>
+{% comment %} #  user double quote otherwise form will get the error {% endcomment %}
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form.as_p}}
+    <br>
+    <button type="submit" >Confirm</button>
 </form>
+{% endblock content %}
