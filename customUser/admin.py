@@ -43,7 +43,7 @@ class CourseOfferingInline(admin.StackedInline):
 
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display=('id','student','joining_date','international_student','remark')
+    list_display=('id','student','joining_date','international_student','remark','enrolled_course','email_id','enrollment_status','passport_number','visa_number','visa_expiry_date')
     inlines=[ProgramOfferingInline,CourseOfferingInline]
 
 admin.site.register(Staff, StaffAdmin)  

@@ -6,7 +6,98 @@ from .forms import CSVModelForm
 # from .models import UploadFile
 from .models import Csv
 from program.models import Program,Course
+from customUser.models import NewUser,Student
 import csv
+from django.contrib.auth.hashers import make_password
+from datetime import datetime
+
+def handle_date_in_correct_format(date_str):
+    print(date_str)
+    print("-----------------------------------------")
+    if date_str and '/' in date_str and len(date_str) > 7:
+        try:
+            return datetime.strptime(date_str, "%d/%m/%Y")
+        except ValueError:
+            # Handle invalid date format here, if needed
+            print(f"Invalid date format: {date_str}")
+            return None
+            # return datetime.strptime('01/01/2001', "%d/%m/%Y")
+    else:
+        # Handle the case where date_str does not exist or is not in the expected format
+        return None
+
+def updated_or_create_user(data):
+    if data['student_id'] and data['student_id'].isdigit():
+        try:
+            user=NewUser.objects.get(temp_id=data['student_id'])
+            # user.username=data['student_id'], # updated username as string ('20220756',) need attention here 
+            user.first_name=data['student_fname']
+            user.last_name=data['student_lname']
+            user.dob=handle_date_in_correct_format(data['student_dob'])
+            user.email=data['student_email']
+            user.phone=data['student_mobile']
+            user.nationality=data['student_nationality']
+            user.save()
+            # print(user.first_name)
+            # print(data['student_id'])
+            # print(user.username)
+            print(f"user:{user.username} updated successfully")
+
+            
+        except NewUser.DoesNotExist:
+            new_user=NewUser.objects.create(
+                temp_id=data['student_id'],
+                username=data['student_id'],
+                first_name=data['student_fname'],
+                last_name=data['student_lname'],
+                dob=handle_date_in_correct_format(data['student_dob']),
+                email=data['student_email'],
+                phone=data['student_mobile'],
+                nationality=data['student_nationality'],
+                )
+             # Set the user's password
+            password = f'WC{data["student_id"]}@{data["student_fname"]}'
+            new_user.password = make_password(password)
+            new_user.save()
+            print(f'user"{new_user.username} cerated successfully')
+    else:
+        print(f"Ignoring program with code '{data['student_id']}' is not valid ")
+
+def updated_or_create_student(data):
+    if data['student_id'] and data['student_id'].isdigit():
+        # first cerate and updated user then create and updated student 
+        updated_or_create_user(data)
+
+        try:
+            student=Student.objects.get(temp_id=data['student_id'])
+            
+            # student.temp_id=data['student_id'], no changes while updated
+            student.email_id=data['student_alternative_email'],
+            student.enrollment_status=data['student_enrolment_status'],
+            student.passport_number=data['student_passport_number'],
+            student.visa_number=data['student_visa_number'],
+            # student.visa_expiry_date=handle_date_in_correct_format(data['student_visa_expiry_date']),
+            student.save()
+            # print(user.first_name)
+            # print(data['student_id'])
+            # print(user.username)
+            print(f"student:{student.student.first_name}  updated successfully")
+
+            
+        except Student.DoesNotExist:
+            new_student=Student.objects.create(
+                temp_id=data['student_id'],
+                email_id=data['student_alternative_email'],
+                enrollment_status=data['student_enrolment_status'],
+                passport_number=data['student_passport_number'],
+                visa_number=data['student_visa_number'],
+                # visa_expiry_date=handle_date_in_correct_format(data['student_visa_expiry_date']),
+                student=NewUser.objects.get(temp_id=data['student_id']) # link user with student while creating new user not while update
+                )
+            new_student.save()
+            print(f'new student:{new_student.student.first_name} cerated successfully')
+    else:
+        print(f"Ignoring program with code '{data['student_id']}' is not valid ")
 
 
 def update_or_create_program(data):
@@ -68,7 +159,7 @@ def Upload_file_view(request):
                                 "client last name":"student_lname",
                                 "client dob":"student_dob",
                                 "client refinternal":"student_ref_internal",
-                                "client refexternal":"student_ref_external",
+                                "client refexternal":"student_id",
                                 "client email":"student_email",
                                 "client alternative email":"student_alternative_email",
                                 "client mobile":"student_mobile",
@@ -81,20 +172,20 @@ def Upload_file_view(request):
                                 "nz ethnicity 1":"student_ethnicity1",
                                 "nz ethnicity 2":"student_ethnicity2",
                                 "nz ethnicity 3":"student_ethnicity3",
-                                "client passport number":"student_passpport_number",
+                                "client passport number":"student_passport_number",
                                 "client country of nationality":"student_nationality",
                                 "visa number":"student_visa_number",
-                                "visa expiry date":"student_visa_expirty_date",
+                                "visa expiry date":"student_visa_expiry_date",
                                 "course code":"student_program_code",
                                 "course desc":"student_program_name",
                                 "course offer code":"student_program_offer_code",
-                                "course offer desc":"student_Program_offer_desc",
+                                "course offer desc":"student_Program_offer_name",
                                 "cor start date":"student_program_offer_start_date",
                                 "cor end date":"student_program_offer_end_date",
                                 "unit code":"student_course_code",
                                 "unit desc":"student_course_name",
                                 "unit offer code":"student_course_offer_code",
-                                "unit offer description":"student_course_offer_desc",
+                                "unit offer description":"student_course_offer_name",
                                 "cuor start date":"student_course_offer_start_date",
                                 "cuor end date":"student_Course_offer_end_date",
             }
@@ -115,14 +206,18 @@ def Upload_file_view(request):
                 # create object as needed for data by importing models here 
                 
                 # add Program temp- student_program_code, student_program_desc
-                    # if program_code is available then update otherwise cerate program 
+                update_or_create_program(data=data)
+               
                 # Print or process the variables
                 # print(data['student_program_code'])
-           
-                update_or_create_program(data=data)
                 
                 # add Course temp- student_program_code, student_program_desc
                 update_or_create_course(data=data)
+
+                # add or update Student
+                updated_or_create_student(data)
+
+
                
 
         obj.activated = True
