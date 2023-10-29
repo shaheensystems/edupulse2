@@ -9,5 +9,9 @@ class ProgramAdmin(admin.ModelAdmin):
     list_display=['id','temp_id','name','description']
     inlines = [CourseInline]
 
+class CourseAdmin(admin.ModelAdmin):
+    list_display=['id','temp_id','name','description']
+
 admin.site.register(Program, ProgramAdmin)
-admin.site.register(Course)
+
+admin.site.register(Course,CourseAdmin)
