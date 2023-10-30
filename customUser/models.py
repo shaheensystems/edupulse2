@@ -20,7 +20,7 @@ class NewUser(AbstractUser):
     nationality=models.CharField(max_length=255,null=True,blank=True)
     address=models.ForeignKey(Address, verbose_name="Address", on_delete=models.CASCADE,null=True,blank=True)
     
-    campus=models.ForeignKey(Campus, verbose_name="Address", on_delete=models.CASCADE,null=True,blank=True)
+    campus=models.ForeignKey(Campus, verbose_name="Campus", on_delete=models.CASCADE,null=True,blank=True)
     
     
 
@@ -48,7 +48,7 @@ class Student(BaseModel):
     # course Offering 
     enrolled_course=models.CharField(max_length=255,null=True,blank=True)
     email_id=models.EmailField(null=True,blank=True)
-    enrollment_status=models.CharField( max_length=255,null=True,blank=True)
+    enrollment_status=models.CharField(max_length=255,null=True,blank=True)
     passport_number=models.CharField(max_length=255,null=True,blank=True)
     visa_number=models.CharField(max_length=255,null=True,blank=True)
     visa_expiry_date=models.DateField(default=None, null=True,blank=True)

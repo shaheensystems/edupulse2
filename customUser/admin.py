@@ -9,10 +9,10 @@ from program.models import ProgramOffering,CourseOffering
 class CustomUserAdmin(UserAdmin):
     
     fieldsets = UserAdmin.fieldsets + (
-        ('Custom Fields', {'fields': ('gender', 'dob','address','phone','user_image')}),
+        ('Custom Fields', {'fields': ('gender', 'dob','address','phone','user_image','campus')}),
     )
-    list_display = ('id', 'get_full_name','username', 'email', 'dob', 'gender','phone','address','display_groups','user_image')  # Add 'get_full_name' to display combined name
-    list_filter = UserAdmin.list_filter + ('gender',)  # Add 'position' and 'department' to filters
+    list_display = ('id', 'get_full_name','username', 'email', 'dob', 'gender','phone','address','display_groups','user_image','campus')  # Add 'get_full_name' to display combined name
+    list_filter = UserAdmin.list_filter + ('gender','campus',)  # Add 'position' and 'department' to filters
     readonly_fields=('last_login','date_joined')
     # Custom method to get combined first name and last name
     def get_full_name(self, obj):
@@ -46,7 +46,12 @@ class StudentAdmin(admin.ModelAdmin):
     list_display=('id','student','joining_date','international_student','remark','enrolled_course','email_id','enrollment_status','passport_number','visa_number','visa_expiry_date')
     inlines=[ProgramOfferingInline,CourseOfferingInline]
 
+class ProgramOfferingAdmin(admin.ModelAdmin):
+    list_display=('temp_id','start_date','end_date','program')
+class CourseOfferingAdmin(admin.ModelAdmin):
+    list_display=('temp_id','start_date','end_date','course')
+
 admin.site.register(Staff, StaffAdmin)  
-admin.site.register(ProgramOffering)
-admin.site.register(CourseOffering)
+admin.site.register(ProgramOffering,ProgramOfferingAdmin)
+admin.site.register(CourseOffering,CourseOfferingAdmin)
 admin.site.register(Student,StudentAdmin)

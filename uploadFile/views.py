@@ -5,18 +5,24 @@ from .forms import CSVModelForm
 # from .forms import CSVUploadForm
 # from .models import UploadFile
 from .models import Csv
-from program.models import Program,Course
-from customUser.models import NewUser,Student
+from program.models import Program,Course,ProgramOffering,CourseOffering
+from customUser.models import NewUser,Student,Campus
 import csv
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
 
 def handle_date_in_correct_format(date_str):
-    print(date_str)
-    print("-----------------------------------------")
+    print("raw data ",date_str)
+    
     if date_str and '/' in date_str and len(date_str) > 7:
         try:
-            return datetime.strptime(date_str, "%d/%m/%Y")
+            date_obj = datetime.strptime(date_str, "%d/%m/%Y")
+            # Extract the date part and return it as a string in "YYYY-MM-DD" format
+            formatted_date = date_obj.date()
+            formatted_date_str = formatted_date.strftime("%Y-%m-%d")
+            print("date converted successfully", formatted_date_str)
+            return formatted_date_str
+            
         except ValueError:
             # Handle invalid date format here, if needed
             print(f"Invalid date format: {date_str}")
@@ -24,10 +30,30 @@ def handle_date_in_correct_format(date_str):
             # return datetime.strptime('01/01/2001', "%d/%m/%Y")
     else:
         # Handle the case where date_str does not exist or is not in the expected format
+        print("data invalid for date return None")
         return None
+
+def update_or_create_campus(data):
+    # Check if the program_code exits and doesn't contain spaces
+    if data['student_campus_temp_id'] :
+        try:
+            campus = Campus.objects.get(temp_id=data['student_campus_temp_id'])
+            # If found, update the program_desc
+            campus.name = data['student_campus_temp_id']
+            campus.save()
+            print("Campus updated successfully")
+        except Campus.DoesNotExist:
+            # If not found, create a new program object
+            Campus.objects.create(temp_id=data['student_campus_temp_id'], 
+                                  name=data['student_campus_temp_id'])
+            print("Campus created successfully")
+    else:
+        print(f"Ignoring campus with code '{data['student_campus_temp_id']}' due to data not valid ")
+
 
 def updated_or_create_user(data):
     if data['student_id'] and data['student_id'].isdigit():
+        update_or_create_campus(data)
         try:
             user=NewUser.objects.get(temp_id=data['student_id'])
             # user.username=data['student_id'], # updated username as string ('20220756',) need attention here 
@@ -37,6 +63,7 @@ def updated_or_create_user(data):
             user.email=data['student_email']
             user.phone=data['student_mobile']
             user.nationality=data['student_nationality']
+            user.campus=Campus.objects.get(temp_id=data['student_campus_temp_id']) # link campus with User while creating new user 
             user.save()
             # print(user.first_name)
             # print(data['student_id'])
@@ -54,6 +81,7 @@ def updated_or_create_user(data):
                 email=data['student_email'],
                 phone=data['student_mobile'],
                 nationality=data['student_nationality'],
+                campus=Campus.objects.get(temp_id=data['student_campus_temp_id']), # link campus with User while creating new user 
                 )
              # Set the user's password
             password = f'WC{data["student_id"]}@{data["student_fname"]}'
@@ -67,17 +95,21 @@ def updated_or_create_student(data):
     if data['student_id'] and data['student_id'].isdigit():
         # first cerate and updated user then create and updated student 
         updated_or_create_user(data)
+        
 
         try:
             student=Student.objects.get(temp_id=data['student_id'])
-            
+            print(data['student_enrolment_status'])
+            print('student object,',student.enrollment_status)
             # student.temp_id=data['student_id'], no changes while updated
-            student.email_id=data['student_alternative_email'],
-            student.enrollment_status=data['student_enrolment_status'],
-            student.passport_number=data['student_passport_number'],
-            student.visa_number=data['student_visa_number'],
+            student.email_id=data['student_alternative_email']
+            student.enrollment_status=data['student_enrolment_status']
+            student.passport_number=data['student_passport_number']
+            student.visa_number=data['student_visa_number']
             # student.visa_expiry_date=handle_date_in_correct_format(data['student_visa_expiry_date']),
+            print('student object before save ,',student.enrollment_status)
             student.save()
+            print('student object after save ,',student.enrollment_status)
             # print(user.first_name)
             # print(data['student_id'])
             # print(user.username)
@@ -139,6 +171,74 @@ def update_or_create_course(data):
             print("Course created successfully")
     else:
         print(f"Ignoring Course with code '{data['student_course_code']}' due to spaces in the code, not valid ")
+def update_or_create_course_offering(data):
+    print("start course offering :",data['student_course_offer_code'])
+    # Check if the program_code exits and doesn't contain spaces
+    if data['student_course_offer_code'] and  ' ' not in data['student_course_offer_code']:
+        # validation for course_offering_name with linked course name
+        try:
+            course_offering = CourseOffering.objects.get(temp_id=data['student_course_offer_code'])
+            # If found, update the program_desc
+            course_offering.start_date=handle_date_in_correct_format(data['student_course_offer_start_date'])
+            course_offering.end_date=handle_date_in_correct_format(data['student_course_offer_end_date'])
+            course_offering.save()
+            print("course offering updated successfully")
+        except CourseOffering.DoesNotExist:
+            # If not found, create a new course_offering object
+            CourseOffering.objects.create(
+                temp_id=data['student_course_offer_code'], 
+                start_date=handle_date_in_correct_format(data['student_course_offer_start_date']),
+                end_date=handle_date_in_correct_format(data['student_course_offer_end_date']),
+                )
+            print("Course offering created successfully")
+        # linked student and course with course_offering
+        try:
+            course_offering = CourseOffering.objects.get(temp_id=data['student_course_offer_code'])
+            # linked_course=Course.objects.get(temp_id=data['student_course_code'])
+            linked_student = Student.objects.get(temp_id=data['student_id'])
+            course_offering.student.add(linked_student)
+            course_offering.course=Course.objects.get(temp_id=data['student_course_code']) # one-to-one relationship
+            course_offering.save()
+        except course_offering.DoesNotExist:
+            # Handle the case where the program doesn't exist
+            print(f"CourseOffering has error while creating or updating with code '{data['student_course_offering_code']}' n")        
+            
+    else:
+        print(f"Ignoring Course offering with code '{data['student_course_offer_code']}' due to spaces in the code, not valid ")
+def update_or_create_program_offering(data):
+    print("start program offering :",data['student_program_offer_code'])
+    # Check if the program_code exits and doesn't contain spaces
+    if data['student_program_offer_code'] and  ' ' not in data['student_program_offer_code']:
+        # validation for program_offering_name with linked course name
+        try:
+            program_offering = ProgramOffering.objects.get(temp_id=data['student_program_offer_code'])
+            # If found, update the program_desc
+            program_offering.start_date=handle_date_in_correct_format(data['student_program_offer_start_date'])
+            program_offering.end_date=handle_date_in_correct_format(data['student_program_offer_end_date'])
+            program_offering.save()
+            print("program offering updated successfully")
+        except ProgramOffering.DoesNotExist:
+            # If not found, create a new course_offering object
+            ProgramOffering.objects.create(
+                temp_id=data['student_program_offer_code'], 
+                start_date=handle_date_in_correct_format(data['student_program_offer_start_date']),
+                end_date=handle_date_in_correct_format(data['student_program_offer_end_date']),
+                )
+            print("program offering created successfully")
+        # linked student and course with course_offering
+        try:
+            program_offering = ProgramOffering.objects.get(temp_id=data['student_program_offer_code'])
+            # linked_course=Course.objects.get(temp_id=data['student_course_code'])
+            linked_student = Student.objects.get(temp_id=data['student_id'])
+            program_offering.student.add(linked_student)
+            program_offering.program=Program.objects.get(temp_id=data['student_program_code']) # one-to-one relationship
+            program_offering.save()
+        except program_offering.DoesNotExist:
+            # Handle the case where the program doesn't exist
+            print(f"ProgramOffering has error while creating or updating with code '{data['student_program_offering_code']}' n")        
+            
+    else:
+        print(f"Ignoring program offering with code '{data['student_program_offer_code']}' due to spaces in the code, not valid ")
 
 def Upload_file_view(request):
     form = CSVModelForm(request.POST or None, request.FILES or None)
@@ -187,7 +287,8 @@ def Upload_file_view(request):
                                 "unit offer code":"student_course_offer_code",
                                 "unit offer description":"student_course_offer_name",
                                 "cuor start date":"student_course_offer_start_date",
-                                "cuor end date":"student_Course_offer_end_date",
+                                "cuor end date":"student_course_offer_end_date",
+                                "unit offer location":"student_campus_temp_id",
             }
 
             # Create variables for each column
@@ -216,6 +317,9 @@ def Upload_file_view(request):
 
                 # add or update Student
                 updated_or_create_student(data)
+                # add course and program offering after creating student 
+                update_or_create_course_offering(data)
+                update_or_create_program_offering(data)
 
 
                

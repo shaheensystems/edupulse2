@@ -65,3 +65,6 @@ class Campus(BaseModel):
     class Meta:
         verbose_name = "Campus"  # Set the verbose name for the singular form
         verbose_name_plural = "Campus"
+    
+    def __str__(self):
+        return f'{self.name}'
