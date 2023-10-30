@@ -159,6 +159,7 @@ def update_or_create_course(data):
             course.name = data['student_course_name']
             try:
                 linked_program = Program.objects.get(temp_id=data['student_program_code'])
+                course.course_efts=float(data['student_course_efts'])
                 course.program.add(linked_program)
             except Program.DoesNotExist:
                 # Handle the case where the program doesn't exist
@@ -167,7 +168,10 @@ def update_or_create_course(data):
             print("course updated successfully")
         except Course.DoesNotExist:
             # If not found, create a new program object
-            Course.objects.create(temp_id=data['student_course_code'], name=data['student_course_name'])
+            Course.objects.create(temp_id=data['student_course_code'], 
+                                  name=data['student_course_name'],
+                                  course_efts=float(data['student_course_efts']),
+                                  )
             print("Course created successfully")
     else:
         print(f"Ignoring Course with code '{data['student_course_code']}' due to spaces in the code, not valid ")
@@ -198,6 +202,8 @@ def update_or_create_course_offering(data):
             linked_student = Student.objects.get(temp_id=data['student_id'])
             course_offering.student.add(linked_student)
             course_offering.course=Course.objects.get(temp_id=data['student_course_code']) # one-to-one relationship
+            course_offering.result_status_code=data['student_course_offer_result_code']
+            course_offering.result_status=data['student_course_offer_result_status']
             course_offering.save()
         except course_offering.DoesNotExist:
             # Handle the case where the program doesn't exist
@@ -289,6 +295,9 @@ def Upload_file_view(request):
                                 "cuor start date":"student_course_offer_start_date",
                                 "cuor end date":"student_course_offer_end_date",
                                 "unit offer location":"student_campus_temp_id",
+                                "unit efts factor":"student_course_efts",
+                                "outcome code":"student_course_offer_result_code",
+                                "outcome desc":"student_course_offer_result_status",
             }
 
             # Create variables for each column

@@ -23,6 +23,7 @@ class Course(BaseModel):
     total_credit=models.PositiveIntegerField(null=True,blank=True)
     duration_in_week=models.PositiveIntegerField(null=True,blank=True)
     program = models.ManyToManyField(Program, blank=True, related_name='course')
+    course_efts=models.FloatField(null=True,blank=True)
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
 
@@ -31,6 +32,8 @@ class CourseOffering(BaseModel):
     start_date=models.DateField( auto_now=False, auto_now_add=False)
     end_date=models.DateField( auto_now=False, auto_now_add=False)
     remark=models.TextField(max_length=255,blank=True,null=True)
+    result_status_code=models.CharField(max_length=255,null=True,blank=True)
+    result_status=models.CharField(max_length=255,null=True,blank=True)
     student = models.ManyToManyField(Student,blank=True ,related_name='course_offering')
     def __str__(self):
         return f'{self.temp_id}-{self.course.name}'
@@ -40,6 +43,7 @@ class ProgramOffering(BaseModel):
     start_date=models.DateField( auto_now=False, auto_now_add=False)
     end_date=models.DateField( auto_now=False, auto_now_add=False)
     remark=models.TextField(max_length=255,blank=True,null=True)
+    
     student=models.ManyToManyField(Student,blank=True,related_name='program_offering')
     def __str__(self):
         return f'{self.temp_id}-{self.program.name}'

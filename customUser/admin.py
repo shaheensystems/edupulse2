@@ -43,13 +43,39 @@ class CourseOfferingInline(admin.StackedInline):
 
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display=('id','student','joining_date','international_student','remark','enrolled_course','email_id','enrollment_status','passport_number','visa_number','visa_expiry_date')
+    list_display=(
+        'id','student','joining_date','international_student','remark',
+        'enrolled_course','email_id','enrollment_status','passport_number',
+        'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered'
+        )
     inlines=[ProgramOfferingInline,CourseOfferingInline]
+
+    def get_programs_offered(self, obj):
+        # print(obj.student.first_name)
+        programs_offered = obj.program_offering.all()
+        # print('program_offered:',programs_offered)
+
+        # for program in programs_offered:
+        #     print("prog object:",program.program.name)
+    
+        return ', '.join([str(program.program.name) for program in programs_offered])
+
+    def get_courses_offered(self, obj):
+        # courses_offered = obj.course_offering.through.objects.filter(student=obj)
+        courses_offered = obj.course_offering.all()
+        # print("student name:",obj.student.first_name)
+        # print( f"course name:", {str(course.course.name) for course in courses_offered})
+
+        return ', '.join([str(course.course.name) for course in courses_offered])
+
+    get_programs_offered.short_description = 'Programs Offered'
+    get_courses_offered.short_description = 'Courses Offered'
 
 class ProgramOfferingAdmin(admin.ModelAdmin):
     list_display=('temp_id','start_date','end_date','program')
+
 class CourseOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','course')
+    list_display=('temp_id','start_date','end_date','course','result_status','result_status_code')
 
 admin.site.register(Staff, StaffAdmin)  
 admin.site.register(ProgramOffering,ProgramOfferingAdmin)
