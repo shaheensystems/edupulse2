@@ -22,9 +22,11 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
+    path("__reload__/", include("django_browser_reload.urls")),
     path('admin/', admin.site.urls),
-    path('upload_file/',include('uploadFile.urls',namespace='upload_file')), #namespace is the same name mentioned in urls.py file app_name 
-    path('',views.home),
+    path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
+    path('',views.home, name='dashboard'),
+    path('wc_current_programs/',include('program.urls'))
 ]
 
 if settings.DEBUG:

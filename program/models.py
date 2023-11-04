@@ -28,12 +28,15 @@ class Course(BaseModel):
         return f'{self.temp_id}-{self.name}'
 
 class CourseOffering(BaseModel):
-    course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True)
+    course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True,related_name='course_offering')
     start_date=models.DateField( auto_now=False, auto_now_add=False)
     end_date=models.DateField( auto_now=False, auto_now_add=False)
     remark=models.TextField(max_length=255,blank=True,null=True)
+
+    # both field below has to go with student or linked with result table with each student with each course offering
     result_status_code=models.CharField(max_length=255,null=True,blank=True)
     result_status=models.CharField(max_length=255,null=True,blank=True)
+
     student = models.ManyToManyField(Student,blank=True ,related_name='course_offering')
     def __str__(self):
         return f'{self.temp_id}-{self.course.name}'

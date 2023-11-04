@@ -10,6 +10,7 @@ from customUser.models import NewUser,Student,Campus
 import csv
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
+from django.urls import reverse
 
 def handle_date_in_correct_format(date_str):
     print("raw data ",date_str)
@@ -248,6 +249,7 @@ def update_or_create_program_offering(data):
 
 def Upload_file_view(request):
     form = CSVModelForm(request.POST or None, request.FILES or None)
+
     if form.is_valid():
         form.save()
         form = CSVModelForm()
@@ -335,5 +337,5 @@ def Upload_file_view(request):
 
         obj.activated = True
         obj.save()
-
+        # url = reverse('upload_file:upload_file')
     return render(request, 'upload/upload_file.html', {'form': form})

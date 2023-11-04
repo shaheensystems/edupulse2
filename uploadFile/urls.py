@@ -5,6 +5,6 @@ from . import views
 app_name='upload_file'
 
 urlpatterns = [
-    path('', views.Upload_file_view, name='upload-csv'),
+    path('', views.Upload_file_view, name='upload_csv'),
     # Add other URL patterns as needed
 ]

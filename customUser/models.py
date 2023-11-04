@@ -52,3 +52,6 @@ class Student(BaseModel):
     passport_number=models.CharField(max_length=255,null=True,blank=True)
     visa_number=models.CharField(max_length=255,null=True,blank=True)
     visa_expiry_date=models.DateField(default=None, null=True,blank=True)
+
+
+# table for enrolled courses for each course offering linked with each student for result , result status and attendance 

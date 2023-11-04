@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    <section>
+        <h1> Program Deatil </h1>
+        <li>
+            
+            <p>Program Name :{{ program.name }}</P>
+            <p> Description :{{ program.description }} </p>
+            <p> Program Link :{{ program.program_link }} </p>
+            <p> Total Credit :{{ program.total_credit }} </p>
+            <p> Duration in Week :{{ program.duration_in_week }} </p>
+            <p> Total Course : {{program.course.count}} </p>
+            
+            <ul class='ml-10'>
+                
+                {% for course in program.course.all%}
+                <p> Course Name :{{ course.name }} </p>
+                <p> Course Description :{{ course.description }} </p>
+                <p> Total Credit :{{ course.total_credit }} </p>
+                <p> Duration in Week :{{ course.duration_in_week }} </p>
+                <p> EFTS :{{ course.course_efts }} </p>
+
+                {% endfor %}
+            </ul>
+          </a></li>
+    </section>
+    
+{% endblock content %}
