@@ -144,6 +144,7 @@ AUTH_USER_MODEL='customUser.NewUser'
 
 # tailwind setup instruction
 TAILWIND_APP_NAME='theme'
+
 # for window
 # NPM_BIN_PATH=r"C:\Program Files\nodejs\npm.cmd"
 # for Mac bok

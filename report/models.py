@@ -3,6 +3,7 @@ from base.models import BaseModel
 from customUser.models import Student  # Import the Student model
 from program.models import ProgramOffering, Course
 from django.utils import timezone
+from django.db import models
 
 class Attendance(BaseModel):
     # this table can be access by teacher for each course and each student to mark attendance
@@ -15,7 +16,7 @@ class Attendance(BaseModel):
     class Meta:
         unique_together = ('student', 'program_offering', 'course')
 
-from django.db import models
+
 
 class CourseResult(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
