@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <h1>Attendance Report</h1>
+    
+    <h2>Date-wise Attendance</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Course</th>
+                <th>Present Students</th>
+                <th>Total Students</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attendance in attendance %}
+            <tr>
+                <td>{{ attendance.attendance_date }}</td>
+                <td>{{ attendance.course_offering.course.name }}</td>
+                {% comment %} <td>{{ attendance_present_count attendance }}</td> {% endcomment %}
+                {% comment %} <td>{{ attendance_total_count attendance }}</td> {% endcomment %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Course-wise Attendance</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Course</th>
+                <th>Present Students</th>
+                <th>Total Students</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.course.name }}</td>
+                {% comment %} <td>{{ course_present_count(course) }}</td>
+                <td>{{ course_total_count(course) }}</td> {% endcomment %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+</div>
+
+<script>
+    // JavaScript function to count present students for an attendance entry
+    function attendance_present_count(attendance) {
+        var count = 0;
+        if (attendance.is_present) {
+            count = 1;
+        }
+        return count;
+    }
+
+    // JavaScript function to count total students for an attendance entry
+    function attendance_total_count(attendance) {
+        return 1;
+    }
+
+    // JavaScript function to count present students for a course
+    function course_present_count(course) {
+        var count = 0;
+        course.forEach(function(attendance) {
+            if (attendance.is_present) {
+                count++;
+            }
+        });
+        return count;
+    }
+
+    // JavaScript function to count total students for a course
+    function course_total_count(course) {
+        return course.length;
+    }
+</script>
+{% endblock %}

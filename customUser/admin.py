@@ -2,7 +2,8 @@ from django.contrib import admin
 from customUser.models import NewUser,Staff,Student
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
-from program.models import ProgramOffering,CourseOffering
+
+from report.models import Attendance
 
 # Register your models here.
 # Extend the UserAdmin class
@@ -71,13 +72,8 @@ class StudentAdmin(admin.ModelAdmin):
     get_programs_offered.short_description = 'Programs Offered'
     get_courses_offered.short_description = 'Courses Offered'
 
-class ProgramOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','program')
 
-class CourseOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','course','result_status','result_status_code')
 
 admin.site.register(Staff, StaffAdmin)  
-admin.site.register(ProgramOffering,ProgramOfferingAdmin)
-admin.site.register(CourseOffering,CourseOfferingAdmin)
+
 admin.site.register(Student,StudentAdmin)

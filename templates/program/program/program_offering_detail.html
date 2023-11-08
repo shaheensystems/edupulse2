@@ -12,18 +12,19 @@
   <p><strong>End Date:</strong> {{ program_offering.end_date }}</p>
   <p><strong>Remark:</strong> {{ program_offering.remark }}</p>
 <br>
-<h1>Total Course : {{program_offering.program.course.count}} </h1>
+<h1>Total Course Offering : {{program_offering.program.course.count}} </h1>
   
   {% for course in program_offering.program.course.all %}
   <br>   
   <p>Course Name  :{{course.name}}</p>
 
-      Total Course Offring :{{course.course_offering.count}}
+      Check Total Course Offring has to be 1 : {{course.course_offering.count}}
      
       {% for course_offering  in course.course_offering.all  %}
-         
-        <p>course offering name :{{course_offering.student.all}}</p>
-        <p>course offering  name 2 :{{course_offering.course.name}}</p>
+      <a href="{% url 'course_offering_detail' course_offering.pk %}">
+         <div class='bg-gray-400 ml-5 p-5  rounded-xl'>
+        <p >course offering object :{{course_offering.student.all}}</p>
+        <p>course offering  name :{{course_offering.course.name}}</p>
         <p>course offering  Start date : {{course_offering.start_date}}</p>
         <p>course offering  End  date : {{course_offering.end_date}}</p>
         <p>course offering  remark :{{course_offering.remark}}</p>
@@ -31,8 +32,10 @@
         <p>course offering  Result Status :{{course_offering.result_status}}</p>
         
         <br>
-        <p>All  Student :{{course_offering.student.count}}</p>
+        <p>Enrolled  Student :{{course_offering.student.count}}</p>
+        <div class='ml-5 p-5  rounded-xl flex flex-row flex-wrap gap-1'>
           {% for student in course_offering.student.all %}
+            <div class='bg-blue-200 m-4 p-4 rounded-lg'>
               <p>Student first Name :{{student.student.first_name}} </p>
               <p>Student Last Name :{{student.student.last_name}} </p>
               <p>Student email ID:{{student.student.email}} </p>
@@ -46,7 +49,11 @@
               <p>Student Visa Number :{{student.visa_number}} </p>
               <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p>
               <br>
+            </div>
           {% endfor %}
+        </div>
+        </div>
+      </a>
       {% endfor %}
 
       

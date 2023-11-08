@@ -1,4 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1> Course Offering Deatil </h1>
+    <section>
+        <h1> Course Offering Deatil </h1>
+        <div class="flex justify-end gap-5">
+            <a href="{% url 'attendance_list' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Show Attendance</a>
+            <a href="{% url 'take_attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Take Attendance</a>
+        </div>
+    
+   
+        <div class='bg-gray-400 ml-5 p-5  rounded-xl'>
+       <p>course offering  name :{{course_offering.course.name}}</p>
+       <p>course offering  Start date : {{course_offering.start_date}}</p>
+       <p>course offering  End  date : {{course_offering.end_date}}</p>
+       <p>course offering  remark :{{course_offering.remark}}</p>
+       <p>course offering  Result Status code :{{course_offering.result_status_code}}</p>
+       <p>course offering  Result Status :{{course_offering.result_status}}</p>
+       
+       <br>
+       <p>Enrolled  Student :{{course_offering.student.count}}</p>
+       <div class='ml-5 p-5  rounded-xl flex flex-row flex-wrap gap-1'>
+         {% for student in course_offering.student.all %}
+           <div class='bg-blue-200 m-4 p-4 rounded-lg'>
+             <p>Student first Name :{{student.student.first_name}} </p>
+             <p>Student Last Name :{{student.student.last_name}} </p>
+             <p>Student email ID:{{student.student.email}} </p>
+             <p>Student personal Email :{{student.email_id}} </p>
+             <p>Student date of brth :{{student.student.dob}} </p>
+             <p>Student gender :{{student.student.gender}} </p>
+             <p>Student campus :{{student.student.campus.name}} </p>
+             <p>Student Joining date  :{{student.joining_date}} </p>
+             <p>International Studnet Status  :{{student.international_student}} </p>
+             <p>Student passport Number  :{{student.passport_number}} </p>
+             <p>Student Visa Number :{{student.visa_number}} </p>
+             <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p>
+             <br>
+           </div>
+         {% endfor %}
+       </div>
+       </div>
+   
+    </section>
 {% endblock content %}
