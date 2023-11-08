@@ -4,7 +4,8 @@
         <h1> Course Offering Deatil </h1>
         <div class="flex justify-end gap-5">
             <a href="{% url 'attendance_list' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Show Attendance</a>
-            <a href="{% url 'take_attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Take Attendance</a>
+            <a href="{% url 'take_attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg hidden">Take Attendance</a>
+            <a href="{% url 'create-attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Mark Attendance</a>
         </div>
     
    

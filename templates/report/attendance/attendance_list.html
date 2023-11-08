@@ -1,46 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
 <section>
-    <h1>Attendance Report</h1>
+    <h1 class='my-4 font-semibold text-lg'>Attendance Report
+        <br>
+        Course name : {{course_offering.temp_id}} : {{course_offering.course.name}}
+    </h1>
+   
     
     <h2>Date-wise Attendance</h2>
-    <table>
+
+
+    <table class="table-auto w-full"style="border-collapse: separate; border-spacing: 10px;">
         <thead>
             <tr>
                 <th>Date</th>
+                <th>Semester</th>
                 <th>Course</th>
                 <th>Present Students</th>
                 <th>Total Students</th>
             </tr>
         </thead>
         <tbody>
-            {% for attendance in attendance %}
-            <tr>
-                <td>{{ attendance.attendance_date }}</td>
-                <td>{{ attendance.course_offering.course.name }}</td>
-                {% comment %} <td>{{ attendance_present_count attendance }}</td> {% endcomment %}
-                {% comment %} <td>{{ attendance_total_count attendance }}</td> {% endcomment %}
+            {% for attendance in attendance_list %}
+            {{attendance.course_offering.temp_id}}
+            <br>
+            <tr class="{% cycle 'bg-gray-200' 'bg-white' %}">
+                <td class="border p-2">{{ attendance.attendance_date }}</td>
+                <td class="border p-2">{{ attendance.course_offering.course.name }}</td>
+                <td class="border p-2">{{ attendance.course_offering.temp_id }}</td>
+                {% comment %} <td class="border p-2">{{ attendance.attendance_set.filter(is_present=True).count }}</td> {% endcomment %}
+                <td class="border p-2">{{ attendance.course_offering.student.count }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <h2>Course-wise Attendance</h2>
-    <table>
+    <h1 class="text-2xl font-semibold mb-4">Attendance for {{ course_offering.course.name }}</h1>
+
+    <table class="table-auto w-full">
         <thead>
             <tr>
-                <th>Course</th>
-                <th>Present Students</th>
-                <th>Total Students</th>
+                <th>Date</th>
+                <th>Attendance Status</th>
+                <th>Remarks</th>
             </tr>
         </thead>
         <tbody>
-            {% for course in courses %}
-            <tr>
-                <td>{{ course.course.name }}</td>
-                {% comment %} <td>{{ course_present_count(course) }}</td>
-                <td>{{ course_total_count(course) }}</td> {% endcomment %}
-            </tr>
+            {% for attendance in attendance_list %}
+                <tr>
+                    <td>{{ attendance.attendance_date }}</td>
+                    <td>{{ attendance.is_present|yesno:"Present,Absent" }}</td>
+                    <td>{{ attendance.remark|default:"N/A" }}</td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>

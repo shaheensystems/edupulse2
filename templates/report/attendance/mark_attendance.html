@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <!-- mark_attendance.html -->
+    <form method="post">
+        {% csrf_token %}
+        <h2>Mark Attendance for {{ course_offering.course.name }} ({{ course_offering.start_date }} - {{ course_offering.end_date }})</h2>
+
+        <label for="attendanceDate">Select Date:</label>
+        <input type="date" id="attendanceDate" name="attendanceDate" value="{{ today_date }}" required>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Is Present</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.student.first_name }} {{ student.student.last_name }}</td>
+                        <td>
+                            <select name="is_present_{{ student.id }}">
+                                <option value="present">Present</option>
+                                <option value="absent">Absent</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="remark_{{ student.id }}">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Save Attendance</button>
+    </form>
+</section>
+
+{% endblock content %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const attendanceDateInput = document.getElementById("attendanceDate");
+
+        // Get the current date in the format "YYYY-MM-DD"
+        const currentDate = new Date().toISOString().split("T")[0];
+
+        // Set the input field's value to the current date
+        attendanceDateInput.value = currentDate;
+    });
+</script>

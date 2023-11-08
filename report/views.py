@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from django.views.generic import ListView,DetailView,UpdateView,CreateView
 from report.models import Attendance
 from report.form import AttendanceForm
@@ -6,13 +7,25 @@ from django.shortcuts import get_object_or_404
 from program.models import CourseOffering
 from django.urls import reverse
 from django.forms import modelformset_factory
+from django.views.generic.edit import FormView
+from datetime import datetime
 # from customUser.models import Student
 # Create your views here.
 
-class AttendanceListView(ListView):
-    model=Attendance
-    template_name='report/attendance/attendance_list.html'
-    context_object_name='attendance'
+class AttendanceListView(DetailView):
+    model = CourseOffering
+    template_name = 'report/attendance/attendance_list.html'
+    context_object_name = 'course_offering'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get attendance data for the course offering
+        # getting all attendance data for the course offering selected 
+        attendance_list = self.object.attendance_set.all()
+
+        context['attendance_list'] = attendance_list
+        return context
 
 class AttendanceCreateView(CreateView):
     model=Attendance
@@ -38,33 +51,34 @@ class AttendanceCreateView(CreateView):
         context['student_forms'] = student_forms
         return context
    
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
+def mark_attendance(request, pk):
+    course_offering = get_object_or_404(CourseOffering, id=pk)
+    students = course_offering.student.all()
+    today_date = datetime.now().strftime('%Y-%m-%d')
 
-    #     # You need to add code to get the course offering here, assuming you have a method or logic for that
-    #     course_offering = get_object_or_404(CourseOffering, pk=self.kwargs['pk'])
-    #     context['course_offering'] = course_offering
+    if request.method == 'POST':
+        # Get the selected date from the form
+        selected_date = request.POST.get('attendanceDate')
 
-    #     # Create a dictionary of initial values for each student
-    #     initial_values = {}
-    #     for student in course_offering.student.all():
-    #         initial_values[student.pk] = {
-    #             'student': student,
-    #             'course_offering': course_offering,
-    #             # 'is_present': True,  # Set the default value you want for is_present
-    #             # 'attendance_date': '2023-11-08',  # Set the default date you want
-    #             # 'remark': 'Your default remark',  # Set the default remark
-    #         }
+        # Convert the selected date to a datetime object
+        selected_date = datetime.strptime(selected_date, '%Y-%m-%d')
 
-    #     print(initial_values)
+        # Use the selected date for attendance_date
+        for student in students:
+            is_present = request.POST.get(f'is_present_{student.id}')
+            remark = request.POST.get(f'remark_{student.id}')
+            attendance, created = Attendance.objects.get_or_create(
+                student=student, course_offering=course_offering, attendance_date=selected_date)
 
-    #     # Create a formset for all student forms with initial values
-    #     AttendanceFormSet = modelformset_factory(Attendance, form=AttendanceForm, extra=0)
-    #     student_forms = AttendanceFormSet(queryset=course_offering.student.all(), initial=initial_values)
-       
-    #     context['student_forms'] = student_forms
-    #     # print(student_forms)
-    #     # print(student_forms)
-    #     return context
+            attendance.is_present = is_present == 'present'
+            attendance.remark = remark
+            attendance.save()
 
-  
+        # Redirect to a success page or do something else
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return render(request, 'report/attendance/mark_attendance.html', {
+        'course_offering': course_offering,
+        'students': students,
+        'today_date': today_date,
+    })

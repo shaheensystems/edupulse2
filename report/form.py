@@ -13,3 +13,6 @@ class AttendanceForm(forms.ModelForm):
         # self.fields['course_offering'].widget = forms.HiddenInput()
 
     # Optionally, you can add custom validation or widgets here
+
+
+
