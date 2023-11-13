@@ -1,5 +1,5 @@
 from django.contrib import admin
-from report.models import Attendance, CourseResult
+from report.models import Attendance, CourseResult, WeeklyReport
 
 class AttendanceAdmin(admin.ModelAdmin):
     list_display = ('student', 'program_offering', 'course_offering', 'is_present', 'attendance_date')
@@ -22,3 +22,19 @@ class CourseResultAdmin(admin.ModelAdmin):
     list_per_page = 20
 
 admin.site.register(CourseResult, CourseResultAdmin)
+
+class SessionsInline(admin.TabularInline):  # You can also use admin.StackedInline for a different layout
+    model = WeeklyReport.sessions.through  # Use the through attribute to access the Attendance model
+    extra = 1  # Number of empty forms to display
+
+
+class WeeklyReportAdmin(admin.ModelAdmin):
+    list_display=('week_number','engagement','action','follow_up','course_offering','student','get_sessions_is_present')
+    inlines = [SessionsInline]
+    
+    def get_sessions_is_present(self, obj):
+        return ', '.join(session.is_present for session in obj.sessions.all())
+
+    get_sessions_is_present.short_description = 'Sessions is_present'
+
+admin.site.register(WeeklyReport, WeeklyReportAdmin)

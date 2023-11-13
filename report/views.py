@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView,DetailView,UpdateView,CreateView
-from report.models import Attendance
+from report.models import Attendance,WeeklyReport
 from report.form import AttendanceForm
 from django.shortcuts import get_object_or_404
 from program.models import CourseOffering
@@ -9,8 +9,18 @@ from django.urls import reverse
 from django.forms import modelformset_factory
 from django.views.generic.edit import FormView
 from datetime import datetime
+from django.db.models import Sum, Count,When,Case
+from datetime import timedelta
 # from customUser.models import Student
 # Create your views here.
+
+def get_week_number(startingDate,currentDate):
+    startingDate = datetime.combine(startingDate, datetime.min.time())
+    currentDate = datetime.combine(currentDate, datetime.min.time())
+    delta=currentDate-startingDate
+    weeks=delta.days//7
+
+    return weeks +1
 
 class AttendanceListView(DetailView):
     model = CourseOffering
@@ -20,12 +30,40 @@ class AttendanceListView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Get attendance data for the course offering
-        # getting all attendance data for the course offering selected 
-        attendance_list = self.object.attendance_set.all()
+        # Get attendance data for the course offering in ascending order 
+        attendance_list = self.object.attendance_set.values('attendance_date').annotate(
+            total_present=Count(Case(When(is_present='present', then=1))),
+            total_students=Count('student')
+        ).order_by('attendance_date')
+        
+        # Calculate the week number starting from the course start date
+        course_start_date = self.object.start_date
+    
+        for attendance in attendance_list:
+            # delta = attendance['attendance_date'] - course_start_date
+            # attendance['week_number'] = (delta.days // 7) + 1
+            attendance['week_number'] = get_week_number(course_start_date,attendance['attendance_date'])
+            # print(attendance['week_number'])
+
+
+        current_week_number =0
+        current_session_number=0
+        for attendance in attendance_list:
+            new_week_number=attendance['week_number']
+            if current_week_number==new_week_number:
+               new_session_number=current_session_number+1
+            else:
+                new_session_number=1
+            attendance['session_number']=new_session_number
+            current_session_number=new_session_number
+            current_week_number=new_week_number
+
+
 
         context['attendance_list'] = attendance_list
         return context
+    
+   
 
 class AttendanceCreateView(CreateView):
     model=Attendance
@@ -69,11 +107,17 @@ def mark_attendance(request, pk):
             remark = request.POST.get(f'remark_{student.id}')
             attendance, created = Attendance.objects.get_or_create(
                 student=student, course_offering=course_offering, attendance_date=selected_date)
-
             attendance.is_present = is_present == 'present'
             attendance.remark = remark
             attendance.save()
+        
+            # generate weekly report for each student while marking attendance  with the attendance 
+            weekly_report, created = WeeklyReport.objects.get_or_create(
+                student=student, course_offering=course_offering, week_number=get_week_number(course_offering.start_date,selected_date))
 
+            weekly_report.sessions.add(attendance)
+            weekly_report.save()
+            
         # Redirect to a success page or do something else
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -82,3 +126,11 @@ def mark_attendance(request, pk):
         'students': students,
         'today_date': today_date,
     })
+
+
+class WeeklyReportView(DetailView):
+    model = CourseOffering
+    template_name = 'report/attendance/weekly_report_list.html'
+    context_object_name = 'course_offering'
+
+    

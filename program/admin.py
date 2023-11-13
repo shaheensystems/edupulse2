@@ -1,6 +1,7 @@
 from django.contrib import admin
 from program.models import Program, Course,ProgramOffering, CourseOffering
 from customUser.models import Student
+from report.models import WeeklyReport
 
 from report.models import Attendance
 
@@ -24,11 +25,13 @@ class AttendanceInline(admin.TabularInline):
     model= Attendance
     extra =1
     
-
+class WeeklyReportInline(admin.TabularInline):
+    model=WeeklyReport
+    extra=0
 
 class CourseOfferingAdmin(admin.ModelAdmin):
     list_display=('temp_id','start_date','end_date','course','result_status','result_status_code')
-    inlines=[AttendanceInline]
+    inlines=[WeeklyReportInline,AttendanceInline]
 
     # def change_view(self, request, object_id, form_url='', extra_context=None):
     #     # Get the CourseOffering instance

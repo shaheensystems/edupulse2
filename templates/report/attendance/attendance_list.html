@@ -4,53 +4,34 @@
     <h1 class='my-4 font-semibold text-lg'>Attendance Report
         <br>
         Course name : {{course_offering.temp_id}} : {{course_offering.course.name}}
+        <br>
+        course starts from  {{course_offering.start_date}} to {{course_offering.end_date}}
     </h1>
    
-    
+    <a href="{% url 'weekly_report_list' course_offering.pk %}" class="px-4 py-2  bg-blue-200 rounded-lg"> Weekly Report</a>
+  
+
+    <h1 class="text-2xl font-semibold mb-0">Attendance for {{ course_offering.course.name }}</h1>
     <h2>Date-wise Attendance</h2>
-
-
-    <table class="table-auto w-full"style="border-collapse: separate; border-spacing: 10px;">
+    <table class="table-auto w-full"style="border-collapse: separate; border-spacing: 10px ;">
         <thead>
             <tr>
+                <th>Week Number</th>
+                <th>Session Number</th>
                 <th>Date</th>
-                <th>Semester</th>
-                <th>Course</th>
-                <th>Present Students</th>
+                <th>Total Students Present</th>
                 <th>Total Students</th>
             </tr>
         </thead>
         <tbody>
             {% for attendance in attendance_list %}
-            {{attendance.course_offering.temp_id}}
-            <br>
-            <tr class="{% cycle 'bg-gray-200' 'bg-white' %}">
-                <td class="border p-2">{{ attendance.attendance_date }}</td>
-                <td class="border p-2">{{ attendance.course_offering.course.name }}</td>
-                <td class="border p-2">{{ attendance.course_offering.temp_id }}</td>
-                {% comment %} <td class="border p-2">{{ attendance.attendance_set.filter(is_present=True).count }}</td> {% endcomment %}
-                <td class="border p-2">{{ attendance.course_offering.student.count }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h1 class="text-2xl font-semibold mb-4">Attendance for {{ course_offering.course.name }}</h1>
-
-    <table class="table-auto w-full">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Attendance Status</th>
-                <th>Remarks</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for attendance in attendance_list %}
-                <tr>
-                    <td>{{ attendance.attendance_date }}</td>
-                    <td>{{ attendance.is_present|yesno:"Present,Absent" }}</td>
-                    <td>{{ attendance.remark|default:"N/A" }}</td>
+                <tr class="{% cycle 'bg-gray-200' 'bg-white' %}">
+                    <td>{{ attendance.week_number }}</td>
+                    <td>{{ attendance.session_number }}</td>
+                    <td>{{ attendance.attendance_date|date:'Y-m-d' }}</td>
+                    <td>{{ attendance.total_present|default:'0' }}</td>
+                    <td>{{ attendance.total_students }}</td>
+                    
                 </tr>
             {% endfor %}
         </tbody>
@@ -58,35 +39,5 @@
 </section>
 </div>
 
-<script>
-    // JavaScript function to count present students for an attendance entry
-    function attendance_present_count(attendance) {
-        var count = 0;
-        if (attendance.is_present) {
-            count = 1;
-        }
-        return count;
-    }
 
-    // JavaScript function to count total students for an attendance entry
-    function attendance_total_count(attendance) {
-        return 1;
-    }
-
-    // JavaScript function to count present students for a course
-    function course_present_count(course) {
-        var count = 0;
-        course.forEach(function(attendance) {
-            if (attendance.is_present) {
-                count++;
-            }
-        });
-        return count;
-    }
-
-    // JavaScript function to count total students for a course
-    function course_total_count(course) {
-        return course.length;
-    }
-</script>
 {% endblock %}
