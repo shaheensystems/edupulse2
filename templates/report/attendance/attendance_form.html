@@ -7,7 +7,7 @@
         {% csrf_token %}
    
 
-        Hi {{ student_forms.management_form }}HI 
+        {{ student_forms.management_form }}
         {% for student_form in student_forms %}
            
              {{student_form.as_p}}

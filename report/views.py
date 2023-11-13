@@ -2,15 +2,17 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView,DetailView,UpdateView,CreateView
 from report.models import Attendance,WeeklyReport
-from report.form import AttendanceForm
+from report.form import AttendanceForm,WeeklyReportEditForm
 from django.shortcuts import get_object_or_404
 from program.models import CourseOffering
 from django.urls import reverse
 from django.forms import modelformset_factory
 from django.views.generic.edit import FormView
+from django.views import View
 from datetime import datetime
 from django.db.models import Sum, Count,When,Case
 from datetime import timedelta
+from django.http import JsonResponse
 # from customUser.models import Student
 # Create your views here.
 
@@ -107,7 +109,7 @@ def mark_attendance(request, pk):
             remark = request.POST.get(f'remark_{student.id}')
             attendance, created = Attendance.objects.get_or_create(
                 student=student, course_offering=course_offering, attendance_date=selected_date)
-            attendance.is_present = is_present == 'present'
+            attendance.is_present = is_present 
             attendance.remark = remark
             attendance.save()
         
@@ -133,4 +135,45 @@ class WeeklyReportView(DetailView):
     template_name = 'report/attendance/weekly_report_list.html'
     context_object_name = 'course_offering'
 
-    
+def edit_weekly_report(request, pk,week_number):
+    print(week_number)
+    print("PK: ",pk)
+    course_offering = get_object_or_404(CourseOffering, id=pk)
+    # Retrieve a list of WeeklyReport objects for the given week_number and course_offering
+    weekly_reports = WeeklyReport.objects.filter(week_number=week_number, course_offering=course_offering)
+    students = course_offering.student.filter(weekly_reports__week_number=week_number).distinct()
+    print(weekly_reports)
+    for weekly_report in weekly_reports:
+        print(f"Weekly Report: {weekly_report.week_number}")
+        for session in weekly_report.sessions.all():
+            print(f"  Session: {session.attendance_date}, Is Present: {session.is_present}")
+
+    if request.method == 'POST':
+        print("saving report initialise")
+
+        # Use the selected date for attendance_date
+        for weekly_report in weekly_reports:
+            action = request.POST.get(f'action_{weekly_report.id}')
+            engagement = request.POST.get(f'engagement_{weekly_report.id}')
+            follow_up = request.POST.get(f'follow_up_{weekly_report.id}')
+            # update weekly report data 
+            weekly_report.action=action
+            weekly_report.engagement=engagement
+            weekly_report.follow_up=follow_up
+
+            weekly_report.save()
+            print("weekly report saved : ",weekly_report)
+            
+        # Redirect to a success page or do something else
+        # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        # return HttpResponseRedirect(reverse('edit_weekly_report', args=[pk, week_number]))
+        return redirect('weekly_report_list', course_offering.pk)
+
+    return render(request, 'report/attendance/edit_weekly_report.html', {
+        'weekly_reports': weekly_reports,
+        'students': students,
+        'week_number':week_number,
+        'course_offering':course_offering
+       
+    })
+

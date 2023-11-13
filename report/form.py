@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import Attendance  # Import your Attendance model
+from .models import Attendance,WeeklyReport  # Import your Attendance model
 
 class AttendanceForm(forms.ModelForm):
     class Meta:
@@ -15,4 +15,7 @@ class AttendanceForm(forms.ModelForm):
     # Optionally, you can add custom validation or widgets here
 
 
-
+class WeeklyReportEditForm(forms.ModelForm):
+    class Meta:
+        model = WeeklyReport
+        fields = ['engagement', 'action', 'follow_up']

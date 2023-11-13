@@ -2,43 +2,53 @@
 {% block content %}
 <section class="my-4">
     <h1 class='font-semibold text-lg mb-4'>Weekly Report  
-        <br>Course name : {{course_offering.temp_id}} - {{course_offering.course.name}}
-        <br> {{course_offering.start_date}} - {{course_offering.end_date}}
+        <br>Course name: {{ course_offering.temp_id }} - {{ course_offering.course.name }}
+        <br>{{ course_offering.start_date }} - {{ course_offering.end_date }}
     </h1>
 
     {% regroup course_offering.weekly_reports.all by week_number as weekly_reports_by_week %}
     
     {% for week in weekly_reports_by_week %}
+        <div class='mb-4'>
         <h2 class="text-xl font-semibold mb-2">Week {{ week.grouper }}</h2>
-        <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden mb-4">
-            <thead class="bg-gray-200">
-                <tr>
-                    <th class="border px-4 py-2">Student ID</th>
-                    <th class="border px-4 py-2">Name</th>
-                    {% for session_date in week.list.0.sessions.all %}
-                        <th class="border px-4 py-2">{{ session_date.attendance_date }}</th>
-                    {% endfor %}
-                    <th class="border px-4 py-2">Engagement</th>
-                    <th class="border px-4 py-2">Action</th>
-                    <th class="border px-4 py-2">Follow Up</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for weekly_report in week.list %}
+        <form id="week-form-{{ week.grouper }}" class="mb-4">
+            {% csrf_token %}
+            <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+                <thead class="bg-gray-200">
                     <tr>
-                        <td class="border px-4 py-2">{{ weekly_report.student.temp_id }}</td>
-                        <td class="border px-4 py-2">{{ weekly_report.student.student.first_name }} {{ weekly_report.student.student.last_name }}</td>
-                        {% for session in weekly_report.sessions.all %}
-                            <td class="border px-4 py-2">{{ session.is_present }}</td>
+                        <th class="border px-4 py-2">Student ID</th>
+                        <th class="border px-4 py-2">Name</th>
+                        {% for session_date in week.list.0.sessions.all|dictsort:"attendance_date" %}
+                            <th class="border px-4 py-2">Session {{ forloop.counter }} <br>{{ session_date.attendance_date }}</th>
                         {% endfor %}
-                        <td class="border px-4 py-2">{{ weekly_report.student.engagement }}</td>
-                        <td class="border px-4 py-2">{{ weekly_report.student.student.action }}</td>
-                        <td class="border px-4 py-2">{{ weekly_report.student.student.follow_up }}</td>
+                        
+                        <th class="border px-4 py-2">Engagement</th>
+                        <th class="border px-4 py-2">Action</th>
+                        <th class="border px-4 py-2">Follow Up</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for weekly_report in week.list %}
+                        <tr>
+                            <td class="border px-4 py-2">{{ weekly_report.student.temp_id }}</td>
+                            <td class="border px-4 py-2">{{ weekly_report.student.student.first_name }} {{ weekly_report.student.student.last_name }}</td>
+                            {% for session in weekly_report.sessions.all|dictsort:"attendance_date" %}
+                                <td class="border px-4 py-2">{{ session.is_present }}</td>
+                            {% endfor %}
+                            <td class="border px-4 py-2">{{ weekly_report.engagement }}</td>
+                            <td class="border px-4 py-2">{{ weekly_report.action }}</td>
+                            <td class="border px-4 py-2">{{ weekly_report.follow_up }}</td>
+                        </tr>
+                        
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+            
+        </form>
+        <a href="{% url 'edit_weekly_report' course_offering.pk week.grouper %} " class='bg-sky-300 px-4 py-2  rounded-lg'>Edit report</a>
+        </div>
+        
     {% endfor %}
-
 </section>
 {% endblock %}

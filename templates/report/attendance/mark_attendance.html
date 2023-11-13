@@ -25,6 +25,8 @@
                             <select name="is_present_{{ student.id }}">
                                 <option value="present">Present</option>
                                 <option value="absent">Absent</option>
+                                <option value="informed absent">Informed Absent</option>
+                                <option value="tardy">Tardy</option>
                             </select>
                         </td>
                         <td>
@@ -34,7 +36,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <button type="submit">Save Attendance</button>
+        <button type="submit"><p class='bg-green-300 px-4 py-2  rounded-lg flex'>Save Attendance</p></button>
     </form>
 </section>
 

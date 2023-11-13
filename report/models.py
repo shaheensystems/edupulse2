@@ -51,9 +51,9 @@ class WeeklyReport(BaseModel):
     week_number=models.PositiveIntegerField(blank=True,null=True)
     # sessions will be list of all attendance in one week
     sessions=models.ManyToManyField(Attendance, verbose_name=("sessions"))
-    engagement=models.CharField(choices=ENGAGEMENT_CHOICE,default="N/A",null=True,blank=True, max_length=255)
-    action=models.CharField(choices=ACTION_CHOICE,null=True,blank=True, max_length=255)
-    follow_up=models.CharField(choices=FOLLOW_UP_CHOICE,null=True,blank=True, max_length=255)
+    engagement=models.CharField(choices=ENGAGEMENT_CHOICE,default="n/a",null=True,blank=True, max_length=255)
+    action=models.CharField(choices=ACTION_CHOICE,null=True,blank=True, max_length=255,default='n/a')
+    follow_up=models.CharField(choices=FOLLOW_UP_CHOICE,null=True,blank=True, max_length=255,default="n/a")
     course_offering=models.ForeignKey(CourseOffering, verbose_name=("Course Offering"), on_delete=models.CASCADE,related_name='weekly_reports')
     student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='weekly_reports')
 
