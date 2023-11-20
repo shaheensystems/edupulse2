@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <h1> All Program  List  </h1>
+    <br>
+    <ul class='flex flex-col gap-4'>
+        {% for program in programs %}
+          <li><a href="{% url 'program_detail' program.pk %}">
+            
+            <h1>{{ program.name }}</h1>
+            <p> Description :{{ program.description }} </p>
+            {% comment %} <p> Program Link :{{ program.program_link }} </p>
+            <p> Total Credit :{{ program.total_credit }} </p>
+            <p> Duration in Week :{{ program.duration_in_week }} </p> {% endcomment %}
+            <p> Total Course : {{program.course.count}} </p>
+            
+            <ul class='ml-10'>
+                
+                {% for course in program.course.all%}
+                <p> Course Name :{{ course.name }} </p>
+                {% comment %} <p> Course Description :{{ course.description }} </p>
+                <p> Total Credit :{{ course.total_credit }} </p>
+                <p> Duration in Week :{{ course.duration_in_week }} </p>
+                <p> EFTS :{{ course.course_efts }} </p> {% endcomment %}
+
+                {% endfor %}
+            </ul>
+          </a></li>
+
+        {% endfor %}
+      </ul>
+</section>
+{% endblock content %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <h1> Program Deatil </h1>
+  <p><strong>Title:</strong> {{ program_offering.program.name }}</p>
+  <p><strong>Description:</strong> {{ program_offering.program.description }}</p>
+  <p><strong>Program Link:</strong> {{ program_offering.program.program_link }}</p>
+  <p><strong>Total Credit:</strong> {{ program_offering.program.total_credit }}</p>
+  <p><strong>Duration in week:</strong> {{ program_offering.program.duration_in_week }}</p>
+<br>
+  <p><strong>Start Date:</strong> {{ program_offering.start_date }}</p>
+  <p><strong>End Date:</strong> {{ program_offering.end_date }}</p>
+  <p><strong>Remark:</strong> {{ program_offering.remark }}</p>
+<br>
+<h1>Total Course Offering : {{program_offering.program.course.count}} </h1>
+  
+  {% for course in program_offering.program.course.all %}
+  <br>   
+  <p>Course Name  :{{course.name}}</p>
+
+      Check Total Course Offring has to be 1 : {{course.course_offering.count}}
+     
+      {% for course_offering  in course.course_offering.all  %}
+      <a href="{% url 'course_offering_detail' course_offering.pk %}">
+         <div class='bg-gray-400 ml-5 p-5  rounded-xl'>
+        <p >course offering object :{{course_offering.student.all}}</p>
+        <p>course offering  name :{{course_offering.course.name}}</p>
+        <p>course offering  Start date : {{course_offering.start_date}}</p>
+        <p>course offering  End  date : {{course_offering.end_date}}</p>
+        <p>course offering  remark :{{course_offering.remark}}</p>
+        <p>course offering  Result Status code :{{course_offering.result_status_code}}</p>
+        <p>course offering  Result Status :{{course_offering.result_status}}</p>
+        
+        <br>
+        <p>Enrolled  Student :{{course_offering.student.count}}</p>
+        <div class='ml-5 p-5  rounded-xl flex flex-row flex-wrap gap-1'>
+          {% for student in course_offering.student.all %}
+            <div class='bg-blue-200 m-4 p-4 rounded-lg'>
+              <p>Student first Name :{{student.student.first_name}} </p>
+              <p>Student Last Name :{{student.student.last_name}} </p>
+              <p>Student email ID:{{student.student.email}} </p>
+              <p>Student personal Email :{{student.email_id}} </p>
+              <p>Student date of brth :{{student.student.dob}} </p>
+              <p>Student gender :{{student.student.gender}} </p>
+              <p>Student campus :{{student.student.campus.name}} </p>
+              <p>Student Joining date  :{{student.joining_date}} </p>
+              <p>International Studnet Status  :{{student.international_student}} </p>
+              <p>Student passport Number  :{{student.passport_number}} </p>
+              <p>Student Visa Number :{{student.visa_number}} </p>
+              <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p>
+              <br>
+            </div>
+          {% endfor %}
+        </div>
+        </div>
+      </a>
+      {% endfor %}
+
+      
+  {% endfor %}
+
+</section>
+   
+
+{% endblock content %}

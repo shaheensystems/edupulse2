@@ -15,12 +15,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.conf import settings
+from django.urls import path,include
+from django.conf.urls.static import static
+
+from . import views
 
 urlpatterns = [
-    path(
-        "__reload__/", include("django_browser_reload.urls")
-    ),  # For django-browser-reload
-    path("admin/", admin.site.urls),
-    path("", include("home.urls")),
+    path("__reload__/", include("django_browser_reload.urls")),
+    path('admin/', admin.site.urls),
+    path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
+    path('',views.home, name='dashboard'),
+    path('wc_current_programs/',include('program.urls'))
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

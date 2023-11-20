@@ -1,0 +1,106 @@
+<!-- edit_weekly_report.html -->
+
+{% extends "base.html" %}
+{% block content %}
+<section class="my-4">
+    <h1 class="font-semibold text-lg mb-4">Edit Weekly Report</h1>
+    <div class=my-5>
+        <a href="{% url 'weekly_report_list' course_offering.pk %}"  class='bg-sky-300 px-4 py-2 rounded-lg'>All Reports</a>
+   
+    </div>
+       
+    <form method="post" id="editForm" >
+        {% csrf_token %}
+        <h2>Weekly Report Attendance for {{ course_offering.temp_id }} {{ course_offering.course.name }} ({{ course_offering.start_date }} - {{ course_offering.end_date }})</h2>
+        Week :{{ week_number }}
+        {% comment %} <label for="attendanceDate">Select Date:</label>
+        <input type="date" id="attendanceDate" name="attendanceDate" value="{{ today_date }}" required> {% endcomment %}
+      
+    
+        <br>
+        <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+        <thead class="bg-gray-200">
+            <tr>
+                <th class="border px-4 py-2">Week Number</th>
+                <th class="border px-4 py-2">Student ID</th>
+                <th class="border px-4 py-2">Name</th>
+                {% if weekly_reports %}
+                    {% with weekly_reports.0.sessions.all|dictsort:"attendance_date" as sessions %}
+                        {% for session in sessions %}
+                            <th class="border px-4 py-2">Session {{ forloop.counter }} <br> {{ session.attendance_date }}</th>
+                        {% endfor %}
+                    {% endwith %}
+                {% endif %}
+                <th class="border px-4 py-2">Engagement</th>
+                <th class="border px-4 py-2">Action</th>
+                <th class="border px-4 py-2">Follow Up</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for weekly_report in weekly_reports %}
+                <tr>
+                    <td class="border px-4 py-2">{{ weekly_report.week_number }}</td>
+                    <td class="border px-4 py-2">{{ weekly_report.student.temp_id }}</td>
+                    <td class="border px-4 py-2">{{ weekly_report.student.student.first_name }} {{ weekly_report.student.student.last_name }}</td>
+                    {% with weekly_report.sessions.all|dictsort:"attendance_date" as sessions %}
+                        {% for session in sessions %}
+                            <td class="border px-4 py-2"> {{ session.is_present }} </td>
+                        {% endfor %}
+                    {% endwith %}
+                    <td class="border px-4 py-2">
+                        {% comment %} {{ weekly_report.engagement }} {% endcomment %}
+                        <select name="engagement_{{ weekly_report.id }}" class="edited-field">
+                            <option value="na" {% if weekly_report.engagement == 'na' %}selected{% endif %}>N/A</option>
+                            <option value="on track canvas" {% if weekly_report.engagement == 'on track canvas' %}selected{% endif %}>On Track - CANVAS</option>
+                            <option value="on track assessment" {% if weekly_report.engagement == 'on track assessment' %}selected{% endif %}>On Track - Assessment</option>
+                            <option value="on track learning activity" {% if weekly_report.engagement == 'on track learning activity' %}selected{% endif %}>On Track - Learning Activity'</option>
+                            <option value="on track blended" {% if weekly_report.engagement == 'on track blended' %}selected{% endif %}>On Track - Blended</option>
+                            <option value="not engaged" {% if weekly_report.engagement == 'not engaged' %}selected{% endif %}>Not Engaged</option>
+
+                        </select> 
+                    </td>
+                    <td class="border px-4 py-2">
+                        {% comment %} {{ weekly_report.action }} {% endcomment %}
+                        <select name="action_{{ weekly_report.id }}" class="edited-field">
+                            <option value="na" {% if weekly_report.action == 'na' %}selected{% endif %}>N/A</option>
+                            <option value="follow up email and call" {% if weekly_report.action == 'follow up email and call' %}selected{% endif %}>Follow Up Email and Call</option>
+                            <option value="pastoral care" {% if weekly_report.action == 'pastoral care' %}selected{% endif %}>Pastoral Care</option>
+                            <option value="personalised study plan/Extra session" {% if weekly_report.action == 'personalised study plan/Extra session' %}selected{% endif %}>Personlaised Study Plan /Extra Session</option>
+                            <option value="emergency contact" {% if weekly_report.action == 'emergency contact' %}selected{% endif %}>Emergency Contact'</option>
+                            <option value="other" {% if weekly_report.action == 'other' %}selected{% endif %}>Other</option>
+                        </select> 
+                    </td>
+                    <td class="border px-4 py-2">
+                        {% comment %} {{ weekly_report.follow_up }} {% endcomment %}
+                        <select name="follow_up_{{ weekly_report.id }}" class="edited-field">
+                            <option value="na" {% if weekly_report.follow_up == 'na' %}selected{% endif %} >N/A</option>
+                            <option value="warning letter 1" {% if weekly_report.follow_up == 'warning letter 1' %}selected{% endif %}>Warning Letter 1</option>
+                            <option value="warning letter 2" {% if weekly_report.follow_up == 'warning letter 2' %}selected{% endif %}>Warning Letter 2</option>
+                        </select> 
+                    </td>
+                </tr>
+                
+            {% endfor %}
+            
+        </tbody>
+    </table>
+  
+    <button type="submit" > <p class='bg-sky-300 px-4 py-2  rounded-lg flex'>Save Report</P></button>
+        
+
+       
+    </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var form = document.getElementById('editForm');
+            
+            // Add event listener for change event on select elements with the class 'edited-field'
+            form.addEventListener('change', function (event) {
+                if (event.target.classList.contains('edited-field')) {
+                    event.target.style.backgroundColor = 'yellow'; // Highlight the edited field
+                }
+            });
+        });
+    </script>
+</section>
+{% endblock %}

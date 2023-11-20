@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <h1> take Attendance here
+        <p>Course Ofering name : {{course_offering.course.name}}</P>
+            {{course_offering}}
+    </h1>
+    <br>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-inline flex flex-row gap-3 m-4">
+            <label for="attendance_date">Select Date:</label>
+            <input type="date" id="attendance_date_input">
+          
+        </div>
+        <br>
+
+        {% for student_form in student_forms %}
+        <div class="form-inline flex flex-row gap-3 ">
+            {% comment %} {{ student_form.student.label_tag }} {% endcomment %}
+            <p class=''>{{ student_form.student }}</p>
+            
+            <p class='flex flex-row gap-1'>
+                {{ student_form.is_present.label_tag }}
+                {{ student_form.is_present }}
+            </P> 
+          
+            <p class='flex flex-row'>
+                {% comment %} {{ student_form.attendance_date.label_tag }}
+                {{ student_form.attendance_date }}  {% endcomment %}
+                {% comment %} <!-- Hidden Attendance Date Field --> {% endcomment %}
+                <input type="hidden" name="{{ student_form.attendance_date.name }}" id="{{ student_form.attendance_date.id }}">
+               
+            </P>
+           
+            <p class='flex flex-row '>
+                {% comment %} {{ student_form.remark.label_tag }}
+                {{ student_form.remark }} {% endcomment %}
+                {% comment %} <!-- Hidden Remark and Course Offering Fields --> {% endcomment %}
+                <input type="hidden" name="{{ student_form.remark.name }}" id="{{ student_form.remark.id }}">
+                <input type="hidden" name="{{ student_form.course_offering.name }}" id="{{ student_form.course_offering.id }}">
+                {{student_form.course_offering}}
+            </P>
+             
+          
+            {% comment %} {{ student_form.program_offering }} {% endcomment %}
+           
+        </div>
+        <br>
+        {% endfor %}
+        <input type="submit" value="Submit">
+    </form>
+</section>
+<script>
+   
+    // Add JavaScript to set attendance_date based on the selected date
+    document.getElementById("attendance_date_input").addEventListener("change", function() {
+        var selectedDate = this.value;
+        
+        // Set the attendance_date for all student forms to the selected date
+        var attendanceDateFields = document.querySelectorAll("input[name^='attendance_date']");
+        attendanceDateFields.forEach(function(attendanceDateField) {
+            attendanceDateField.value = selectedDate;
+        });
+    });
+</script>
+{% endblock content %}

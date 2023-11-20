@@ -1,4 +1,5 @@
 {% load static %}
+{% load static tailwind_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,15 +8,28 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% tailwind_css %}
   <title>EduPulse</title>
   <link rel="stylesheet" href="{% static 'src/styles.css' %}">
 </head>
 
-<body class="bg-yellow-50">
-  <div class="container mx-auto mt-4">
+<body class="bg-yellow-50 flex flex-col gap-3">
+  <header>
+    <div class="container mx-auto mt-4 flex flex-row gap-4">
+      <a href={% url 'dashboard' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Dashboard</a>
+      <a href={% url 'upload_file:upload_csv' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Upload File</a>
+      <a href="/admin" class='px-4 py-2 bg-blue-300 rounded-lg'>Admin</a>
+    
+      <a href={% url 'program_offering_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>WC Current programs </a>
+      <a href={% url 'program_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>All programs </a>
+      
+    </div>
+  </hedaer>
+  <section class="container mx-auto mt-4 flex flex-row gap-4">
+   
     {% block content %}
     {% endblock content %}
-  </div>
+  </section>
 </body>
 
 </html>

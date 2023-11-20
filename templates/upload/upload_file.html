@@ -1,0 +1,37 @@
+
+{% extends "base.html" %}
+<!-- upload.html -->
+{% comment %} <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload CSV</button>
+</form> {% endcomment %}
+{% block content %}
+<section class="flex flex-row gap-5">
+    <section class='flex flex-col gap-3 bg-gray-200 p-4 rounded-sm'>
+        <h1 class='text-lg font-semibold'> Student data Upload file  </h1>
+    
+    {% comment %} #  user double quote otherwise form will get the error {% endcomment %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form.as_p}}
+        <br>
+        <button type="submit" ><p class="px-4 py-1 bg-blue-300 rounded-lg">Confirm</P></button>
+    </form>
+    </section>
+    <section class='flex flex-col gap-3 bg-gray-200 p-4 rounded-sm'>
+        <h1 class='text-lg font-semibold'> Canvas Report Uplaod for student  </h1>
+    
+    {% comment %} #  user double quote otherwise form will get the error {% endcomment %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{canvasForm.as_p}}
+        <br>
+        <button type="submit" ><p class="px-4 py-1 bg-blue-300 rounded-lg">Confirm</P></button>
+    </form>
+    </section>
+</section>
+
+
+
+{% endblock content %}
