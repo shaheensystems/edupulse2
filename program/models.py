@@ -37,7 +37,7 @@ class CourseOffering(BaseModel):
     result_status_code=models.CharField(max_length=255,null=True,blank=True)
     result_status=models.CharField(max_length=255,null=True,blank=True)
 
-    student = models.ManyToManyField(Student,blank=True ,related_name='course_offering')
+    student = models.ManyToManyField(Student,blank=True ,related_name='course_offerings')
     
     def __str__(self):
         return f'{self.temp_id}-{self.course.name}'

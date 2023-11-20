@@ -44,7 +44,7 @@
                     <td class="border px-4 py-2">{{ weekly_report.student.student.first_name }} {{ weekly_report.student.student.last_name }}</td>
                     {% with weekly_report.sessions.all|dictsort:"attendance_date" as sessions %}
                         {% for session in sessions %}
-                            <td class="border px-4 py-2"> {{ session.is_present }}</td>
+                            <td class="border px-4 py-2"> {{ session.is_present }} </td>
                         {% endfor %}
                     {% endwith %}
                     <td class="border px-4 py-2">

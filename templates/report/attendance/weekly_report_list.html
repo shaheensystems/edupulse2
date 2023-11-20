@@ -11,6 +11,7 @@
     {% for week in weekly_reports_by_week %}
         <div class='mb-4'>
         <h2 class="text-xl font-semibold mb-2">Week {{ week.grouper }}</h2>
+        <h2 class="text-xl font-semibold mb-2">Total Student {{ course_offering.student.count}}</h2>
         <form id="week-form-{{ week.grouper }}" class="mb-4">
             {% csrf_token %}
             <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">

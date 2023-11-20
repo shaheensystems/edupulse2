@@ -56,6 +56,17 @@ class WeeklyReport(BaseModel):
     follow_up=models.CharField(choices=FOLLOW_UP_CHOICE,null=True,blank=True, max_length=255,default="n/a")
     course_offering=models.ForeignKey(CourseOffering, verbose_name=("Course Offering"), on_delete=models.CASCADE,related_name='weekly_reports')
     student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='weekly_reports')
+    # no_of_pages_viewed_on_canvas=models.PositiveIntegerField(null=True,blank=True, default=0)
+    # login_in_on_canvas=models.BooleanField(default=False)
+
+class CanvasStudentReport(BaseModel):
+    student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='canvas_reports')
+    no_of_pages_viewed=models.PositiveIntegerField(null=True,blank=True, default=0)
+    last_page_view_date=models.DateField( auto_now=False, auto_now_add=False , null=True, blank=True)
+    last_participation_date=models.DateField( auto_now=False, auto_now_add=False , null=True, blank=True)
+    last_logged_out_date=models.DateField( auto_now=False, auto_now_add=False , null=True, blank=True)
+
+
 
 class CourseResult(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)

@@ -37,7 +37,7 @@ class ProgramOfferingInline(admin.StackedInline):
     extra=1
 
 class CourseOfferingInline(admin.StackedInline):
-    model=Student.course_offering.through
+    model=Student.course_offerings.through
     # model=CourseOffering
     extra=1
 
@@ -63,7 +63,7 @@ class StudentAdmin(admin.ModelAdmin):
 
     def get_courses_offered(self, obj):
         # courses_offered = obj.course_offering.through.objects.filter(student=obj)
-        courses_offered = obj.course_offering.all()
+        courses_offered = obj.course_offerings.all()
         # print("student name:",obj.student.first_name)
         # print( f"course name:", {str(course.course.name) for course in courses_offered})
 

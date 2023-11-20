@@ -17,4 +17,21 @@ class Csv(models.Model):
     activated=models.BooleanField(default=False)
 
     def __str__(self):
+        return f'file id:{self.id} : {self.file_name.path} '
+
+class AttendanceUpload(models.Model):
+    file_name=models.FileField(upload_to='attendance')
+    uploaded=models.DateTimeField(auto_now_add=True)
+    activated=models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'file id:{self.id}'
+
+
+class CanvasStatsUpload(models.Model):
+    file_name=models.FileField(upload_to='canvasStats')
+    uploaded=models.DateTimeField(auto_now_add=True)
+    activated=models.BooleanField(default=False)
+
+    def __str__(self):
         return f'file id:{self.id}'
