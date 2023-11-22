@@ -256,7 +256,7 @@ def update_or_create_program_offering(data):
 
 def Upload_file_view(request):
     form = CSVModelForm(request.POST or None, request.FILES or None)
-    canvasForm=CanvasStatsUploadForm(request.POST or None, request.FILES or None)
+   
 
     if form.is_valid():
         form.save()
@@ -348,9 +348,8 @@ def Upload_file_view(request):
         obj.save()
         # url = reverse('upload_file:upload_file')
     
-    if canvasForm.is_valid():
-        pass
-    return render(request, 'upload/upload_file.html', {'form': form,'canvasForm':canvasForm})
+   
+    return render(request, 'upload/upload_file.html', {'form': form})
 
 
 
@@ -500,8 +499,59 @@ def Attendance_Upload_View(request, pk):
             # print(data)
         except Exception as e:
              print(f'Error opening file: {e}')
-        
-        
-        
+
+    pass      
 
     return render(request, 'upload/upload_attendance.html', {'form': form, "course_offering": course_offering})
+
+def Canvas_weekly_report_upload_view(request, pk,week_number):
+    course_offering = get_object_or_404(CourseOffering, id=pk)
+    week_number=week_number
+    form=CanvasStatsUploadForm(request.POST or None, request.FILES or None)
+    weekly_reports = WeeklyReport.objects.filter(week_number=week_number, course_offering=course_offering)
+    students = course_offering.student.filter(weekly_reports__week_number=week_number).distinct()
+    print(weekly_reports)
+
+    if form.is_valid():
+        form.save()
+        form = CanvasStatsUploadForm()
+        obj = Csv.objects.get(activated=False)
+        with open(obj.file_name.path, 'r') as f:
+            reader = csv.reader(f)
+
+            header = next(reader, None)
+
+            # Define a dictionary to map header names to variable names
+            header_mappings = {
+                                "Last page view time":"last_login_date",
+                                "Page Views":"no_of_page_views",
+                                "Email":"student_email_id",
+                               
+            }
+
+            # Create variables for each column
+            data = {variable_name: None for header_name, variable_name in header_mappings.items()}
+
+            for row in reader:
+                if header is not None:
+                    for header_name, variable_name in header_mappings.items():
+                        index = header.index(header_name) if header_name in header else -1
+                        if index >= 0:
+                            data[variable_name] = row[index]
+
+                print("canvas data in json format to upload ",data)
+        
+        
+        
+        
+        obj.activated = True
+        obj.save()
+
+
+    return render(request, 'upload/upload_canvas_weekly_report.html', {
+        'form':form,
+        'weekly_reports': weekly_reports,
+        'students': students,
+        'week_number':week_number,
+        'course_offering':course_offering
+        })

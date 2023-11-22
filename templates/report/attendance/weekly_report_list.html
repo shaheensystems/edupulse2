@@ -5,13 +5,29 @@
         <br>Course name: {{ course_offering.temp_id }} - {{ course_offering.course.name }}
         <br>{{ course_offering.start_date }} - {{ course_offering.end_date }}
     </h1>
+    
 
     {% regroup course_offering.weekly_reports.all by week_number as weekly_reports_by_week %}
     
     {% for week in weekly_reports_by_week %}
         <div class='mb-4'>
-        <h2 class="text-xl font-semibold mb-2">Week {{ week.grouper }}</h2>
-        <h2 class="text-xl font-semibold mb-2">Total Student {{ course_offering.student.count}}</h2>
+            <div class='flex flex-row p-3 justify-between'>
+                <div>
+                    <h2 class="text-xl font-semibold mb-2">Week {{ week.grouper }}</h2>
+                     <h2 class="text-xl font-semibold mb-2">Total Student {{ course_offering.student.count}}</h2>
+                </div>
+                <div class='flex flex-col justify-between items-center'>
+                    <h1 class='text-center font-medium text-lg'>
+                        Upload Canvas Weekly report for the Week 
+                    </h1>
+                    <h1>
+                    <a href="{% url 'upload_canvas_report' course_offering.pk week.grouper %} " class='bg-sky-300 px-4 py-2  rounded-lg'>Uplaod Canvas Report</a>
+                    </h1>
+                </div>
+            </div>
+        
+        
+        
         <form id="week-form-{{ week.grouper }}" class="mb-4">
             {% csrf_token %}
             <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
