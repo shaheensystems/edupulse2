@@ -48,6 +48,12 @@ class WeeklyReport(BaseModel):
         ('warning letter 1','Warning Letter 1'),
         ('warning letter 2','Warning Letter 2'),
     ]
+    PERFORMANCE_CHOICE=[
+        ('na','N/A'),
+        ('poor','POOR'),
+        ('good','GOOD'),
+        ('moderate','MODERATE'),
+    ]
     week_number=models.PositiveIntegerField(blank=True,null=True)
     # sessions will be list of all attendance in one week
     sessions=models.ManyToManyField(Attendance, verbose_name=("sessions"))
@@ -58,7 +64,7 @@ class WeeklyReport(BaseModel):
     student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='weekly_reports')
     no_of_pages_viewed_on_canvas=models.PositiveIntegerField(null=True,blank=True, default=0)
     login_in_on_canvas=models.BooleanField(default=False, blank=True,null=True)
-    performance=models.CharField( max_length=255,null=True,blank=True)
+    performance=models.CharField( choices=PERFORMANCE_CHOICE, max_length=255,null=True,blank=True,default="n/a")
 
 
 

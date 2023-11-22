@@ -43,7 +43,7 @@ class CourseOffering(BaseModel):
         return f'{self.temp_id}-{self.course.name}'
 
 class ProgramOffering(BaseModel):
-    program=models.ForeignKey(Program, verbose_name=("program"), on_delete=models.CASCADE,null=True,blank=True)
+    program=models.ForeignKey(Program, verbose_name=("program"), on_delete=models.CASCADE,null=True,blank=True,related_name="program_offerings")
     start_date=models.DateField( auto_now=False, auto_now_add=False)
     end_date=models.DateField( auto_now=False, auto_now_add=False)
     remark=models.TextField(max_length=255,blank=True,null=True)

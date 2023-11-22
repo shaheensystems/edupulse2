@@ -134,6 +134,7 @@ class WeeklyReportView(DetailView):
     model = CourseOffering
     template_name = 'report/attendance/weekly_report_list.html'
     context_object_name = 'course_offering'
+    
 
 def edit_weekly_report(request, pk,week_number):
     print(week_number)
@@ -156,10 +157,13 @@ def edit_weekly_report(request, pk,week_number):
             action = request.POST.get(f'action_{weekly_report.id}')
             engagement = request.POST.get(f'engagement_{weekly_report.id}')
             follow_up = request.POST.get(f'follow_up_{weekly_report.id}')
+            performance = request.POST.get(f'performance_{weekly_report.id}')
+            
             # update weekly report data 
             weekly_report.action=action
             weekly_report.engagement=engagement
             weekly_report.follow_up=follow_up
+            weekly_report.performance=performance
 
             weekly_report.save()
             print("weekly report saved : ",weekly_report)

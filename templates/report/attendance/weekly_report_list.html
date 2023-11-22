@@ -42,6 +42,9 @@
                         <th class="border px-4 py-2">Engagement</th>
                         <th class="border px-4 py-2">Action</th>
                         <th class="border px-4 py-2">Follow Up</th>
+                        <th class="border px-4 py-2">Last Login Status</th>
+                        <th class="border px-4 py-2">No of Page View in canvas</th>
+                        <th class="border px-4 py-2">Performance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,10 +54,14 @@
                             <td class="border px-4 py-2">{{ weekly_report.student.student.first_name }} {{ weekly_report.student.student.last_name }}</td>
                             {% for session in weekly_report.sessions.all|dictsort:"attendance_date" %}
                                 <td class="border px-4 py-2">{{ session.is_present }}</td>
+                                
                             {% endfor %}
                             <td class="border px-4 py-2">{{ weekly_report.engagement }}</td>
                             <td class="border px-4 py-2">{{ weekly_report.action }}</td>
                             <td class="border px-4 py-2">{{ weekly_report.follow_up }}</td>
+                            <td class="border px-4 py-2">{{ weekly_report.login_in_on_canvas }}</td>
+                            <td class="border px-4 py-2">{{ weekly_report.no_of_pages_viewed_on_canvas }}</td>
+                            <td class="border px-4 py-2">{{ weekly_report.performance }}</td>
                         </tr>
                         
                     {% endfor %}

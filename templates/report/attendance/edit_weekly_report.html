@@ -34,6 +34,9 @@
                 <th class="border px-4 py-2">Engagement</th>
                 <th class="border px-4 py-2">Action</th>
                 <th class="border px-4 py-2">Follow Up</th>
+                <th class="border px-4 py-2">Last Login Status</th>
+                <th class="border px-4 py-2">No of Page View in canvas</th>
+                <th class="border px-4 py-2">Performance</th>
             </tr>
         </thead>
         <tbody>
@@ -76,6 +79,23 @@
                             <option value="na" {% if weekly_report.follow_up == 'na' %}selected{% endif %} >N/A</option>
                             <option value="warning letter 1" {% if weekly_report.follow_up == 'warning letter 1' %}selected{% endif %}>Warning Letter 1</option>
                             <option value="warning letter 2" {% if weekly_report.follow_up == 'warning letter 2' %}selected{% endif %}>Warning Letter 2</option>
+                        </select> 
+                    </td>
+                    <td class="border px-4 py-2">
+                        {% if weekly_report.login_in_on_canvas %}
+                            Yes
+                        {% else %}
+                            No
+                        {% endif %}
+                    </td>
+                    <td class="border px-4 py-2">{{ weekly_report.no_of_pages_viewed_on_canvas }}</td>
+                    <td class="border px-4 py-2">
+                        {% comment %} {{ weekly_report.performance}} {% endcomment %}
+                        <select name="performance_{{ weekly_report.id }}" class="edited-field">
+                            <option value="na" {% if weekly_report.performance == 'na' %}selected{% endif %} >N/A</option>
+                            <option value="poor" {% if weekly_report.performance == 'poor' %}selected{% endif %} >POOR</option>
+                            <option value="good" {% if weekly_report.performace == 'good' %}selected{% endif %}>GOOD</option>
+                            <option value="moderate" {% if weekly_report.performace == 'moderate' %}selected{% endif %}>MODERATE</option>
                         </select> 
                     </td>
                 </tr>
