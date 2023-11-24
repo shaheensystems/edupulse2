@@ -19,13 +19,14 @@ from django.conf import settings
 from django.urls import path,include
 from django.conf.urls.static import static
 
-from . import views
+
+from .views import DashboardView, home
 
 urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path('admin/', admin.site.urls),
     path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
-    path('',views.home, name='dashboard'),
+    path('',DashboardView.as_view(), name='dashboard'),
     path('wc_current_programs/',include('program.urls'))
 ]
 

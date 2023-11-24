@@ -4,6 +4,7 @@ from customUser.models import Student
 
 
 
+
 class Program(BaseModel):
     name=models.CharField(max_length=255,null=True,blank=True)
     description=models.CharField(max_length=255,null=True,blank=True)
