@@ -1,28 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
     <section>
-        <h1> Program Deatil </h1>
-        <li>
+
+        
+        <h1> Programme Detail </h1>
+        
+            <div class='container mx-auto flex flex-row bg-orange-600 py-2 text-4xl font-inter pl-3'>
+                <b><h1>{{ program.name }}</h1> </a> </b>
+            </div>
+
+                <div class="container mx-auto mt-4 flex flex-row gap-4 pl-3 space-x-36"> <!--gap-4 pl-3 space-x-36 -->
+                    <div class="container mx-auto mt-4 flex flex-row gap-2">
+                        <div> <p> Attendance </p>  </div>
+                        <div><img src="\media\edupulse-global.icon.png" alt="international students icon" width="45" height="45"></div>
+                        <div><img src="\media\edupulse-domestic.icon.png" alt="international students icon" width="45" height="45"></div>
+                    </div>
+                    
+                    <div> <p> View Students </p> </div>
+                    <div> <p> View Results </p> </div>
+                    </div> 
+
+                   
             
-            <p>Program Name :{{ program.name }}</P>
-            <p> Description :{{ program.description }} </p>
-            <p> Program Link :{{ program.program_link }} </p>
-            <p> Total Credit :{{ program.total_credit }} </p>
-            <p> Duration in Week :{{ program.duration_in_week }} </p>
-            <p> Total Course : {{program.course.count}} </p>
+            <p>Programme Name: {{ program.name }}</P>
+            <p> Description: {{ program.description }} </p>
+            <p> Programme Link: {{ program.program_link }} </p>
+            <p> Total Credit: {{ program.total_credit }} </p>
+            <p> Duration in Week: {{ program.duration_in_week }} </p>
+            <p> Total Course: {{program.course.count}} </p>
             
             <ul class='ml-10'>
                 
                 {% for course in program.course.all%}
-                <p> Course Name :{{ course.name }} </p>
-                <p> Course Description :{{ course.description }} </p>
-                <p> Total Credit :{{ course.total_credit }} </p>
-                <p> Duration in Week :{{ course.duration_in_week }} </p>
-                <p> EFTS :{{ course.course_efts }} </p>
+                <p> Course Name: {{ course.name }} </p>
+                <p> Course Description: {{ course.description }} </p>
+                <p> Total Credit: {{ course.total_credit }} </p>
+                <p> Duration in Week: {{ course.duration_in_week }} </p>
+                <p> EFTS: {{ course.course_efts }} </p>
 
                 {% endfor %}
             </ul>
-          </a></li>
+          </a>
     </section>
     
 {% endblock content %}
