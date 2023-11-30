@@ -13,6 +13,8 @@ from datetime import datetime
 from django.db.models import Sum, Count,When,Case
 from datetime import timedelta
 from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 # from customUser.models import Student
 # Create your views here.
 
@@ -24,7 +26,7 @@ def get_week_number(startingDate,currentDate):
 
     return weeks +1
 
-class AttendanceListView(DetailView):
+class AttendanceListView(LoginRequiredMixin,DetailView):
     model = CourseOffering
     template_name = 'report/attendance/attendance_list.html'
     context_object_name = 'course_offering'
@@ -67,7 +69,7 @@ class AttendanceListView(DetailView):
     
    
 
-class AttendanceCreateView(CreateView):
+class AttendanceCreateView(LoginRequiredMixin,CreateView):
     model=Attendance
     template_name='report/attendance/attendance_form.html'
     form_class=AttendanceForm
@@ -90,7 +92,7 @@ class AttendanceCreateView(CreateView):
         
         context['student_forms'] = student_forms
         return context
-   
+@login_required(login_url='user-login') 
 def mark_attendance(request, pk):
     course_offering = get_object_or_404(CourseOffering, id=pk)
     students = course_offering.student.all()
@@ -130,12 +132,12 @@ def mark_attendance(request, pk):
     })
 
 
-class WeeklyReportView(DetailView):
+class WeeklyReportView(LoginRequiredMixin, DetailView):
     model = CourseOffering
     template_name = 'report/attendance/weekly_report_list.html'
     context_object_name = 'course_offering'
     
-
+@login_required(login_url='user-login') 
 def edit_weekly_report(request, pk,week_number):
     print(week_number)
     print("PK: ",pk)

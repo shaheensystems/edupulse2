@@ -2,36 +2,37 @@ from django.shortcuts import render
 from django.db.models import Count,Q
 from django.views.generic import ListView,DetailView,UpdateView,CreateView
 from program.models import Course,CourseOffering,Program,ProgramOffering
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
-class CourseListView(ListView):
+class CourseListView(LoginRequiredMixin,ListView):
     model=Course
     template_name='program/course/course_list.html'
     context_object_name='course'
 
-class CourseDetailView(DetailView):
+class CourseDetailView(LoginRequiredMixin,DetailView):
     model=Course
     template_name='program/course/course_detail.html'
     context_object_name='course'
 
 
 
-class ProgramListView(ListView):
+class ProgramListView(LoginRequiredMixin,ListView):
     model=Program
     template_name='program/program/program_list.html'
     context_object_name='programs'
 
-class ProgramDetailView(DetailView):
+class ProgramDetailView(LoginRequiredMixin,DetailView):
     model=Program
     template_name='program/program/program_detail.html'
     context_object_name='program'
 
-class ProgramOfferingListView(ListView):
+class ProgramOfferingListView(LoginRequiredMixin,ListView):
     model=ProgramOffering
     template_name='program/program/program_offering_list.html'
     context_object_name='program_offering'
 
-class ProgramOfferingDetailView(DetailView):
+class ProgramOfferingDetailView(LoginRequiredMixin,DetailView):
     model = ProgramOffering
     template_name = 'program/program/program_offering_detail.html'  
     context_object_name = 'program_offering'  
@@ -72,12 +73,12 @@ class ProgramOfferingDetailView(DetailView):
         context['total_course_offering_count']=course.course_offering.all().count()
         return context
 
-class CourseOfferingListView(ListView):
+class CourseOfferingListView(LoginRequiredMixin,ListView):
     model=CourseOffering
     template_name='program/course/course_offering_list.html'
     context_object_name='course_offering'
 
-class CourseOfferingDetailView(DetailView):
+class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
     model = CourseOffering
     template_name = 'program/course/course_offering_detail.html'  
     context_object_name = 'course_offering'  

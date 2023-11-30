@@ -3,7 +3,7 @@ from customUser.models import Student,Staff
 from base.models import Campus
 from django.views.generic import DetailView,ListView,TemplateView
 from program.models import ProgramOffering,CourseOffering
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
@@ -11,7 +11,7 @@ def home(request):
     
     return render(request,'index.html')
 
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin,TemplateView):
     template_name = 'index.html'
 
     def get_context_data(self, **kwargs):

@@ -1,7 +1,7 @@
 
 {% load static %}
 {% load static tailwind_tags %}
-
+{% load custom_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -24,12 +24,21 @@
   <header>
     <div class="container mx-auto mt-4 flex flex-row gap-4">
       <a href={% url 'dashboard' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Dashboard</a>
-      <a href={% url 'upload_file:upload_csv' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Upload File</a>
+      
+
+      {% if request.user|user_belongs_to_group:'Admin' %} 
+      <a href={% url 'upload_file:upload_csv' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Upload Student data </a>
       <a href="/admin" class='px-4 py-2 bg-blue-300 rounded-lg'>Admin</a>
-    
+      {% endif %}
+
+      
       <a href={% url 'program_offering_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>WC Current programs </a>
       <a href={% url 'program_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>All programs </a>
-      
+      {% if user.is_authenticated %}
+      <a href="{% url 'user-logout' %}" class='px-4 py-2 bg-red-300 rounded-lg'>{{user.username | title}}</a>  
+      <a href="{% url 'user-logout' %}" class='px-4 py-2 bg-red-300 rounded-lg'>Logout</a>
+         
+      {% endif %}
     </div>
   </hedaer>
   

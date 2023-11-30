@@ -1,0 +1,10 @@
+
+{% extends "base.html" %}
+{% block content %}
+<section class="my-4">
+    <h1 class="font-semibold text-lg mb-4">Logout </h1>
+    <p> user logged out sucessfully </p>
+    
+    <a href={% url 'user-login' %} class='mt-10 text-blue-300 '>login again </a>
+</section>
+{% endblock %}

@@ -27,7 +27,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
     path('',DashboardView.as_view(), name='dashboard'),
-    path('wc_current_programs/',include('program.urls'))
+    path('wc_current_programs/',include('program.urls')),
+    path('user/',include('customUser.urls')),
 ]
 
 if settings.DEBUG:

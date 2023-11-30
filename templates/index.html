@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_tags %}
 {% block content %}
     <section class='flex w-full flex-col'>
      <p>Total Program Offerings :  {{program_offerings.count}}</p>
@@ -12,86 +13,71 @@
       {% comment %} chart to choose 
       chartType:pie,line,bar,doughnut,polarArea
       {% endcomment %}
-     <div class='w-4/12 bg-gray-100 rounded-lg'>
- 
-      {% with data=chart_data_campus_enrollment_student title='Student Enrollment Count By Campus' id='students_by_campus' chartType='pie' lengendDisplay='false' limitData=10 %}
-        {% include 'charts/chart.html' %}
-      {% endwith %}
-      </div>
-
-     
-
-      <div class='w-7/12 bg-gray-100 rounded-lg'>
-        {% comment %} bar Chart Horizonal {% endcomment %}
-        {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
-          {% include 'charts/barChartHorizontal.html' %}
-        {% endwith %}
+      {% if request.user|user_belongs_to_group:'Admin' %} 
+        <div class='w-4/12 bg-gray-100 rounded-lg'>
+          {% with data=chart_data_campus_enrollment_student title='Student Enrollment Count By Campus' id='students_by_campus' chartType='pie' lengendDisplay='false' limitData=10 %}
+            {% include 'charts/chart.html' %}
+          {% endwith %}
         </div>
 
-
         <div class='w-5/12 bg-gray-100 rounded-lg'>
-
           {% with data=chart_data_campus_enrollment_staff title='Staff Count By Campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' limitData=10 %}
             {% include 'charts/chart.html' %}
           {% endwith %}
+        </div>
+        <div class='w-7/12 bg-gray-100 rounded-lg'>
+          {% comment %} bar Chart Horizonal {% endcomment %}
+          {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
+            {% include 'charts/barChartHorizontal.html' %}
+          {% endwith %}
           </div>
-
-
-
-
-
-
-
-
-
-
-
-     <div class='w-5/12 bg-gray-100 rounded-lg'>
-      {% comment %} chart to choose 
-      chartType:pie,line,bar,doughnut,polarArea
-      {% endcomment %}
-      
-      {% with data=chart_data_campus_enrollment_student title='Staff Appointment By campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' %}
-        {% include 'charts/chart.html' %}
-      {% endwith %}
+  
+  
+       <div class='w-5/12 bg-gray-100 rounded-lg'>
+  
+        {% with data=chart_data_campus_enrollment_student title='Staff Appointment By campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' %}
+          {% include 'charts/chart.html' %}
+        {% endwith %}
+        </div>
+       <div class='w-5/12 bg-gray-100 rounded-lg'>
+  
+        {% with data=chart_data_campus_enrollment_student title='Staff Appointment By campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' %}
+          {% include 'charts/chart.html' %}
+        {% endwith %}
+        </div>
+  
+       <div class='w-5/12 bg-gray-100 rounded-lg'>
+  
+        {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
+          {% include 'charts/barChartVertical.html' %}
+        {% endwith %}
+        </div>
+  
+        <div class='w-5/12 bg-gray-100 rounded-lg'> 
+        {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
+          {% include 'charts/pieChart.html' %}
+        {% endwith %}
+        </div>
+        <div class='w-5/12  bg-gray-100 rounded-lg'>
+  
+        {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
+          {% include 'charts/doughnutChart.html' %}
+        {% endwith %}
       </div>
-     <div class='w-5/12 bg-gray-100 rounded-lg'>
-      {% comment %} chart to choose 
-      chartType:pie,line,bar,doughnut,polarArea
-      {% endcomment %}
-      
-      {% with data=chart_data_campus_enrollment_student title='Staff Appointment By campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' %}
-        {% include 'charts/chart.html' %}
-      {% endwith %}
+    
+      <div class='w-5/12 bg-gray-100 rounded-lg'>
+  
+        {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
+        {% include 'charts/lineChart.html' %}
+        {% endwith %}
       </div>
 
-     <div class='w-5/12 bg-gray-100 rounded-lg'>
-      {% comment %} Bar chart Vertical {% endcomment %}
-      {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
-        {% include 'charts/barChartVertical.html' %}
-      {% endwith %}
-      </div>
+      {% endif %}
+     
 
      
-        {% comment %} Pie Chart  {% endcomment %}
-      <div class='w-5/12 bg-gray-100 rounded-lg'> 
-      {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
-        {% include 'charts/pieChart.html' %}
-      {% endwith %}
-      </div>
-      <div class='w-5/12  bg-gray-100 rounded-lg'>
-      {% comment %} doughnut Chart {% endcomment %}
-      {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
-        {% include 'charts/doughnutChart.html' %}
-      {% endwith %}
-    </div>
-  
-      <div class='w-5/12 bg-gray-100 rounded-lg'>
-        {% comment %} Line Chart {% endcomment %}
-      {% with data=chart_data_enrollment text='Students Enrollment' id='students_enrollment'%}
-      {% include 'charts/lineChart.html' %}
-      {% endwith %}
-    </div>
+
+     
     <section>
    </section>
 {% endblock content %}
