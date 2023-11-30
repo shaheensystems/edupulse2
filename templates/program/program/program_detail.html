@@ -5,42 +5,76 @@
         
         <h1> Programme Detail </h1>
         
-            <div class='container mx-auto flex flex-row bg-orange-600 py-2 text-4xl font-inter pl-3'>
-                <b><h1>{{ program.name }}</h1> </a> </b>
+            <div class='container bg-orange-600 py-2 text-3xl font-inter pl-3 flex justify-center rounded-lg gap-6'>
+                <b><h1 class="pt-2">{{ program.name }}</h1> </a> </b>
+
+                <svg width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
+                    <path d="M22.5909 37.0114V18.2614H25.7727V37.0114H22.5909ZM14.8068 29.2273V26.0455H33.5568V29.2273H14.8068Z" fill="#D2D3C7"/>
+                    </svg>
+                    
+
+                <svg width="78" height="57" viewBox="0 0 78 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="23.1079" cy="34.715" rx="23.1079" ry="22.0024" fill="black"/>
+                    <path d="M11.5357 38.2216C10.8525 38.2216 10.2662 37.9769 9.77681 37.4876C9.28746 36.9982 9.04279 36.4119 9.04279 35.7287C9.04279 35.0455 9.28746 34.4592 9.77681 33.9698C10.2662 33.4805 10.8525 33.2358 11.5357 33.2358C12.2189 33.2358 12.8052 33.4805 13.2946 33.9698C13.7839 34.4592 14.0286 35.0455 14.0286 35.7287C14.0286 36.1811 13.9132 36.5966 13.6824 36.9751C13.4608 37.3537 13.1607 37.6584 12.7821 37.8892C12.4128 38.1108 11.9973 38.2216 11.5357 38.2216ZM22.2759 38.2216C21.5927 38.2216 21.0064 37.9769 20.517 37.4876C20.0277 36.9982 19.783 36.4119 19.783 35.7287C19.783 35.0455 20.0277 34.4592 20.517 33.9698C21.0064 33.4805 21.5927 33.2358 22.2759 33.2358C22.9592 33.2358 23.5455 33.4805 24.0348 33.9698C24.5241 34.4592 24.7688 35.0455 24.7688 35.7287C24.7688 36.1811 24.6534 36.5966 24.4226 36.9751C24.201 37.3537 23.9009 37.6584 23.5224 37.8892C23.1531 38.1108 22.7376 38.2216 22.2759 38.2216ZM33.0162 38.2216C32.3329 38.2216 31.7466 37.9769 31.2573 37.4876C30.7679 36.9982 30.5233 36.4119 30.5233 35.7287C30.5233 35.0455 30.7679 34.4592 31.2573 33.9698C31.7466 33.4805 32.3329 33.2358 33.0162 33.2358C33.6994 33.2358 34.2857 33.4805 34.775 33.9698C35.2644 34.4592 35.5091 35.0455 35.5091 35.7287C35.5091 36.1811 35.3936 36.5966 35.1628 36.9751C34.9412 37.3537 34.6412 37.6584 34.2626 37.8892C33.8933 38.1108 33.4778 38.2216 33.0162 38.2216Z" fill="white"/>
+                    </svg>
+                    
             </div>
 
-                <div class="container mx-auto mt-4 flex flex-row gap-4 pl-3 space-x-36"> <!--gap-4 pl-3 space-x-36 -->
-                    <div class="container mx-auto mt-4 flex flex-row gap-2">
-                        <div> <p> Attendance </p>  </div>
+                <div class="container flex flex-row gap-6 pl-7 bg-neutral-100 mb-1 "> <!--gap-4 pl-3 space-x-36 -->
+                    
+                    <div class="container mx-auto mt-4 flex flex-row gap-6 text-2xl font-semibold w-full mb-1 ">
+                         <p> Attendance </p>  
                         <div><img src="\media\edupulse-global.icon.png" alt="international students icon" width="45" height="45"></div>
                         <div><img src="\media\edupulse-domestic.icon.png" alt="international students icon" width="45" height="45"></div>
                     </div>
                     
-                    <div> <p> View Students </p> </div>
-                    <div> <p> View Results </p> </div>
-                    </div> 
+                    <div class="container mx-auto mt-4 flex flex-row gap-6 font-semibold text-2xl">
+                         <p> Student Directory </p>
+                        <div><img class="details-icon" src="\media\edupulse-studentdirectory.icon.png" alt="student directory icon" width="45" height="45"></div>
+                    </div>
+                   
+                    <div class="container mx-auto mt-4 flex flex-row gap-6 font-semibold text-2xl ">
+                        <p> View Results </p>
+                        <div> <img src="\media\edupulse-viewresults.icon.png" alt="view results icon" width="45" height="45"> </div>
+                    </div>
+                    
+                </div> 
 
                    
             
-            <p>Programme Name: {{ program.name }}</P>
             <p> Description: {{ program.description }} </p>
             <p> Programme Link: {{ program.program_link }} </p>
-            <p> Total Credit: {{ program.total_credit }} </p>
-            <p> Duration in Week: {{ program.duration_in_week }} </p>
-            <p> Total Course: {{program.course.count}} </p>
+            <p> Total Credits: {{ program.total_credit }} </p>
+            <p> Duration in Weeks: {{ program.duration_in_week }} </p>
+            <p> Total Courses: {{program.course.count}} </p>
             
+            <h2 class="text-2xl font-semibold"> Courses included in the {{ program.name }}:</h2>
+
+
             <ul class='ml-10'>
                 
                 {% for course in program.course.all%}
-                <p> Course Name: {{ course.name }} </p>
+
+                
+
+                <p> {{ course.name }} </p>
                 <p> Course Description: {{ course.description }} </p>
                 <p> Total Credit: {{ course.total_credit }} </p>
                 <p> Duration in Week: {{ course.duration_in_week }} </p>
                 <p> EFTS: {{ course.course_efts }} </p>
 
+
+                <div class="container mx-auto mt-4 flex gap-4 pl-3 space-x-36">
+              
+                    <div> <p> Attendance </p> </div>
+                    <div> <p> View Students </p> </div>
+                    <div> <p> View Results </p> </div>
+                    </div> 
+
                 {% endfor %}
             </ul>
           </a>
-    </section>
+        </section>
     
 {% endblock content %}
