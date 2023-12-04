@@ -1,0 +1,12 @@
+{% block content %}
+<section class='bg-blue-200 my-4 px-2 py-4 rounded-lg'>
+    
+    <a href="{% url 'course_offering_detail' course_offering.pk %}" >
+        <p>{{course_offering}} ({{course_offering.offering_mode}})</p>
+        <p> Start from {{course_offering.start_date}} to  {{course_offering.end_date}}</p>
+        <p>Remark :{{course_offering.remark}}</p>
+     <p> Total No of Students:{{course_offering.student.count}}</p>
+    </a>
+</section>
+
+{% endblock content %}

@@ -31,7 +31,11 @@
       <a href="/admin" class='px-4 py-2 bg-blue-300 rounded-lg'>Admin</a>
       {% endif %}
 
-      
+      {% if request.user|user_belongs_to_group:'Teacher' or request.user|user_belongs_to_group:'Admin'  %} 
+      <a href={% url 'course_offering_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Course Offring for teacher</a>
+      {% endif %}
+
+  
       <a href={% url 'program_offering_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>WC Current programs </a>
       <a href={% url 'program_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>All programs </a>
       {% if user.is_authenticated %}
@@ -41,9 +45,15 @@
       {% endif %}
     </div>
   </hedaer>
+  <h1> username:{{user.username}} <br>
+    GroupStatus :{{request.user|user_belongs_to_group:'Teacher' }} 
+    {% for group in user.groups.all %}
+    {{ group.name }}
+    {% if not forloop.last %}, {% endif %}
+{% endfor %}</h1>
   
   <section class="container mx-auto mt-4 flex flex-row gap-4">
-   
+
     {% block content %}
     {% endblock content %}
   </section>

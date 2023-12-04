@@ -35,7 +35,7 @@ class AttendanceListView(LoginRequiredMixin,DetailView):
         context = super().get_context_data(**kwargs)
 
         # Get attendance data for the course offering in ascending order 
-        attendance_list = self.object.attendance_set.values('attendance_date').annotate(
+        attendance_list = self.object.attendance.values('attendance_date').annotate(
             total_present=Count(Case(When(is_present='present', then=1))),
             total_students=Count('student')
         ).order_by('attendance_date')
@@ -159,16 +159,25 @@ def edit_weekly_report(request, pk,week_number):
             action = request.POST.get(f'action_{weekly_report.id}')
             engagement = request.POST.get(f'engagement_{weekly_report.id}')
             follow_up = request.POST.get(f'follow_up_{weekly_report.id}')
-            performance = request.POST.get(f'performance_{weekly_report.id}')
-            
+            assessment_status = request.POST.get(f'assessment_status_{weekly_report.id}')
+            at_risk_value = request.POST.get(f'at_risk_{weekly_report.id}')
+            # print("at risk value :",at_risk_value)
             # update weekly report data 
             weekly_report.action=action
             weekly_report.engagement=engagement
             weekly_report.follow_up=follow_up
-            weekly_report.performance=performance
-
+            weekly_report.assessment_status=assessment_status
+            if at_risk_value == "true":
+                weekly_report.at_risk = True
+            elif at_risk_value == "false":
+                weekly_report.at_risk = False
+            else:
+                weekly_report.at_risk = None  # or handle the case when the value is not True or False
+            
             weekly_report.save()
             print("weekly report saved : ",weekly_report)
+            # print("weekly report at risk value saved : ",weekly_report.at_risk)
+            # print("weekly report at assessment status  saved : ",weekly_report.assessment_status)
             
         # Redirect to a success page or do something else
         # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

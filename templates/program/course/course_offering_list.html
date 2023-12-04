@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+    <section>
+        <h1 class='text-lg font-bold mb-5'> Course Offering List  </h1>
+        
+        <h1 class='flex flex-col gap-3'>
+            {% for course_offering in course_offerings  %}
+               {% with course_offering=course_offering %}
+                 {% include 'components/flash_card/course_offering_FC.html' %}
+               {% endwith %}  
+    
+        {% endfor %}
+        </h1>
+        
+    </section>
+    
+{% endblock content %}

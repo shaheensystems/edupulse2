@@ -36,7 +36,8 @@
                 <th class="border px-4 py-2">Follow Up</th>
                 <th class="border px-4 py-2">Last Login Status</th>
                 <th class="border px-4 py-2">No of Page View in canvas</th>
-                <th class="border px-4 py-2">Performance</th>
+                <th class="border px-4 py-2">Assessment Status</th>
+                <th class="border px-4 py-2">At Risk</th>
             </tr>
         </thead>
         <tbody>
@@ -91,11 +92,23 @@
                     <td class="border px-4 py-2">{{ weekly_report.no_of_pages_viewed_on_canvas }}</td>
                     <td class="border px-4 py-2">
                         {% comment %} {{ weekly_report.performance}} {% endcomment %}
-                        <select name="performance_{{ weekly_report.id }}" class="edited-field">
-                            <option value="na" {% if weekly_report.performance == 'na' %}selected{% endif %} >N/A</option>
-                            <option value="poor" {% if weekly_report.performance == 'poor' %}selected{% endif %} >POOR</option>
-                            <option value="good" {% if weekly_report.performace == 'good' %}selected{% endif %}>GOOD</option>
-                            <option value="moderate" {% if weekly_report.performace == 'moderate' %}selected{% endif %}>MODERATE</option>
+                        <select name="assessment_status_{{ weekly_report.id }}" class="edited-field">
+                            <option value="na" {% if weekly_report.assessment_status == 'na' %}selected{% endif %} >N/A</option>
+                            <option value="making progress" {% if weekly_report.assessment_status == 'making progress' %}selected{% endif %} >MAKING PROGRESS</option>
+                            <option value="no progress" {% if weekly_report.assessment_status == 'no progress' %}selected{% endif %}>NO PROGRESS</option>
+                            <option value="request extension" {% if weekly_report.assessment_status == 'request extension' %}selected{% endif %}>REQUEST EXTENSION</option>
+                            <option value="submitted" {% if weekly_report.assessment_status == 'submitted' %}selected{% endif %}>SUBMITTED</option>
+                            <option value="not submitted" {% if weekly_report.assessment_status == 'not submitted' %}selected{% endif %}>NOT SUBMITTED</option>
+                            <option value="failed" {% if weekly_report.assessment_status == 'failed' %}selected{% endif %}>FAILED</option>
+                            <option value="re-sit" {% if weekly_report.assessment_status == 're-sit' %}selected{% endif %}>RE-SIT</option>
+                        
+                        </select> 
+                    </td>
+                    <td class="border px-4 py-2">
+                        {% comment %} {{ weekly_report.follow_up }} {% endcomment %}
+                        <select name="at_risk_{{ weekly_report.id }}" class="edited-field">
+                            <option value="true" {% if weekly_report.at_risk %}selected{% endif %} >TRUE</option>
+                            <option value="false" {% if not weekly_report.at_risk %}selected{% endif %}>FALSE</option>
                         </select> 
                     </td>
                 </tr>

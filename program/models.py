@@ -1,6 +1,6 @@
 from django.db import models
 from base.models import BaseModel
-from customUser.models import Student
+from customUser.models import Student, Staff
 
 
 
@@ -29,6 +29,12 @@ class Course(BaseModel):
         return f'{self.temp_id}-{self.name}'
 
 class CourseOffering(BaseModel):
+    OFFERING_CHOICES = [
+        ('online', 'ONLINE'),
+        ('offline', 'OFFLINE'),
+        ('blended', 'BLENDED'),
+    ]
+
     course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True,related_name='course_offering')
     start_date=models.DateField( auto_now=False, auto_now_add=False)
     end_date=models.DateField( auto_now=False, auto_now_add=False)
@@ -39,6 +45,9 @@ class CourseOffering(BaseModel):
     result_status=models.CharField(max_length=255,null=True,blank=True)
 
     student = models.ManyToManyField(Student,blank=True ,related_name='course_offerings')
+    teacher = models.ManyToManyField(Staff,blank=True ,related_name='course_offerings')
+    offering_mode = models.CharField(max_length=10,choices=OFFERING_CHOICES,default='online',blank=True, null=True,help_text='Select the mode of course offering: Online, Offline, or Blended'
+    )
     
     def __str__(self):
         return f'{self.temp_id}-{self.course.name}'

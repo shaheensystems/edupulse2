@@ -48,22 +48,20 @@
         <p>Total Enrolled  Student :{{course_offering.student.count}}</p>
         <br>
        
-        {% for data in poor_performance_data %}
+        {% comment %} {% for data in poor_performance_data %} {% endcomment %}
           {% comment %} {% if data.course_offering in course_offering %} {% endcomment %}
           {% comment %} <p>Course Offering: {{ data.course_offering.temp_id }} compare {{course_offering.temp_id}}</p> {% endcomment %}
           
-          {% if data.course_offering.temp_id|stringformat:"s" == course_offering.temp_id|stringformat:"s" %}
-            <p>Week Number: {{ data.week_number }}</p>
-            <p>Total Students: {{ data.total_students }}</p>
-            <p>Poor Performance Count: {{ data.poor_performance_count }}</p>
+          {% comment %} {% if data.course_offering.temp_id|stringformat:"s" == course_offering.temp_id|stringformat:"s" %} {% endcomment %}
+            {% comment %} <p>Week Number: {{ data.week_number }}</p> {% endcomment %}
+            {% comment %} <p>Total Students: {{ data.total_students }}</p> {% endcomment %}
+            {% comment %} <p>Poor Performance Count: {{ data.poor_performance_count }}</p> {% endcomment %}
             <hr>
-          {% else %}
-              Not Matched
-          {% endif %}
+          
           
           {% comment %} {% endif %} {% endcomment %}
           
-        {% endfor %}
+        {% comment %} {% endfor %} {% endcomment %}
        
 
         <div class='ml-5 p-5  rounded-xl flex flex-col flex-wrap gap-1'>
@@ -76,7 +74,7 @@
               {% for weekly_report in student.weekly_reports.all %}
               <div class='flex flex-row gap-3'>
                 <p>Week Number {{weekly_report.week_number}} </p>
-                <p>Status : {{weekly_report.performance}}   </p>
+                <p>Status : {{weekly_report.assessment_status}}   </p>
               </div>
               
                   

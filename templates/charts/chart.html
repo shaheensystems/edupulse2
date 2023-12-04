@@ -1,6 +1,14 @@
 {% load static %} <!-- Load the static template tag -->
 {% block content %} 
    <section class='w-full'>
+    {% comment %} {{id}}
+    <br>
+   All Data : {{data}}
+    <br>
+    Labels :{{data.labels}}
+    <br>
+    Data :{{data.data}}
+    {{title}} {% endcomment %}
     <p class='text-center hidden'>Chart </p>
     <canvas id="chart{{id}}" style="width:100%;max-width:1200px"></canvas>
  
@@ -32,6 +40,7 @@
           display: true,
           text: "{{title}}"
         }
+    
       }
     });
     </script>

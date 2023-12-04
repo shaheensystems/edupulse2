@@ -15,7 +15,7 @@ class Attendance(BaseModel):
     # this table can be access by teacher for each course and each student to mark attendance
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
     program_offering = models.ForeignKey(ProgramOffering, on_delete=models.CASCADE, null=True, blank=True)
-    course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, null=True, blank=True)  
+    course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, null=True, blank=True ,related_name="attendance")  
     is_present = models.CharField(max_length=255,choices=ATTENDANCE_CHOICE,default="present", null=True, blank=True)  
     attendance_date = models.DateField(default=timezone.now, null=True, blank=True)
     remark=models.TextField(null=True,blank=True,max_length=255)
@@ -54,6 +54,16 @@ class WeeklyReport(BaseModel):
         ('good','GOOD'),
         ('moderate','MODERATE'),
     ]
+    ASSESSMENT_CHOICE=[
+        ('na','N/A'),
+        ('making progress','MAKING PROGRESS '),
+        ('no progress','NO PROGRESS'),
+        ('request extension','REQUEST EXTENSION'),
+        ('submitted','SUBMITTED'),
+        ('not submitted','NOT SUBMITTED'),
+        ('failed','FAILED'),
+        ('re-sit','RE-SIT'),
+    ]
     week_number=models.PositiveIntegerField(blank=True,null=True)
     # sessions will be list of all attendance in one week
     sessions=models.ManyToManyField(Attendance, verbose_name=("sessions"))
@@ -64,7 +74,9 @@ class WeeklyReport(BaseModel):
     student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='weekly_reports')
     no_of_pages_viewed_on_canvas=models.PositiveIntegerField(null=True,blank=True, default=0)
     login_in_on_canvas=models.BooleanField(default=False, blank=True,null=True)
-    performance=models.CharField( choices=PERFORMANCE_CHOICE, max_length=255,null=True,blank=True,default="n/a")
+    # at_risk Status
+    assessment_status=models.CharField( choices=ASSESSMENT_CHOICE, max_length=255,null=True,blank=True,default="n/a")
+    at_risk=models.BooleanField(default=None,null=True,blank=True)
 
 
 

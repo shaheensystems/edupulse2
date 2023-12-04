@@ -1,13 +1,13 @@
 {% load static %} <!-- Load the static template tag -->
 {% block content %} 
-   <section class='w-full'>
-    <p class='text-center'>Line Chart </p>
+   <section class='w-full '>
+    {% comment %} <p class='text-center'>Line Chart </p> {% endcomment %}
     <canvas id="line{{id}}" style="width:100%;max-width:600px"></canvas>
 
     <script>
     var xValues = {{data.labels|safe}};
     var yValues = {{data.data|safe}};
-    var limit =6
+    var limit =20
     var barColors = [
       "#b91d47",
       "#00aba9",
@@ -31,7 +31,12 @@
         title: {
           display: true,
           text: "{{text}}"
-        }
+        },
+        scales: {
+          y: {
+            beginAtZero: true 
+          }
+      }
       }
     });
     </script>
