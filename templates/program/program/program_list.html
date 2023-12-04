@@ -3,31 +3,57 @@
 <section>
     <h1> All Program  List  </h1>
     <br>
-    <ul class='flex flex-col gap-4'>
+    <ul class='flex flex-col gap-4 '>
         {% for program in programs %}
-          <li><a href="{% url 'program_detail' program.pk %}">
-            
-            <h1>{{ program.name }}</h1>
-            <p> Description :{{ program.description }} </p>
-            {% comment %} <p> Program Link :{{ program.program_link }} </p>
-            <p> Total Credit :{{ program.total_credit }} </p>
-            <p> Duration in Week :{{ program.duration_in_week }} </p> {% endcomment %}
-            <p> Total Course : {{program.course.count}} </p>
-            
-            <ul class='ml-10'>
-                
-                {% for course in program.course.all%}
-                <p> Course Name :{{ course.name }} </p>
-                {% comment %} <p> Course Description :{{ course.description }} </p>
-                <p> Total Credit :{{ course.total_credit }} </p>
-                <p> Duration in Week :{{ course.duration_in_week }} </p>
-                <p> EFTS :{{ course.course_efts }} </p> {% endcomment %}
+        
+        <div class='m-4 bg-gray-200 px-4 py-2 rounded-lg'>
+          <a href="{% url 'program_detail' program.pk %}">
+          <li class='flex flex-col gap-2'>
 
+              <h1>{{ program.name }}</h1>
+              <p> Description :{{ program.description }} </p>
+              {% comment %} <p> Program Link :{{ program.program_link }} </p>
+              <p> Total Credit :{{ program.total_credit }} </p>
+              <p> Duration in Week :{{ program.duration_in_week }} </p> {% endcomment %}
+              <div class='flex ml-10 flex-col'>
+                <p> Courses : {{program.course.count}} </p>
+                <p class='flex flex-row '>
+                  
+                  {% for course in program.course.all%}
+                  <div class='flex flex-col justify-center items-center '>
+                    <p class='text-center  bg-green-200 px-4 py-2 m-2 rounded-lg max-w-md '>{{ course.name }} </P>
+                   
+                  </div>
+                  
+                  {% comment %} <p> Course Description :{{ course.description }} </p>
+                  <p> Total Credit :{{ course.total_credit }} </p>
+                  <p> Duration in Week :{{ course.duration_in_week }} </p>
+                  <p> EFTS :{{ course.course_efts }} </p> {% endcomment %}
+
+                  {% endfor %}
+                </p>
+              
+            
+              </div>
+            
+          </li>
+          {% comment %} program offering detail  {% endcomment %}
+          <div class='ml-10'>
+            <p> Current Program Offering: {{program.program_offerings.count}} </p>
+              <div class='flex flex-row flex-wrap gap-5'>
+                {% for program_offering in program.program_offerings.all%}
+                <div class='flex flex-col  bg-sky-400 px-4 py-2 m-2 rounded-lg'>
+                    <p class='text-center'> {{program_offering.temp_id}}</P>
+                    <p> {{ program_offering.start_date}} to {{ program_offering.end_date}}</p>
+                  </div>
                 {% endfor %}
-            </ul>
-          </a></li>
-
+              </div>
+          </div>
+            
+        </a>  
+        </div>
         {% endfor %}
-      </ul>
+      
+    </ul>
 </section>
 {% endblock content %}

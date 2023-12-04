@@ -29,7 +29,7 @@ class SessionsInline(admin.TabularInline):  # You can also use admin.StackedInli
 
 
 class WeeklyReportAdmin(admin.ModelAdmin):
-    list_display=('week_number','engagement','action','follow_up','course_offering','student','get_sessions_is_present')
+    list_display=('week_number','engagement','action','follow_up','course_offering','student','get_sessions_is_present','no_of_pages_viewed_on_canvas','login_in_on_canvas','assessment_status','at_risk')
     inlines = [SessionsInline]
     
     def get_sessions_is_present(self, obj):

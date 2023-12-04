@@ -4,7 +4,7 @@ import csv
 from .forms import CSVModelForm,AttendanceUploadForm, CanvasStatsUploadForm
 # from .forms import CSVUploadForm
 # from .models import UploadFile
-from .models import Csv
+from .models import Csv,CanvasStatsUpload
 from report.models import Attendance,WeeklyReport
 from customUser.models import Student
 from program.models import Program,Course,ProgramOffering,CourseOffering
@@ -15,6 +15,7 @@ from datetime import datetime
 from django.urls import reverse
 
 from report.views import get_week_number
+from django.db.models import Q
 
 def handle_date_in_correct_format(date_str):
     print("raw data ",date_str)
@@ -256,7 +257,6 @@ def update_or_create_program_offering(data):
 
 def Upload_file_view(request):
     form = CSVModelForm(request.POST or None, request.FILES or None)
-    canvasForm=CanvasStatsUploadForm(request.POST or None, request.FILES or None)
 
     if form.is_valid():
         form.save()
@@ -348,9 +348,8 @@ def Upload_file_view(request):
         obj.save()
         # url = reverse('upload_file:upload_file')
     
-    if canvasForm.is_valid():
-        pass
-    return render(request, 'upload/upload_file.html', {'form': form,'canvasForm':canvasForm})
+   
+    return render(request, 'upload/upload_file.html', {'form': form})
 
 
 
@@ -478,7 +477,13 @@ def Attendance_Upload_View(request, pk):
                                 weekly_report, created = WeeklyReport.objects.get_or_create(
                                     student=student_obj, course_offering=course_offering, week_number=week_number)
 
-                                weekly_report.sessions.add(newAttendance)
+                                # weekly_report.sessions.add(newAttendance)
+                                if not weekly_report.sessions.filter(Q(id=newAttendance.id) ).exists():
+                                    # The newAttendance does not exist, so add it
+                                    weekly_report.sessions.add(newAttendance)
+                                else:
+                                    # The newAttendance already exists
+                                    print("Attendance already exists")
                                 weekly_report.save()
                             else:
                                 print("Error !!! attendance date is not belong to this course offering ")
@@ -500,8 +505,90 @@ def Attendance_Upload_View(request, pk):
             # print(data)
         except Exception as e:
              print(f'Error opening file: {e}')
-        
-        
-        
+
+    pass      
 
     return render(request, 'upload/upload_attendance.html', {'form': form, "course_offering": course_offering})
+
+def Canvas_weekly_report_upload_view(request, pk,week_number):
+    form=CanvasStatsUploadForm(request.POST or None, request.FILES or None)
+    course_offering = get_object_or_404(CourseOffering, id=pk)
+    week_number=week_number
+    weekly_reports = WeeklyReport.objects.filter(week_number=week_number, course_offering=course_offering)
+    students = course_offering.student.filter(weekly_reports__week_number=week_number).distinct()
+    # print("weekly report for all week:",weekly_reports)
+
+    if form.is_valid():
+        form.save()
+        form = CanvasStatsUploadForm()
+        obj = CanvasStatsUpload.objects.get(activated=False)
+        with open(obj.file_name.path, 'r') as f:
+            reader = csv.reader(f)
+
+            header = next(reader, None)
+
+            # Define a dictionary to map header names to variable names
+            header_mappings = {
+                                "Last page view time":"last_login_date",
+                                "Page Views":"no_of_page_views",
+                                "Email":"student_email_id",
+                               
+            }
+
+            # Create variables for each column
+            data = {variable_name: None for header_name, variable_name in header_mappings.items()}
+
+            for row in reader:
+                if header is not None:
+                    for header_name, variable_name in header_mappings.items():
+                        index = header.index(header_name) if header_name in header else -1
+                        if index >= 0:
+                            data[variable_name] = row[index]
+                
+                last_login_date=data['last_login_date']
+                if len(last_login_date)>4:
+                    last_login_status=True
+                else:
+                    last_login_status=False
+
+                no_of_canvas_page_views=data['no_of_page_views']
+                if no_of_canvas_page_views=="-":
+                    no_of_canvas_page_views=0
+                student_email_id=data['student_email_id']
+                student_id=student_email_id.split('@')[0] 
+                # print(f"Student id :{student_id} last login status is {last_login_status} on date {last_login_date} and total pages view in canvas is {no_of_canvas_page_views} ")
+
+                for weekly_report in weekly_reports:
+                    # print("student Id in weekly report",weekly_report.student.temp_id)
+                    if student_id==weekly_report.student.temp_id:
+                        print("Student Id matched : ",student_id)
+
+                student_weekly_report = weekly_reports.filter(student__temp_id=student_id)
+
+                if student_weekly_report:
+                    print(f"Student weekly report exists for {student_id}")
+                    # Update the specific WeeklyReport instance with the new data
+                    student_weekly_report = student_weekly_report  # Ensure it's a single instance
+                    student_weekly_report.no_of_pages_viewed_on_canvas = no_of_canvas_page_views
+                    student_weekly_report.login_in_on_canvas = last_login_status
+                    # student_weekly_report.save()
+                else:
+                    print("Student weekly report not exits ")
+                # print("student weekly report ",student_weekly_report.login_in_on_canvas)
+                # print("student weekly report ",student_weekly_report.no_of_pages_viewed_on_canvas)
+                
+        
+        
+        
+        
+        obj.activated = True
+        obj.save()
+
+
+    return render(request, 'upload/upload_canvas_weekly_report.html', {
+        'form':form,
+        'weekly_reports': weekly_reports,
+        'students': students,
+        'week_number':week_number,
+        'course_offering':course_offering
+        })

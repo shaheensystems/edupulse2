@@ -1,0 +1,36 @@
+{% load static %} <!-- Load the static template tag -->
+{% block content %} 
+   <section class='w-full'>
+    <p class='text-center'>Bar Chart Vertical </p>
+        <canvas id="barV{{id}}" style="width:100%;max-width:700px"></canvas>
+   
+    <script>
+        {% comment %} var xValues = ["Italy", "France", "Spain", "USA", "Argentina"]; {% endcomment %}
+        var xValues = {{data.labels|safe}};
+        var yValues = {{data.data|safe}};
+        var barColors = ["red", "green","blue","orange","brown"];
+        var limit =8
+
+        new Chart("barV{{id}}", {
+            type: "bar",
+            data: {
+            labels: xValues.slice(0,limit),
+            datasets: [{
+               
+                backgroundColor: barColors,
+                data: yValues
+            }]
+            },
+            options: {
+            
+            legend: {display: true},
+            title: {
+                display: true,
+                text: "{{text}}"
+            }
+            }
+        });
+    </script>
+</section>
+
+{% endblock %}

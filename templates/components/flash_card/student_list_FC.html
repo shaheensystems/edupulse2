@@ -1,0 +1,83 @@
+{% block content %}
+<section class='rounded-lg '>
+   
+    
+    {% if view == "list" %}
+        {% for student in students  %}
+            <div>{{student.student.first_name}} {{student.student.last_name}}</div>
+        {% endfor %}
+   
+    {% elif view == "detail" %} 
+        {% for student in students  %}
+        <div class='bg-blue-200 m-4 p-4 rounded-lg'>
+            <p>Student first Name :{{student.student.first_name}} </p>
+            <p>Student Last Name :{{student.student.last_name}} </p>
+            <p>Student email ID:{{student.student.email}} </p>
+            <p>Student personal Email :{{student.email_id}} </p>
+            <p>Student date of brth :{{student.student.dob}} </p>
+            <p>Student gender :{{student.student.gender}} </p>
+            <p>Student campus :{{student.student.campus.name}} </p>
+            <p>Student Joining date  :{{student.joining_date}} </p>
+            <p>International Studnet Status  :{{student.international_student}} </p>
+            <p>Student passport Number  :{{student.passport_number}} </p>
+            <p>Student Visa Number :{{student.visa_number}} </p>
+            <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p>
+            <br>
+        </div>
+        {% endfor %}
+    
+    {% elif view == "table" %}
+        {% if students %}
+            <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border px-4 py-2">First Name</th>
+                        <th class="border px-4 py-2">Last Name</th>
+                        <th class="border px-4 py-2">Email ID</th>
+                        <th class="border px-4 py-2">Personal Email</th>
+                        <th class="border px-4 py-2 min-w-[150px]">Date of Birth</th>
+                        <th class="border px-4 py-2">Gender</th>
+                        <th class="border px-4 py-2">Campus</th>
+                        <th class="border px-4 py-2">Joining Date</th>
+                        <th class="border px-4 py-2">International Student</th>
+                        <th class="border px-4 py-2">Passport Number</th>
+                        <th class="border px-4 py-2">Visa Number</th>
+                        <th class="border px-4 py-2">Visa Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td class="border px-4 py-2">{{ student.student.first_name }}</td>
+                            <td class="border px-4 py-2">{{ student.student.last_name }}</td>
+                            <td class="border px-4 py-2">{{ student.student.email }}</td>
+                            <td class="border px-4 py-2">{{ student.email_id }}</td>
+                            <td class="border px-4 py-2">{{ student.student.dob }}</td>
+                            <td class="border px-4 py-2">{{ student.student.gender }}</td>
+                            <td class="border px-4 py-2">{{ student.student.campus.name }}</td>
+                            <td class="border px-4 py-2">{{ student.joining_date }}</td>
+                            <td class="border px-4 py-2">{{ student.international_student }}</td>
+                            <td class="border px-4 py-2">{{ student.passport_number }}</td>
+                            <td class="border px-4 py-2">{{ student.visa_number }}</td>
+                            <td class="border px-4 py-2">{{ student.visa_expiry_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No students available.</p>
+        {% endif %}
+   
+    {% endif %}
+  
+    {% comment %} <a href="{% url 'student_detail.html' student.pk %}" > {% endcomment %}
+        
+      
+        
+          
+       
+       
+    {% comment %} </a> {% endcomment %}
+</section>
+
+{% endblock content %}

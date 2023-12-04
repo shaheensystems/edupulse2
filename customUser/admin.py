@@ -28,8 +28,7 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(NewUser, CustomUserAdmin)
 
 
-class StaffAdmin(admin.ModelAdmin):
-    list_display=('id','staff','joining_date','designation','role','remark')
+
 
 
 class ProgramOfferingInline(admin.StackedInline):
@@ -41,7 +40,24 @@ class CourseOfferingInline(admin.StackedInline):
     # model=CourseOffering
     extra=1
 
+class CourseOfferingStaffInline(admin.StackedInline):
+    model=Staff.course_offerings.through
+    # model=CourseOffering
+    extra=1
 
+class StaffAdmin(admin.ModelAdmin):
+    list_display=('id','staff','joining_date','designation','role','remark')
+    inlines=[CourseOfferingStaffInline]
+    def get_courses_offered(self, obj):
+        # courses_offered = obj.course_offering.through.objects.filter(student=obj)
+        courses_offered = obj.course_offerings.all()
+        # print("student name:",obj.student.first_name)
+        # print( f"course name:", {str(course.course.name) for course in courses_offered})
+
+        return ', '.join([str(course.course.name) for course in courses_offered])
+
+
+    get_courses_offered.short_description = 'Courses Offered'
 
 class StudentAdmin(admin.ModelAdmin):
     list_display=(

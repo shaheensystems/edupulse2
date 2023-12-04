@@ -15,7 +15,7 @@ class Attendance(BaseModel):
     # this table can be access by teacher for each course and each student to mark attendance
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
     program_offering = models.ForeignKey(ProgramOffering, on_delete=models.CASCADE, null=True, blank=True)
-    course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, null=True, blank=True)  
+    course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, null=True, blank=True ,related_name="attendance")  
     is_present = models.CharField(max_length=255,choices=ATTENDANCE_CHOICE,default="present", null=True, blank=True)  
     attendance_date = models.DateField(default=timezone.now, null=True, blank=True)
     remark=models.TextField(null=True,blank=True,max_length=255)
@@ -48,6 +48,22 @@ class WeeklyReport(BaseModel):
         ('warning letter 1','Warning Letter 1'),
         ('warning letter 2','Warning Letter 2'),
     ]
+    PERFORMANCE_CHOICE=[
+        ('na','N/A'),
+        ('poor','POOR'),
+        ('good','GOOD'),
+        ('moderate','MODERATE'),
+    ]
+    ASSESSMENT_CHOICE=[
+        ('na','N/A'),
+        ('making progress','MAKING PROGRESS '),
+        ('no progress','NO PROGRESS'),
+        ('request extension','REQUEST EXTENSION'),
+        ('submitted','SUBMITTED'),
+        ('not submitted','NOT SUBMITTED'),
+        ('failed','FAILED'),
+        ('re-sit','RE-SIT'),
+    ]
     week_number=models.PositiveIntegerField(blank=True,null=True)
     # sessions will be list of all attendance in one week
     sessions=models.ManyToManyField(Attendance, verbose_name=("sessions"))
@@ -56,15 +72,13 @@ class WeeklyReport(BaseModel):
     follow_up=models.CharField(choices=FOLLOW_UP_CHOICE,null=True,blank=True, max_length=255,default="n/a")
     course_offering=models.ForeignKey(CourseOffering, verbose_name=("Course Offering"), on_delete=models.CASCADE,related_name='weekly_reports')
     student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='weekly_reports')
-    # no_of_pages_viewed_on_canvas=models.PositiveIntegerField(null=True,blank=True, default=0)
-    # login_in_on_canvas=models.BooleanField(default=False)
+    no_of_pages_viewed_on_canvas=models.PositiveIntegerField(null=True,blank=True, default=0)
+    login_in_on_canvas=models.BooleanField(default=False, blank=True,null=True)
+    # at_risk Status
+    assessment_status=models.CharField( choices=ASSESSMENT_CHOICE, max_length=255,null=True,blank=True,default="n/a")
+    at_risk=models.BooleanField(default=None,null=True,blank=True)
 
-class CanvasStudentReport(BaseModel):
-    student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='canvas_reports')
-    no_of_pages_viewed=models.PositiveIntegerField(null=True,blank=True, default=0)
-    last_page_view_date=models.DateField( auto_now=False, auto_now_add=False , null=True, blank=True)
-    last_participation_date=models.DateField( auto_now=False, auto_now_add=False , null=True, blank=True)
-    last_logged_out_date=models.DateField( auto_now=False, auto_now_add=False , null=True, blank=True)
+
 
 
 

@@ -4,13 +4,12 @@
         <h1> Course Offering Deatil </h1>
         <div class="flex justify-end gap-5">
             <a href="{% url 'attendance_list' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Show Attendance</a>
-            <a href="{% url 'take_attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg hidden">Take Attendance</a>
             <a href="{% url 'create-attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Mark Attendance</a>
         </div>
     
    
         <div class='bg-gray-400 ml-5 p-5  rounded-xl'>
-       <p>course offering  name :{{course_offering.course.name}}</p>
+       <p>course offering  name :{{course_offering.course.name}} ({{course_offering.offering_mode}})</p>
        <p>course offering  Start date : {{course_offering.start_date}}</p>
        <p>course offering  End  date : {{course_offering.end_date}}</p>
        <p>course offering  remark :{{course_offering.remark}}</p>
@@ -19,24 +18,29 @@
        
        <br>
        <p>Enrolled  Student :{{course_offering.student.count}}</p>
-       <div class='ml-5 p-5  rounded-xl flex flex-row flex-wrap gap-1'>
-         {% for student in course_offering.student.all %}
-           <div class='bg-blue-200 m-4 p-4 rounded-lg'>
-             <p>Student first Name :{{student.student.first_name}} </p>
-             <p>Student Last Name :{{student.student.last_name}} </p>
-             <p>Student email ID:{{student.student.email}} </p>
-             <p>Student personal Email :{{student.email_id}} </p>
-             <p>Student date of brth :{{student.student.dob}} </p>
-             <p>Student gender :{{student.student.gender}} </p>
-             <p>Student campus :{{student.student.campus.name}} </p>
-             <p>Student Joining date  :{{student.joining_date}} </p>
-             <p>International Studnet Status  :{{student.international_student}} </p>
-             <p>Student passport Number  :{{student.passport_number}} </p>
-             <p>Student Visa Number :{{student.visa_number}} </p>
-             <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p>
-             <br>
-           </div>
-         {% endfor %}
+          {% comment %} {{chart_data_attendance}} {% endcomment %}
+       <div class='w-11/12 bg-gray-100 rounded-lg hidden my-3'>
+
+        {% with data=chart_data_attendance title='Student Attendace' id='students_attedance' chartType='bar' lengendDisplay='true' limitData=10 %}
+          {% include 'charts/chart.html' %}
+        {% endwith %}
+      </div>
+        <div class='w-11/12 bg-gray-100 rounded-lg my-5'>
+
+          {% with data=chart_data_attendance title='Student Attendace' text='Students Attendace' id='students_attedance'%}
+          {% include 'charts/lineChart.html' %}
+          {% endwith %}
+        </div>
+     
+
+
+       <div class='mt-3 rounded-xl flex flex-col flex-wrap gap-1'>
+        
+          {% with students=course_offering.student.all  view=view %}
+            {% include 'components/flash_card/student_list_FC.html' %}
+          {% endwith %}
+          
+      
        </div>
        </div>
    

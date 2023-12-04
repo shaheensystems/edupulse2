@@ -149,3 +149,6 @@ TAILWIND_APP_NAME='theme'
 # NPM_BIN_PATH=r"C:\Program Files\nodejs\npm.cmd"
 # for Mac bok
 NPM_BIN_PATH=r"/usr/local/bin/npm"
+
+LOGIN_REDIRECT_URL = '/'  # Replace with your desired redirect 
+LOGIN_URL = 'user-login'
