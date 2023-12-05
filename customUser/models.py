@@ -20,7 +20,7 @@ class NewUser(AbstractUser):
     nationality=models.CharField(max_length=255,null=True,blank=True)
     address=models.ForeignKey(Address, verbose_name="Address", on_delete=models.CASCADE,null=True,blank=True)
     
-    campus=models.ForeignKey(Campus, verbose_name="Campus", on_delete=models.CASCADE,null=True,blank=True)
+    campus=models.ForeignKey(Campus, verbose_name="Campus", on_delete=models.CASCADE,null=True,blank=True, related_name='users')
     
     
 
@@ -30,18 +30,20 @@ class Staff(BaseModel):
         ('HR','Human Resources'),
         ('Lecturer','Lecturer'),
         ('Assistant Lecturer','Assistant Lecturer'),
-        ('Consoler','Consoler'),
+        ('Counselor','Counselor'),
     ]
-    staff=models.ForeignKey(NewUser,on_delete=models.CASCADE,null=True,blank=True)
-    student_email_id=models.EmailField(null=True,blank=True)
+    staff=models.ForeignKey(NewUser,on_delete=models.CASCADE,null=True,blank=True, related_name='staff')
+    email_id=models.EmailField(null=True,blank=True)
     joining_date=models.DateField(null=True,blank=True)
     designation=models.CharField(max_length=255,choices=Designation_Choice,null=True,blank=True)
     role=models.CharField(max_length=255,null=True,blank=True)
     remark=models.TextField(max_length=1000,null=True,blank=True)
+    def __str__(self):
+        return f"{self.staff.first_name} {self.staff.last_name}"
 
 class Student(BaseModel):
     
-    student=models.ForeignKey(NewUser,on_delete=models.CASCADE,null=True,blank=True)
+    student=models.ForeignKey(NewUser,on_delete=models.CASCADE,null=True,blank=True, related_name='students')
     joining_date=models.DateField(null=True,blank=True) 
     international_student=models.BooleanField(default=False)
     remark=models.TextField(max_length=1000,null=True,blank=True)
@@ -52,6 +54,9 @@ class Student(BaseModel):
     passport_number=models.CharField(max_length=255,null=True,blank=True)
     visa_number=models.CharField(max_length=255,null=True,blank=True)
     visa_expiry_date=models.DateField(default=None, null=True,blank=True)
+
+    def __str__(self):
+        return f"{self.student.first_name} {self.student.last_name}"
 
 
 # table for enrolled courses for each course offering linked with each student for result , result status and attendance 

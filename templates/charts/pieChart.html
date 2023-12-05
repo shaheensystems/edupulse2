@@ -1,0 +1,39 @@
+{% load static %} <!-- Load the static template tag -->
+{% block content %} 
+   <section class='w-full'>
+    <p class='text-center'>Pie Chart </p>
+    <canvas id="pie{{id}}" style="width:100%;max-width:1200px"></canvas>
+
+    <script>
+    var xValues = {{data.labels|safe}};
+    var yValues = {{data.data|safe}};
+    var limit =6
+    var barColors = [
+      "#b91d47",
+      "#00aba9",
+      "#2b5797",
+      "#e8c3b9",
+      "#1e7145"
+    ];
+    
+    new Chart("pie{{id}}", {
+      type: "pie",
+      data: {
+        labels: xValues.slice(0,limit),
+        datasets: [{
+          backgroundColor: barColors,
+          data: yValues
+        }]
+      },
+      options: {
+        legend: {display: false},
+        title: {
+          display: true,
+          text: "{{text}}"
+        }
+      }
+    });
+    </script>
+</section>
+
+{% endblock %}

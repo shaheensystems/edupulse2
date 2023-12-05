@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+{% block content %}
+<section class="my-4">
+    <h1 class="font-semibold text-lg mb-4">User Login </h1>
+    <section>
+        <form method='post'>
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type ="Submit" >
+                <p class='bg-sky-300 px-4 py-2 mt-5 rounded-lg '>Login</p>
+            </button>
+        </form>
+    </section>
+    
+</section>
+{% endblock %}

@@ -2,7 +2,8 @@ from django.contrib import admin
 from customUser.models import NewUser,Staff,Student
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
-from program.models import ProgramOffering,CourseOffering
+
+from report.models import Attendance
 
 # Register your models here.
 # Extend the UserAdmin class
@@ -27,8 +28,7 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(NewUser, CustomUserAdmin)
 
 
-class StaffAdmin(admin.ModelAdmin):
-    list_display=('id','staff','joining_date','designation','role','remark')
+
 
 
 class ProgramOfferingInline(admin.StackedInline):
@@ -36,11 +36,28 @@ class ProgramOfferingInline(admin.StackedInline):
     extra=1
 
 class CourseOfferingInline(admin.StackedInline):
-    model=Student.course_offering.through
+    model=Student.course_offerings.through
     # model=CourseOffering
     extra=1
 
+class CourseOfferingStaffInline(admin.StackedInline):
+    model=Staff.course_offerings.through
+    # model=CourseOffering
+    extra=1
 
+class StaffAdmin(admin.ModelAdmin):
+    list_display=('id','staff','joining_date','designation','role','remark')
+    inlines=[CourseOfferingStaffInline]
+    def get_courses_offered(self, obj):
+        # courses_offered = obj.course_offering.through.objects.filter(student=obj)
+        courses_offered = obj.course_offerings.all()
+        # print("student name:",obj.student.first_name)
+        # print( f"course name:", {str(course.course.name) for course in courses_offered})
+
+        return ', '.join([str(course.course.name) for course in courses_offered])
+
+
+    get_courses_offered.short_description = 'Courses Offered'
 
 class StudentAdmin(admin.ModelAdmin):
     list_display=(
@@ -62,7 +79,7 @@ class StudentAdmin(admin.ModelAdmin):
 
     def get_courses_offered(self, obj):
         # courses_offered = obj.course_offering.through.objects.filter(student=obj)
-        courses_offered = obj.course_offering.all()
+        courses_offered = obj.course_offerings.all()
         # print("student name:",obj.student.first_name)
         # print( f"course name:", {str(course.course.name) for course in courses_offered})
 
@@ -71,13 +88,8 @@ class StudentAdmin(admin.ModelAdmin):
     get_programs_offered.short_description = 'Programs Offered'
     get_courses_offered.short_description = 'Courses Offered'
 
-class ProgramOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','program')
 
-class CourseOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','course','result_status','result_status_code')
 
 admin.site.register(Staff, StaffAdmin)  
-admin.site.register(ProgramOffering,ProgramOfferingAdmin)
-admin.site.register(CourseOffering,CourseOfferingAdmin)
+
 admin.site.register(Student,StudentAdmin)

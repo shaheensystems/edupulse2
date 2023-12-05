@@ -6,11 +6,15 @@
         <br>
         <ul class='flex flex-col gap-4'>
             {% for program in program_offering %}
-              <li><a href="{% url 'program_offering_detail' program.pk %}">
+              <li class='flex flex-col bg-sky-300 px-4 py-2 m-2 rounded-lg'>
+                <a href="{% url 'program_offering_detail' program.pk %}">
                 
-                <h1>{{ program.program.name }}</h1>
-                <p> strat from {{ program.start_date }} to {{ program.end_date }}</p>
-              </a></li>
+                  <h1>{{ program.temp_id }}:{{ program.program.name }} </h1>
+                  <p> start from {{ program.start_date }} to {{ program.end_date }}</p>
+                  <p> No of course offering : {{program.program.course.count}}</P>
+
+                </a>
+              </li>
 
             {% endfor %}
           </ul>

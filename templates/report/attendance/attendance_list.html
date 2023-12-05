@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <h1 class='my-4 font-semibold text-lg'>Attendance Report
+        <br>
+        Course name : {{course_offering.temp_id}} : {{course_offering.course.name}}
+        <br>
+        course starts from  {{course_offering.start_date}} to {{course_offering.end_date}}
+    </h1>
+   <div class='flex flex-row gap-9'>
+    <a href="{% url 'weekly_report_list' course_offering.pk %}" class="px-4 py-2  bg-blue-200 rounded-lg"> Weekly Report</a>
+    
+    
+    <a href="{% url 'upload_attendance' course_offering.pk %}" class="px-4 py-2  bg-blue-200 rounded-lg"> Upload Attendance</a>
+  
+   </div>
+    
+
+    <h1 class="text-2xl font-semibold mb-0">Attendance for {{ course_offering.course.name }}</h1>
+    <h2>Date-wise Attendance</h2>
+    <table class="table-auto w-full"style="border-collapse: separate; border-spacing: 10px ;">
+        <thead>
+            <tr>
+                <th>Week Number</th>
+                <th>Session Number</th>
+                <th>Date</th>
+                <th>Total Students Present</th>
+                <th>Total Students</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attendance in attendance_list %}
+                <tr class="{% cycle 'bg-gray-200' 'bg-white' %}">
+                    <td>{{ attendance.week_number }}</td>
+                    <td>{{ attendance.session_number }}</td>
+                    <td>{{ attendance.attendance_date|date:'Y-m-d' }}</td>
+                    <td>{{ attendance.total_present|default:'0' }}</td>
+                    <td>{{ attendance.total_students }}</td>
+                    
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+</div>
+
+
+{% endblock %}

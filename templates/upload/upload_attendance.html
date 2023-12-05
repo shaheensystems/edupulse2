@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<section class='flex flex-col gap-3'>
+    <h1> Upload Attendance </h1>
+    <p> course Offering Name : {{course_offering.temp_id}}: {{course_offering.course.name}}<p>
+    {% comment %} #  user double quote otherwise form will get the error {% endcomment %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form.as_p}}
+        <br>
+        <button type="submit" ><p class="px-4 py-1 rounded-lg bg-blue-300">Confirm</P></button>
+    </form> 
+</section>
+
+{% endblock content %}

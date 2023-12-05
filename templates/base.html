@@ -1,5 +1,7 @@
+
 {% load static %}
 {% load static tailwind_tags %}
+{% load custom_tags %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,6 +11,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {% tailwind_css %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+  <script src="https://www.gstatic.com/charts/loader.js"> </script>
+
+    
   <title>EduPulse</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter">
   <link rel="stylesheet" href="{% static 'src/styles.css' %}">
@@ -16,6 +23,7 @@
 
 <body class="bg-yellow-50 flex flex-col gap-3 font-inter">
   <header>
+
     <div class="container mx-auto mt-4 flex flex-row gap-4 justify-end">
       <a href={% url 'dashboard' %} class='text-neutral-50 px-4 py-2 bg-brown-300 rounded-lg font-semibold '>Dashboard</a>
       <a href={% url 'upload_file:upload_csv' %} class='text-neutral-50 px-4 py-2 bg-brown-300 rounded-lg'>Upload File</a>
@@ -37,6 +45,44 @@
     {% endblock content %}
   </section>
   
+
+    <div class="container mx-auto mt-4 flex flex-row gap-4">
+      <a href={% url 'dashboard' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Dashboard</a>
+      
+
+      {% if request.user|user_belongs_to_group:'Admin' %} 
+      <a href={% url 'upload_file:upload_csv' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Upload Student data </a>
+      <a href="/admin" class='px-4 py-2 bg-blue-300 rounded-lg'>Admin</a>
+      {% endif %}
+
+      {% if request.user|user_belongs_to_group:'Teacher' or request.user|user_belongs_to_group:'Admin'  %} 
+      <a href={% url 'course_offering_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Course Offring for teacher</a>
+      {% endif %}
+
+  
+      <a href={% url 'program_offering_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>WC Current programs </a>
+      <a href={% url 'program_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>All programs </a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'user-logout' %}" class='px-4 py-2 bg-red-300 rounded-lg'>{{user.username | title}}</a>  
+      <a href="{% url 'user-logout' %}" class='px-4 py-2 bg-red-300 rounded-lg'>Logout</a>
+         
+      {% endif %}
+    </div>
+  </hedaer>
+  <h1> username:{{user.username}} <br>
+    GroupStatus :{{request.user|user_belongs_to_group:'Teacher' }} 
+    {% for group in user.groups.all %}
+    {{ group.name }}
+    {% if not forloop.last %}, {% endif %}
+{% endfor %}</h1>
+  
+  <section class="container mx-auto mt-4 flex flex-row gap-4">
+
+    {% block content %}
+    {% endblock content %}
+  </section>
+ 
+
 </body>
 
 <hr class="hr-base-footer"></hr>
