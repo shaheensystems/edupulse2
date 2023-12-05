@@ -4,11 +4,11 @@
 <section>
     <h1> All Programme  List  </h1>
     <br>
-    <ul class='flex flex-col gap-4 bg-neutral-100 text-lg'>
+    <ul class='flex flex-col gap-4 bg-neutral-100 text-lg bottom-round'>
         {% for program in programs %}
-          <li><a href="{% url 'program_detail' program.pk %}">
+          <li><a class="sub-nav-menu" href="{% url 'program_detail' program.pk %}">
             
-            <div class='container mx-auto flex flex-row bg-orange-600 py-2 text-2xl font-inter pl-3'>
+            <div class='container mx-auto flex flex-row bg-orange-600 py-2 text-2xl font-inter pl-3 top-round'>
               <h1>{{ program.name }}</h1> </a> 
               <svg class="ml-1 mb-1 self-end" xmlns="http://www.w3.org/2000/svg" width="30" height="27" viewBox="0 0 30 27" fill="none">
                 <ellipse cx="15" cy="13.5" rx="11" ry="10.5" fill="black"/>
@@ -19,18 +19,22 @@
                 <path d="M25.4733 28.125L23.0492 25.7008C22.3169 24.9686 22.3169 23.7814 23.0492 23.0492C23.7814 22.3169 24.9686 22.3169 25.7008 23.0492L31.3258 28.6742C31.5056 28.8539 31.6412 29.0611 31.7327 29.2823C31.8244 29.5034 31.875 29.7458 31.875 30C31.875 30.2542 31.8244 30.4966 31.7327 30.7177C31.6412 30.9389 31.5056 31.1461 31.3258 31.3258L25.7008 36.9508C24.9686 37.6831 23.7814 37.6831 23.0492 36.9508C22.3169 36.2186 22.3169 35.0314 23.0492 34.2992L25.4733 31.875H15C13.9645 31.875 13.125 31.0355 13.125 30C13.125 28.9645 13.9645 28.125 15 28.125H25.4733Z" fill="black"/>
               </svg> 
             </div>
-            <div class="container mx-auto mt-4 flex flex-row gap-4 pl-3 space-x-36">
+            <div>
+              <div class="container mx-auto mt-4 flex flex-row gap-4 pl-3 space-x-36">
               
-            <div> <p> Attendance </p> </div>
-            <div> <p> View Students </p> </div>
-            <div> <p> View Results </p> </div>
-            </div> 
-            <div class="hidden pl-3" id="more-text"> 
-            {% comment %} <p> Program Link :{{ program.program_link }} </p>
-            <p> Total Credit :{{ program.total_credit }} </p>
-            <p> Duration in Week :{{ program.duration_in_week }} </p> {% endcomment %}
-            <p> Total Course : {{program.course.count}} </p>
+                <div> <p class="sub-nav-menu"> Attendance </p> </div>
+                <div> <p class="sub-nav-menu"> View Students </p> </div>
+                <div> <p class="sub-nav-menu"> View Results </p> </div>
             </div>
+            <div class="hidden pl-3" id="more-text"> 
+              {% comment %} <p> Program Link :{{ program.program_link }} </p>
+              <p> Total Credit :{{ program.total_credit }} </p>
+              <p> Duration in Week :{{ program.duration_in_week }} </p> {% endcomment %}
+              <p> Total Course : {{program.course.count}} </p>
+              </div>
+            
+            </div> 
+            
             
             
         {% endfor %}

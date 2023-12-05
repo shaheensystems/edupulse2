@@ -2,7 +2,7 @@
 {% load static tailwind_tags %}
 
 <!DOCTYPE html>
-<html  lang="en">
+<html lang="en">
 
 <head >
   <meta charset="UTF-8">
@@ -26,11 +26,19 @@
       
     </div>
   </header>
+
+<hr class="hr-base-header">
+
+</hr>
+
   <section class="container mx-auto mt-4 flex justify-center flex-row gap-4">
    
     {% block content %}
     {% endblock content %}
   </section>
+  
 </body>
+
+<hr class="hr-base-footer"></hr>
 
 </html>
