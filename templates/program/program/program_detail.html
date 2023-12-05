@@ -1,44 +1,127 @@
 {% extends "base.html" %}
 {% block content %}
     <section>
-        {% comment %} <h1> Program Deatil </h1> {% endcomment %}
-        <div>
+
+        
+        <h1> Programme Detail </h1>
+        
+            <div class='container bg-orange-600 py-2 text-3xl font-inter pl-3 flex justify-center top-round gap-6'>
+                <b><h1 class="pt-2">{{ program.name }}</h1> </a> </b>
+
+                <svg class= "pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
+                    <path d="M22.5909 37.0114V18.2614H25.7727V37.0114H22.5909ZM14.8068 29.2273V26.0455H33.5568V29.2273H14.8068Z" fill="rgb(254 252 232"/>
+                    </svg>
+                    
+
+                    <svg class= "pr-3 pt-2" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="24" cy="22.715" rx="24" ry="21.9675" fill="black"/>
+                        <ellipse cx="10.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+                        <ellipse cx="34.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+                        <ellipse cx="22.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+                    </svg>
+                        
+                    
+            </div>
+
+                <div class="container flex flex-row gap-6 pl-7 bg-neutral-100 mb-1 bottom-round "> <!--gap-4 pl-3 space-x-36 -->
+                    
+                    <div class="container mx-auto mt-4 flex flex-row gap-6 text-2xl font-semibold w-full mb-1 ">
+                         <p class="sub-nav-menu"> Attendance </p>  
+                        <div><img src="\media\edupulse-global.icon.png" alt="international students icon" width="45" height="45"></div>
+                        <div><img src="\media\edupulse-domestic.icon.png" alt="international students icon" width="45" height="45"></div>
+                    </div>
+                    
+                    <div class="container mx-auto mt-4 flex flex-row gap-6 font-semibold text-2xl">
+                         <p class="sub-nav-menu"> Student Directory </p>
+                        <div><img class="details-icon" src="\media\edupulse-studentdirectory.icon.png" alt="student directory icon" width="45" height="45"></div>
+                    </div>
+                   
+                    <div class="container mx-auto mt-4 flex flex-row gap-6 font-semibold text-2xl ">
+                        <p class="sub-nav-menu"> View Results </p>
+                        <div> <img src="\media\edupulse-viewresults.icon.png" alt="view results icon" width="45" height="45"> </div>
+                    </div>
+                    
+                </div> 
+
+                   
             
-            <p class='text-lg font-semibold'>Program Name :{{ program.name }}</P>
-            <p> Description :{{ program.description }} </p>
-            <p> Program Link :{{ program.program_link }} </p>
-            <p> Total Credit :{{ program.total_credit }} </p>
-            <p> Duration in Week :{{ program.duration_in_week }} </p>
-            <p> Total Course : {{program.course.count}} </p>
+            <p> Description: {{ program.description }} </p>
+            <p> Programme Link: {{ program.program_link }} </p>
+            <p> Total Credits: {{ program.total_credit }} </p>
+            <p> Duration in Weeks: {{ program.duration_in_week }} </p>
+            <p> Total Number of Courses: {{program.course.count}} </p>
             
-            <div class='bg-green-200 px-4 py-2 ml-10 rounded-lg flex flex-row  flex-wrap gap-3'>
+            <h2 class="text-2xl font-semibold"> Courses included in the {{ program.name }}:</h2>
+
+
+            <ul class='ml-10 inline bg-neutral-100 bottom-round'>
                 
                 {% for course in program.course.all%}
-                <a href="{% url 'course_detail' course.pk %}">
-                    <div class='flex flex-col'>
-                        <p> Course Name :{{ course.name }} </p>
-                        <p> Course Description :{{ course.description }} </p>
-                        <p> Total Credit :{{ course.total_credit }} </p>
-                        <p> Duration in Week :{{ course.duration_in_week }} </p>
-                        <p> EFTS :{{ course.course_efts }} </p>
+
+
+                <div class='container bg-orange-600 font-inter pl-3 top-round pb-2'>
+                    <div class="flex flex-row gap-20"> 
+                        <p class="text-2xl mt-2 font-semibold"> 'Course Code' </p>
+
+                        <button id="toggle-btn"> 
+                            <svg class="mt-2 mr-2_5" width="25" height="23" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <ellipse cx="12.5833" cy="11.5" rx="11.9903" ry="11.5" fill="black"/>
+                            <path d="M11.4852 15.2045V7.70455H12.758V15.2045H11.4852ZM8.3716 12.0909V10.8182H15.8716V12.0909H8.3716Z" fill="rgb(254 252 232)"/>
+                            </svg> 
+                        </button>
+
+                        <button id="hide-btn" class="hidden focus:outline-none">
+                            <svg class="mt-2 mr-2_5" width="25" height="23" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <ellipse cx="12.5833" cy="11.5" rx="11.9903" ry="11.5" fill="black"/>
+                            <rect x="8" y="11" width="10" height="2" fill="rgb(254 252 232)"/>
+                            </svg>
+                            </button>
                     </div>
-                </a>
-                {% endfor %}
-            </div>
-            <div class='flex flex-row flex-wrap'>
+                        
+                    <p class="text-sm text-slate-800"> {{ course.name }} </p>
+                </div>
                 
-                {% for program_offering in program.program_offerings.all%}
-                <a href="{% url 'program_offering_detail' program_offering.pk %}">
-                    <div class='flex flex-col  bg-sky-400 px-4 py-2 m-2 rounded-lg'>
-                        <p class='text-center'> {{program_offering.temp_id}}</P>
-                        <p> from {{ program_offering.start_date}} to {{ program_offering.end_date}}</p>
-                    </div>
-                </a>
-                {% endfor %}
+                <div class="hidden" id="more-text">
+                    <p> Total Credit: {{ course.total_credit }} </p>
+                    <p> Duration in Week: {{ course.duration_in_week }} </p>
+                    <p> EFTS: {{ course.course_efts }} </p>
+                </div>
+                
+
+
+                <div class="container text-xl flex flex-col mx-auto  mt-4 gap-4 ">
               
-            </div>
-          
-        </div>
-    </section>
+                    <div class="ml-5"> <p class="sub-nav-menu"> Attendance </p> </div>
+                    <div class="ml-5"> <p class="sub-nav-menu"> View Students </p> </div>
+                    <div class="ml-5"> <p class="sub-nav-menu"> View Results </p> </div>
+
+                </div> 
+
+                {% endfor %}
+            </ul>
+          </a>
+        </section>
     
+        <script>
+            const moreTextEl = document.getElementById('more-text');
+            const toggleBtnEl = document.getElementById('toggle-btn');
+            const hideBtnEl = document.getElementById('hide-btn');
+            
+            toggleBtnEl.addEventListener('click', () => {
+            moreTextEl.classList.toggle('hidden');
+            toggleBtnEl.classList.toggle('hidden');
+            hideBtnEl.classList.toggle('hidden');
+            });
+            
+            hideBtnEl.addEventListener('click', () => {
+            moreTextEl.classList.toggle('hidden');
+            toggleBtnEl.classList.toggle('hidden');
+            hideBtnEl.classList.toggle('hidden');
+            });
+        </script>
+
 {% endblock content %}
+
+
+    
