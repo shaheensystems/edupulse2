@@ -1,0 +1,33 @@
+{% block content %}
+{% load custom_tags %}
+<section class='my-2'>
+    
+    {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
+       <!-- student perforamnce Pie chart -->
+       <div class="bg-gray-200 p-4 mb-4">
+        <h2 class="text-xl font-bold mb-2">Student Performance</h2>
+        <div class='flex flex-row flex-wrap py-4'>
+          
+        <!-- Add three pie charts with dummy data linked with attendance, engagement, and actions -->
+          <div class='w-4/12 bg-gray-100 rounded-lg'>
+            {% with data=chart1_data title=chart1_title id=chart1_id chartType='pie' lengendDisplay='false' limitData=10 %}
+              {% include 'charts/chart.html' %}
+            {% endwith %}
+          </div>
+          <div class='w-4/12 bg-gray-100 rounded-lg'>
+            {% with data=chart2_data title=chart3_title id=chart2_id chartType='pie' lengendDisplay='false' limitData=10 %}
+              {% include 'charts/chart.html' %}
+            {% endwith %}
+          </div>
+          <div class='w-4/12 bg-gray-100 rounded-lg'>
+            {% with data=chart3_data title=chart3_title id=chart3_id chartType='pie' lengendDisplay='false' limitData=10 %}
+              {% include 'charts/chart.html' %}
+            {% endwith %}
+          </div>
+        </div>
+      </div>
+      
+    {% comment %} </a> {% endcomment %}
+</section>
+
+{% endblock content %}

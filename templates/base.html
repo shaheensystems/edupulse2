@@ -45,13 +45,14 @@
       {% endif %}
     </div>
   </hedaer>
-  <h1> username:{{user.username}} <br>
-    GroupStatus :{{request.user|user_belongs_to_group:'Teacher' }} 
-    {% for group in user.groups.all %}
-    {{ group.name }}
-    {% if not forloop.last %}, {% endif %}
-{% endfor %}</h1>
-  
+      {% comment %} <h1> username:{{user.username}} <br>
+        GroupStatus :{{request.user|user_belongs_to_group:'Teacher' }} 
+        {% for group in user.groups.all %}
+        {{ group.name }}
+        {% if not forloop.last %}, {% endif %}
+         {% endfor %}
+      </h1>
+   {% endcomment %}
   <section class="container mx-auto mt-4 flex flex-row gap-4">
 
     {% block content %}

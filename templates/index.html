@@ -2,6 +2,52 @@
 {% load custom_tags %}
 {% block content %}
     <section class='flex w-full flex-col'>
+        <!-- User Profile Section -->
+        {% with current_user=current_user  %}
+           {% include 'components/dashboard/user_profile_FC.html' %}
+        {% endwith %}
+      
+
+        {% if request.user|user_belongs_to_group:'Teacher' %}
+            <!-- Course Offering Details Section -->
+            {% with course_offerings=course_offerings students=students  %}
+              {% include 'components/dashboard/course_offering_info_bar.html' %}
+            {% endwith %}
+        {% endif %}
+        
+        {% if  request.user|user_belongs_to_group:'Program_Leader' %}
+            <!-- Program Offering Details Section -->
+          {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
+            {% include 'components/dashboard/program_offering_info_bar.html' %}
+          {% endwith %}
+          {% with data=chart_data_program_offering_student_enrollment text='Students Enrollment' id='students_enrollment'%}
+            {% include 'charts/barChartHorizontal.html' %}
+          {% endwith %}
+
+          {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
+            {% include 'components/dashboard/program_offering_attendance_info.html' %}
+          {% endwith %}
+
+        {% endif %}
+
+          <!-- Trends Section -->
+        {% with  students=students  %}
+          {% include 'components/dashboard/trends.html' %}
+        {% endwith %}
+       
+
+          <!-- Alerts and Messages Section -->
+        {% with  students=students  %}
+          {% include 'components/dashboard/alerts_messages.html' %}
+        {% endwith %}
+         
+
+          <!-- Student Performance Pie Chart Section -->
+        {% with  chart1_data=chart_data_campus_enrollment_student  chart2_data=chart_data_campus_enrollment_student  chart3_data=chart_data_campus_enrollment_student  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id='attendance' chart2_id='engagement'  chart3_id='actions' %}
+          {% include 'components/dashboard/student_performance_pieChart_flow.html' %}
+        {% endwith %}
+          
+
      <p>Total Program Offerings :  {{program_offerings.count}}</p>
      <p>Total course Offerings :  {{course_offerings.count}}</p>
      <p>Total Studnets :  {{students.count}}</p>

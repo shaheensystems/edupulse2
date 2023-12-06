@@ -4,6 +4,7 @@ from base.models import Campus
 from django.views.generic import DetailView,ListView,TemplateView
 from program.models import ProgramOffering,CourseOffering
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Sum
 
 
 
@@ -22,6 +23,32 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         course_offerings=CourseOffering.objects.all()
         campuses=Campus.objects.all()
 
+        # Program Offering Enrollment data 
+        program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+        total_students_in_program_offerings_for_current_user=0
+        for program_offering in program_offerings_for_current_user:
+            students_count=program_offering.student.count()
+            total_students_in_program_offerings_for_current_user=total_students_in_program_offerings_for_current_user+students_count
+        
+        print("total students :",total_students_in_program_offerings_for_current_user)
+
+        program_offering_enrollment_data=[]
+        for program_offering in program_offerings_for_current_user:
+            prog_off_enrolled_students=program_offering.student.count()
+            program_offering_enrollment_data.append({
+                "program_name":program_offering.temp_id+":"+program_offering.program.name,
+                'enrolled_students':prog_off_enrolled_students
+            })
+        # Sort enrollment_data based on enrolled_students in descending order
+        sorted_program_offering_enrollment_data = sorted(program_offering_enrollment_data, key=lambda x: x['enrolled_students'], reverse=True)
+        
+       
+        program_offering_student_enrollment = {
+            'labels': [enrollment['program_name'] for enrollment in sorted_program_offering_enrollment_data],
+            'data': [enrollment['enrolled_students'] for enrollment in sorted_program_offering_enrollment_data],
+        }
+        
+        # course offering enrollment data 
         enrollment_data = []
         for course_offering in course_offerings:
             enrolled_students = course_offering.student.count()
@@ -66,10 +93,28 @@ class DashboardView(LoginRequiredMixin,TemplateView):
        
         context['chart_data_campus_enrollment_student'] = chart_data_campus_enrollment_student
         context['chart_data_campus_enrollment_staff'] = chart_data_campus_enrollment_staff
+        context['chart_data_program_offering_student_enrollment'] = program_offering_student_enrollment
         context['chart_data_enrollment'] = chart_data_enrollment
         context['program_offerings']=program_offerings
+        context['program_offerings_for_current_user']=program_offerings_for_current_user
+        context['total_students_in_program_offerings_for_current_user']=total_students_in_program_offerings_for_current_user
         context['course_offerings']=course_offerings
         context['students']=students
+        context['current_user'] = self.request.user
+        context['staff_profile'] = self.request.user.staff_profile
+
+        print("current user:", self.request.user)
+        # print("staff profile:", self.request.user.staff_profile)
+        staff_profile = None
+        for staff in Staff.objects.all():
+            if staff.staff == self.request.user:
+                print("user profile by suer:",self.request.user.staff_profile)
+                print("user profile by staff object :",staff.staff)
+                staff_profile = staff
+                break
+
+        context['staff_profile'] = staff_profile
+
 
         # Add other necessary context data
 

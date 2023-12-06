@@ -1,0 +1,41 @@
+{% block content %}
+{% load custom_tags %}
+<section class='my-2'>
+    
+    {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
+       <!-- User Profile Section -->
+       <div class="bg-gray-200 p-4 mb-4 flex flex-col">
+        <h2 class="text-xl font-bold mb-2 flex  justify-leftitems-center">User Profile</h2>
+        <div class="flex flex-row gap-4">
+          <div class='flex justify-center flex-col items-center'>
+            <img src="{{ current_user.user_image.url }}" alt="User Image" class="rounded-full h-16 w-16 mb-2">
+            <p class="mb-2">{{current_user.first_name}} {{current_user.last_name}}</p>
+            
+          </div>
+          <div class='flex flex-col ml-5'>
+            <p class="mb-2">Username: {{current_user.username}}</p>
+            <p class="mb-2">Campus: {{current_user.campus}}</p>
+            <p>
+              {% if current_user.staff_profile %}
+                  Joining Date: {{ current_user.staff_profile.joining_date}}
+              {% else %}
+                  No Staff information available.
+              {% endif %}
+            </p>
+            <p>
+            Group :
+              {% for group in current_user.groups.all %}
+                  {{ group.name }}
+                  {% if not forloop.last %}, {% endif %}
+              {% endfor %}
+              ({{current_user|user_belongs_to_group:'Teacher' }})
+            </p>
+          
+          </div>
+        </div>
+        <!-- Add more user profile details -->
+      </div>
+    {% comment %} </a> {% endcomment %}
+</section>
+
+{% endblock content %}

@@ -1,0 +1,56 @@
+{% block content %}
+{% load custom_tags %}
+<section class='my-2'>
+    
+    {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
+       <!-- Course_offering_infobar -->
+       <div class="bg-gray-200 p-4 mb-4  flex flex-col">
+        <div class='flex flex-row gap-3 items-baseline justify-start ' >
+            <h2 class="text-xl font-bold mb-2 border-l-2 border-y-2">Program Offering attendance info</h2> |
+          {% comment %} <div class='flex flex-row gap-4 flex-wrap '> {% endcomment %}
+            
+            <p class="mb-2 ">Current Program : {{program_offerings.count}}</p> 
+            <p class="mb-2">Total Students Enrolled: {{students}}</p> 
+            <p class="mb-2">Students at Risk: 10</p> 
+
+        </div>
+        
+        
+        {% comment %} </div> {% endcomment %}
+
+          <!-- Program Offering Info Table -->
+         
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 shadow">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b">Program Code</th>
+                            <th class="py-2 px-4 border-b">Program Name</th>
+                            <th class="py-2 px-4 border-b">Enrolled Students</th>
+                            <th class="py-2 px-4 border-b">Attendance Percentage</th>
+                            <th class="py-2 px-4 border-b">At-Risk Students</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for program_offering in program_offerings %}
+                            <tr>
+                                <td class="py-2 px-4 border-b">{{ program_offering.program.temp_id }} </td>
+                                <td class="py-2 px-4 border-b">{{ program_offering.program.name }}</td>
+                                <td class="py-2 px-4 border-b">{{ program_offering.student.count }}</td>
+                                <td class="py-2 px-4 border-b">{{ program_offering.calculate_attendance_percentage }}</td>
+                                <td class="py-2 px-4 border-b">{{ program_offering.calculate_no_at_risk_student_for_last_week }}</td>
+                            </tr>
+                           
+                           
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+                
+      </div>
+      
+    {% comment %} </a> {% endcomment %}
+</section>
+
+{% endblock content %}
