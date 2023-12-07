@@ -1,0 +1,47 @@
+
+{% load static %}
+{% block content %}
+<nav class="bg-gray-100 ">
+  <div class="container mx-auto flex items-center justify-between p-4  flex-row gap-4">
+      <!-- Logo and site name -->
+      <a href="{% url 'dashboard' %}" class="flex items-center flex-col">
+          <img src="{% static '/logo/logo.jpeg' %}" alt="Logo" class="w-10 h-08 mr-2">
+          <span class="text-md font-semibold">EduPulse</span>
+      </a>
+
+      <!-- Navbar links -->
+      <div class="hidden lg:flex space-x-4  md:flex-wrap">
+          <a href="{% url 'admin:index' %}" class="text-blue-500">Admin</a>
+          <a href="{% url 'dashboard' %}" class="text-blue-500">Dashboard</a>
+          <a href="{% url 'upload_file:upload_csv' %}" class="text-blue-500">Upload</a>
+          <a href="{% url 'course_offering_list' %}" class="text-blue-500">Courses</a>
+          <a href="{% url 'program_offering_list' %}" class="text-blue-500">Programs</a>
+          <a href="{% url 'dashboard' %}" class="text-blue-500">Attendance</a>
+          <a href="{% url 'dashboard' %}" class="text-blue-500">Reports</a>
+      </div>
+
+      <!-- User profile or login/logout button -->
+      <div class="flex items-center space-x-2 flex-row gap-3">
+          {% if user.is_authenticated %}
+              <!-- User profile pic and name -->
+              <div class='flex flex-col justify-center items-center'>
+                <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="w-12 h-10 rounded-full">
+              <span class="hidden lg:inline  text-center  text-xs font-semibold text-gray-400">{{ user.first_name }} {{ user.last_name }}</span>
+              </div>
+              <a href="{% url 'user-logout' %}" class="text-red-500 md:mr-5 bg-gray-200 px-4 py-2 rounded-lg">Logout</a>
+          {% endif %}
+      </div>
+
+      <!-- Responsive navigation toggle button -->
+      <button class="lg:hidden focus:outline-none">
+          <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+      </button>
+  </div>
+</nav>
+
+
+  {% endblock content %}

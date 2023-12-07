@@ -5,14 +5,20 @@
     {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
        <!-- Course_offering_infobar -->
        <div class="bg-gray-200 p-4 mb-4  flex flex-col">
-        <div class='flex flex-row gap-3 items-baseline justify-start ' >
+        <div class='flex flex-row gap-3 items-baseline justify-between ' >
+            <div class='flex flex-row gap-3 items-baseline justify-start '>
             <h2 class="text-xl font-bold mb-2 border-l-2 border-y-2">Program Offering attendance info</h2> |
           {% comment %} <div class='flex flex-row gap-4 flex-wrap '> {% endcomment %}
             
             <p class="mb-2 ">Current Program : {{program_offerings.count}}</p> 
             <p class="mb-2">Total Students Enrolled: {{students}}</p> 
             <p class="mb-2">Students at Risk: 10</p> 
-
+        </div>
+            <div class="flex items-center justify-between mb-4">
+                <button id="toggleButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Show More
+                </button>
+            </div>
         </div>
         
         
@@ -20,7 +26,7 @@
 
           <!-- Program Offering Info Table -->
          
-            <div class="overflow-x-auto">
+            <div id="contentDivProgram" class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-300 shadow">
                     <thead>
                         <tr>
@@ -34,23 +40,84 @@
                     <tbody>
                         {% for program_offering in program_offerings %}
                             <tr>
-                                <td class="py-2 px-4 border-b">{{ program_offering.program.temp_id }} </td>
+                                <td class="py-2 px-4 border-b">{{ program_offering.temp_id }} </td>
                                 <td class="py-2 px-4 border-b">{{ program_offering.program.name }}</td>
                                 <td class="py-2 px-4 border-b">{{ program_offering.student.count }}</td>
                                 <td class="py-2 px-4 border-b">{{ program_offering.calculate_attendance_percentage }}</td>
                                 <td class="py-2 px-4 border-b">{{ program_offering.calculate_no_at_risk_student_for_last_week }}</td>
                             </tr>
-                           
-                           
+                            <tr>
+                                
+                            </tr>
+              
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
 
-                
-      </div>
-      
+               
+     
+       <!-- course Offering Info Table -->
+
+       {% comment %} {{program_offerings}} {% endcomment %}
+       
+        <div id="contentDivProgramDetail" class="overflow-x-auto hidden">
+       {% for program_offering in program_offerings  %}
+
+            
+                <h1 class='flex  text-lg font-bold mt-3'> {{program_offering.temp_id}} {{program_offering.program.name}} </h1>
+                <table class="min-w-full bg-white border border-gray-300 shadow">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b">Course Code</th>
+                            <th class="py-2 px-4 border-b">Cousre Name</th>
+                            <th class="py-2 px-4 border-b">Enrolled Students</th>
+                            <th class="py-2 px-4 border-b">Attendance Percentage</th>
+                            <th class="py-2 px-4 border-b">At-Risk Students</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cousre_offering in program_offering.list_course_offerings  %}
+                            <tr>
+                                <td class="py-2 px-4 border-b">{{ cousre_offering.temp_id }} </td>
+                                <td class="py-2 px-4 border-b">{{ cousre_offering.course.name }}</td>
+                                <td class="py-2 px-4 border-b">{{ cousre_offering.student.count }}</td>
+                                <td class="py-2 px-4 border-b">{{ cousre_offering.calculate_attendance_percentage }}</td>
+                                <td class="py-2 px-4 border-b">{{ cousre_offering.calculate_no_at_risk_student_for_last_week }}</td>
+                            </tr>
+              
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+       {% endfor %}
+    </div>
+</div>
     {% comment %} </a> {% endcomment %}
+    <script>
+        // JavaScript to toggle the visibility of the content div
+        const toggleButton = document.getElementById('toggleButton');
+        const contentDivProgramDetail = document.getElementById('contentDivProgramDetail');
+        const contentDivProgram = document.getElementById('contentDivProgram');
+    
+        let isContentDiv1Visible = true;
+
+            toggleButton.addEventListener('click', () => {
+                if (isContentDiv1Visible) {
+                    contentDivProgramDetail.classList.remove('hidden');
+                    contentDivProgram.classList.add('hidden');
+                    toggleButton.textContent = 'Show Less'
+                    
+                } else {
+                    contentDivProgramDetail.classList.add('hidden');
+                    contentDivProgram.classList.remove('hidden');
+                    toggleButton.textContent = 'Show More'
+                }
+
+                // Toggle the visibility state for the next click
+                isContentDiv1Visible = !isContentDiv1Visible;
+            });
+    </script>
 </section>
 
 {% endblock content %}

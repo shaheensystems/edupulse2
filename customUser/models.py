@@ -35,6 +35,7 @@ class Staff(BaseModel):
         ('Assistant Lecturer','Assistant Lecturer'),
         ('Counselor','Counselor'),
         ('Program Leader','Program Leader'),
+        ('Head of School','Head of School'),
 
     ]
     staff = models.OneToOneField(NewUser, on_delete=models.CASCADE, null=True, blank=True, related_name='staff_profile')

@@ -23,9 +23,20 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         course_offerings=CourseOffering.objects.all()
         campuses=Campus.objects.all()
 
-        # Program Offering Enrollment data 
-        program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+        # Program Offering Enrollment data for current user
+        print("current user group :",self.request.user.groups.all())
+        user_groups=self.request.user.groups.all()
+        if user_groups.filter(name="Head_of_School").exists():
+            program_offerings_for_current_user=program_offerings
+        elif user_groups.filter(name="Program_Leader").exists():
+           program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+        else:
+            program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+
+            
+
         total_students_in_program_offerings_for_current_user=0
+
         for program_offering in program_offerings_for_current_user:
             students_count=program_offering.student.count()
             total_students_in_program_offerings_for_current_user=total_students_in_program_offerings_for_current_user+students_count
@@ -89,7 +100,17 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             'data': [enrollment['staff_count'] for enrollment in campus_enrollment_staff],
         }
 
-   
+
+        #Domestic and international students
+        domestic_students = Student.objects.filter(international_student=False).count()
+        international_students = Student.objects.filter(international_student=True).count()
+
+        # Prepare data for the chart
+        chart_data_student_region = {
+            'labels': ['Domestic Students', 'International Students'],
+            'data': [domestic_students, international_students],
+        } 
+
        
         context['chart_data_campus_enrollment_student'] = chart_data_campus_enrollment_student
         context['chart_data_campus_enrollment_staff'] = chart_data_campus_enrollment_staff
@@ -102,6 +123,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['students']=students
         context['current_user'] = self.request.user
         context['staff_profile'] = self.request.user.staff_profile
+        context['chart_data_student_region']=chart_data_student_region
 
         print("current user:", self.request.user)
         # print("staff profile:", self.request.user.staff_profile)

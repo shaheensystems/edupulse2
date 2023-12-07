@@ -142,6 +142,18 @@ class ProgramOffering(BaseModel):
 
         return at_risk_students
 
+    def list_course_offerings(self):
+        courses = self.program.course.all()
+        course_offerings_list = []
+        # Iterate over each course to collect course offerings
+        for course in courses:
+            # Get the course offerings associated with the current course
+            course_offerings = CourseOffering.objects.filter(course=course)
+
+            # Extend the list with the course offerings
+            course_offerings_list.extend(course_offerings)
+
+        return course_offerings_list
 
     def __str__(self):
         return f'{self.temp_id}-{self.program.name}'
