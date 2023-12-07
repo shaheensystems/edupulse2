@@ -8,10 +8,19 @@
             <div class='container bg-orange-600 py-2 text-3xl font-inter pl-3 flex justify-center top-round gap-6'>
                 <b><h1 class="pt-2">{{ program.name }}</h1> </a> </b>
 
+                <button id="programme-toggle-btn">
                 <svg class= "pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
                     <path d="M22.5909 37.0114V18.2614H25.7727V37.0114H22.5909ZM14.8068 29.2273V26.0455H33.5568V29.2273H14.8068Z" fill="rgb(254 252 232"/>
                     </svg>
+                </button>
+
+                <button id="programme-hide-btn" class="hidden focus:outline-none">
+                    <svg class="pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
+                    <rect x="14" y="25" width="20" height="4" fill="rgb(254 252 232)"/>
+                    </svg>
+                </button>
                     
 
                     <svg class= "pr-3 pt-2" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -45,12 +54,15 @@
                 </div> 
 
                    
-            
+                <div class="hidden" id="programme-details">
+
             <p> Description: {{ program.description }} </p>
             <p> Programme Link: {{ program.program_link }} </p>
             <p> Total Credits: {{ program.total_credit }} </p>
             <p> Duration in Weeks: {{ program.duration_in_week }} </p>
             <p> Total Number of Courses: {{program.course.count}} </p>
+
+                </div>
             
             <h2 class="text-2xl font-semibold"> Courses included in the {{ program.name }}:</h2>
 
@@ -118,6 +130,24 @@
             moreTextEl.classList.toggle('hidden');
             toggleBtnEl.classList.toggle('hidden');
             hideBtnEl.classList.toggle('hidden');
+            });
+        </script>
+
+        <script>
+            const programmeDetailsEl = document.getElementById('programme-details');
+            const programmetoggleBtnEl = document.getElementById('programme-toggle-btn');
+            const programmehideBtnEl = document.getElementById('programme-hide-btn');
+    
+            programmetoggleBtnEl.addEventListener('click', () => {
+            programmeDetailsEl.classList.toggle('hidden');
+            programmetoggleBtnEl.classList.toggle('hidden');
+            programmehideBtnEl.classList.toggle('hidden');
+            });
+    
+            programmehideBtnEl.addEventListener('click', () => {
+            programmeDetailsEl.classList.toggle('hidden');
+            programmetoggleBtnEl.classList.toggle('hidden');
+            programmehideBtnEl.classList.toggle('hidden');
             });
         </script>
 
