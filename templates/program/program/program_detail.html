@@ -33,6 +33,7 @@
                     
             </div>
 
+            <div class="bg-neutral-100 bottom-round" >
                 <div class="container flex flex-row gap-6 pl-7 bg-neutral-100 mb-1 bottom-round "> <!--gap-4 pl-3 space-x-36 -->
                     
                     <div class="container mx-auto mt-4 flex flex-row gap-6 text-2xl font-semibold w-full mb-1 ">
@@ -51,18 +52,22 @@
                         <div> <img src="\media\edupulse-viewresults.icon.png" alt="view results icon" width="45" height="45"> </div>
                     </div>
                     
-                </div> 
+                    </div>
+                    
+                    <div class="hidden" id="programme-details">
+
+                        <p> Description: {{ program.description }} </p>
+                        <p> Programme Link: {{ program.program_link }} </p>
+                        <p> Total Credits: {{ program.total_credit }} </p>
+                        <p> Duration in Weeks: {{ program.duration_in_week }} </p>
+                        <p> Total Number of Courses: {{program.course.count}} </p>
+            
+                    </div>
+
+            </div> 
 
                    
-                <div class="hidden" id="programme-details">
-
-            <p> Description: {{ program.description }} </p>
-            <p> Programme Link: {{ program.program_link }} </p>
-            <p> Total Credits: {{ program.total_credit }} </p>
-            <p> Duration in Weeks: {{ program.duration_in_week }} </p>
-            <p> Total Number of Courses: {{program.course.count}} </p>
-
-                </div>
+                
             
             <h2 class="text-2xl font-semibold"> Courses included in the {{ program.name }}:</h2>
 
@@ -94,15 +99,15 @@
                     <p class="text-sm text-slate-800"> {{ course.name }} </p>
                 </div>
                 
-                <div class="hidden" id="more-text">
-                    <p> Total Credit: {{ course.total_credit }} </p>
-                    <p> Duration in Week: {{ course.duration_in_week }} </p>
-                    <p> EFTS: {{ course.course_efts }} </p>
-                </div>
-                
+            
 
+                <div class="container text-xl flex flex-col mx-auto gap-4 bg-neutral-100 bottom-round">
 
-                <div class="container text-xl flex flex-col mx-auto  mt-4 gap-4 ">
+                    <div class="hidden ml-5" id="more-text">
+                        <p> Total Credit: {{ course.total_credit }} </p>
+                        <p> Duration in Week: {{ course.duration_in_week }} </p>
+                        <p> EFTS: {{ course.course_efts }} </p>
+                    </div>
               
                     <div class="ml-5"> <p class="sub-nav-menu"> Attendance </p> </div>
                     <div class="ml-5"> <p class="sub-nav-menu"> View Students </p> </div>
