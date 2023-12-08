@@ -1,5 +1,6 @@
 {% block content %}
 {% load custom_tags %}
+{% load static %}
 <section class='my-2'>
     
     {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
@@ -8,7 +9,13 @@
         <h2 class="text-xl font-bold mb-2 flex  justify-leftitems-center">User Profile</h2>
         <div class="flex flex-row gap-4">
           <div class='flex justify-center flex-col items-center'>
-            <img src="{{ current_user.user_image.url }}" alt="User Image" class="rounded-full h-16 w-16 mb-2">
+     
+            {% if current_user.user_image and current_user.user_image.url %}
+                <img src="{{ current_user.user_image.url }}" alt="User Image" class="rounded-full h-16 w-16 mb-2">
+            {% else %}
+                <img src="{% static '/default/default_user_image.jpeg' %}" alt="User Image" class="rounded-full h-16 w-16 mb-2">            
+            {% endif %} 
+            
             <p class="mb-2">{{current_user.first_name}} {{current_user.last_name}}</p>
             
           </div>

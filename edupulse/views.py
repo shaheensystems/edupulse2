@@ -26,12 +26,12 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         # Program Offering Enrollment data for current user
         print("current user group :",self.request.user.groups.all())
         user_groups=self.request.user.groups.all()
-        if user_groups.filter(name="Head_of_School").exists():
+        if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
             program_offerings_for_current_user=program_offerings
         elif user_groups.filter(name="Program_Leader").exists():
            program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
         else:
-            program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+            program_offerings_for_current_user=None
 
             
 
@@ -122,7 +122,12 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['course_offerings']=course_offerings
         context['students']=students
         context['current_user'] = self.request.user
-        context['staff_profile'] = self.request.user.staff_profile
+        # context['staff_profile'] = self.request.user.staff_profile
+        # Check if the user has a staff_profile
+        if hasattr(self.request.user, 'staff_profile'):
+            context['staff_profile'] = self.request.user.staff_profile
+        else:
+            context['staff_profile'] = None
         context['chart_data_student_region']=chart_data_student_region
 
         print("current user:", self.request.user)
