@@ -2,21 +2,76 @@
 {% block content %}
    
     <section>
-        <h1> Program Offering List  </h1>
+        <h1> Programme Offering List  </h1>
         <br>
         <ul class='flex flex-col gap-4'>
             {% for program in program_offering %}
-              <li class='flex flex-col bg-sky-300 px-4 py-2 m-2 rounded-lg'>
+              <div class='flex flex-col px-4 py-2 m-2'>
                 <a href="{% url 'program_offering_detail' program.pk %}">
                 
-                  <h1>{{ program.temp_id }}:{{ program.program.name }} </h1>
-                  <p> start from {{ program.start_date }} to {{ program.end_date }}</p>
-                  <p> No of course offering : {{program.program.course.count}}</P>
+
+                  <div class='container mx-auto flex flex-row bg-orange-600 py-2 text-2xl font-inter pl-3 top-round'>
+                    <h1>{{ program.temp_id }}:{{ program.program.name }} </h1> </a>
+                    <button id="programme-toggle-btn">
+                      <svg class= "pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
+                          <path d="M22.5909 37.0114V18.2614H25.7727V37.0114H22.5909ZM14.8068 29.2273V26.0455H33.5568V29.2273H14.8068Z" fill="rgb(254 252 232"/>
+                          </svg>
+                      </button>
+      
+                      <button id="programme-hide-btn" class="hidden focus:outline-none">
+                          <svg class="pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
+                          <rect x="14" y="25" width="20" height="4" fill="rgb(254 252 232)"/>
+                          </svg>
+                      </button></a> 
+                    
+                    <svg class=" mb-2 self-end" xmlns="http://www.w3.org/2000/svg" width="65" height="30" viewBox="0 0 60 45" fill="none">
+                      <path d="M43.125 16.875C43.125 15.8395 42.2855 15 41.25 15H28.125C27.0895 15 26.25 15.8395 26.25 16.875V18.1878C26.25 18.8509 26.5134 19.4867 26.9822 19.9556L35.2589 28.2322C36.2352 29.2085 36.2352 30.7915 35.2589 31.7678L26.9822 40.0444C26.5134 40.5133 26.25 41.1491 26.25 41.8122V43.125C26.25 44.1605 27.0895 45 28.125 45H41.25C42.2855 45 43.125 44.1605 43.125 43.125V16.875Z" fill="black"/>
+                      <path d="M25.4733 28.125L23.0492 25.7008C22.3169 24.9686 22.3169 23.7814 23.0492 23.0492C23.7814 22.3169 24.9686 22.3169 25.7008 23.0492L31.3258 28.6742C31.5056 28.8539 31.6412 29.0611 31.7327 29.2823C31.8244 29.5034 31.875 29.7458 31.875 30C31.875 30.2542 31.8244 30.4966 31.7327 30.7177C31.6412 30.9389 31.5056 31.1461 31.3258 31.3258L25.7008 36.9508C24.9686 37.6831 23.7814 37.6831 23.0492 36.9508C22.3169 36.2186 22.3169 35.0314 23.0492 34.2992L25.4733 31.875H15C13.9645 31.875 13.125 31.0355 13.125 30C13.125 28.9645 13.9645 28.125 15 28.125H25.4733Z" fill="black"/>
+                    </svg> 
+                  </div>
+
+                  <div class="bg-neutral-100 bottom-round">
+                    <div class="container mx-auto mt-4 flex flex-row gap-4 pl-3 space-x-36">
+                    
+                      <div> <p class="sub-nav-menu"> Attendance </p> </div>
+                      <div> <p class="sub-nav-menu"> View Students </p> </div>
+                      <div> <p class="sub-nav-menu"> View Results </p> </div>
+                  </div>
+
+                  <div class="hidden pl-3" id="programme-details"> 
+                    <p> Start Date: {{ program.start_date }} End Date: {{ program.end_date }}</p>
+                    <p> Number of Courses : {{program.program.course.count}}<p>
+                    </div>
+                  
+                  </div>
+
+                  
 
                 </a>
-              </li>
+              </div>
 
             {% endfor %}
           </ul>
     </section>
+
+    <script>
+      const programmeDetailsEl = document.getElementById('programme-details');
+      const programmetoggleBtnEl = document.getElementById('programme-toggle-btn');
+      const programmehideBtnEl = document.getElementById('programme-hide-btn');
+
+      programmetoggleBtnEl.addEventListener('click', () => {
+      programmeDetailsEl.classList.toggle('hidden');
+      programmetoggleBtnEl.classList.toggle('hidden');
+      programmehideBtnEl.classList.toggle('hidden');
+      });
+
+      programmehideBtnEl.addEventListener('click', () => {
+      programmeDetailsEl.classList.toggle('hidden');
+      programmetoggleBtnEl.classList.toggle('hidden');
+      programmehideBtnEl.classList.toggle('hidden');
+      });
+  </script>
+
 {% endblock content %}

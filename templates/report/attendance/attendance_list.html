@@ -10,7 +10,8 @@
    <div class='flex flex-row gap-9'>
     <a href="{% url 'weekly_report_list' course_offering.pk %}" class="px-4 py-2  bg-blue-200 rounded-lg"> Weekly Report</a>
     
-    
+    <a href="{% url 'create-attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Mark Attendance</a>
+
     <a href="{% url 'upload_attendance' course_offering.pk %}" class="px-4 py-2  bg-blue-200 rounded-lg"> Upload Attendance</a>
   
    </div>

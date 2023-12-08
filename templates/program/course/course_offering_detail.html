@@ -3,39 +3,38 @@
     <section>
         <h1> Course Offering Detail </h1>
 
-        <div class='container bg-orange-600 py-2 text-3xl font-inter pl-3 flex justify-center top-round gap-6'>
+        <div class='container bg-orange-600 py-2 text-3xl font-inter pl-7 flex top-round gap-6'>
           <b><h1 class="pt-2">{{course_offering.course.name}}</h1> </a> </b>
 
           <button id="course-toggle-btn">
-          <svg class= "pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg class= "pl-3 justify-end" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
               <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
               <path d="M22.5909 37.0114V18.2614H25.7727V37.0114H22.5909ZM14.8068 29.2273V26.0455H33.5568V29.2273H14.8068Z" fill="rgb(254 252 232"/>
               </svg>
           </button>
 
           <button id="course-hide-btn" class="hidden focus:outline-none">
-              <svg class="pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg class="pl-3 justify-end" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
               <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
               <rect x="14" y="25" width="20" height="4" fill="rgb(254 252 232)"/>
               </svg>
           </button>
               
-
-              <svg class= "pr-3 pt-2" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <ellipse cx="24" cy="22.715" rx="24" ry="21.9675" fill="black"/>
-                  <ellipse cx="10.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
-                  <ellipse cx="34.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
-                  <ellipse cx="22.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
-              </svg>
+            <svg class= "pr-3 pt-2 justify-end" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="24" cy="22.715" rx="24" ry="21.9675" fill="black"/>
+                <ellipse cx="10.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+                <ellipse cx="34.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+                <ellipse cx="22.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+            </svg>
                   
               
       </div>
 
-      <div class="bg-neutral-100 bottom-round" >
+      <div class="bg-neutral-100 bottom-round">
           <div class="container flex flex-row gap-6 pl-7 bg-neutral-100 mb-1 bottom-round "> <!--gap-4 pl-3 space-x-36 -->
               
               <div class="container mx-auto mt-4 flex flex-row gap-6 text-2xl font-semibold w-full mb-1 ">
-                   <p class="sub-nav-menu"> Attendance </p>  
+                   <p class="sub-nav-menu"><a href="{% url 'attendance_list' course_offering.pk %}">Attendance</a> </p>  
                   <div><img src="\media\edupulse-global.icon.png" alt="international students icon" width="45" height="45"></div>
                   <div><img src="\media\edupulse-domestic.icon.png" alt="international students icon" width="45" height="45"></div>
               </div>
@@ -52,7 +51,7 @@
               
               </div>
               
-              <div class="hidden flex flex-col" id="course-details">
+              <div class="hidden flex flex-col pl-3 pt-2 pb-2" id="course-details">
 
                 <div class="flex flex-row gap-6"> 
                   <p>Start Date: {{course_offering.start_date}}</p>
@@ -85,23 +84,24 @@
 
 
         <div class="flex justify-end gap-5">
-            <a href="{% url 'attendance_list' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Show Attendance</a>
-            <a href="{% url 'create-attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Mark Attendance</a>
+            
+            
         </div>
     
    
-        <div class='container bg-gray-400 ml-5 p-5  rounded-xl'>
+        <div class='container background: #94B557; ml-5 p-5  rounded-xl'>
        
           {% comment %} {{chart_data_attendance}} {% endcomment %}
 
 
        <div class='w-11/12 bg-gray-100 rounded-lg hidden my-3'>
 
-        {% with data=chart_data_attendance title='Student Attendace' id='students_attedance' chartType='bar' lengendDisplay='true' limitData=10 %}
+        {% with data=chart_data_attendance title='Student Attendance' id='students_attedance' chartType='bar' lengendDisplay='true' limitData=10 %}
           {% include 'charts/chart.html' %}
         {% endwith %}
       </div>
-        <div class='container bg-brown-300 rounded-lg my-5'> <!-- graph-->
+
+        <div class='container bg-gray-100 rounded-lg my-5'> <!-- graph-->
 
           {% with data=chart_data_attendance title='Student Attendace' text='Students Attendace' id='students_attedance'%}
           {% include 'charts/lineChart.html' %}
@@ -110,7 +110,7 @@
      
 
 
-       <div class='mt-3 rounded-xl flex flex-col flex-wrap gap-1'>
+        <div class='mt-3 rounded-xl flex flex-col flex-wrap gap-1'>
         
           {% with students=course_offering.student.all  view=view %}
             {% include 'components/flash_card/student_list_FC.html' %}

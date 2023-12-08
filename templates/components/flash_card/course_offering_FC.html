@@ -1,12 +1,66 @@
 {% block content %}
-<section class='bg-blue-200 my-4 px-2 py-4 rounded-lg'>
+
+<ul class='ml-10 inline bg-neutral-100 bottom-round'>
+                
+    <div class='container bg-green-course font-inter pl-3 top-round pb-2'>
+        <div class="flex flex-row"> 
+            <a href="{% url 'course_offering_detail' course_offering.pk %}">
+                <h2 class="text-lg font-bold">{{course_offering}} ({{course_offering.offering_mode}})</h2>
+                <p> Start from {{course_offering.start_date}} to {{course_offering.end_date}}</p> 
+            </a>
+
+            <button id="toggle-btn" class="top-0 right-0"> 
+                <svg class=" mr-2_5" width="25" height="23" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="12.5833" cy="11.5" rx="11.9903" ry="11.5" fill="black"/>
+                <path d="M11.4852 15.2045V7.70455H12.758V15.2045H11.4852ZM8.3716 12.0909V10.8182H15.8716V12.0909H8.3716Z" fill="rgb(254 252 232)"/>
+                </svg> 
+            </button>
+
+            <button id="hide-btn" class="hidden focus:outline-none">
+                <svg class="mt-2 mr-2_5" width="25" height="23" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="12.5833" cy="11.5" rx="11.9903" ry="11.5" fill="black"/>
+                <rect x="8" y="11" width="10" height="2" fill="rgb(254 252 232)"/>
+                </svg>
+                </button>
+        </div>
+            
+        
+    </div>
+<div class="container text-xl flex flex-col mx-auto gap-4 bg-neutral-100 bottom-round">
     
-    <a href="{% url 'course_offering_detail' course_offering.pk %}" >
-        <p>{{course_offering}} ({{course_offering.offering_mode}})</p>
-        <p> Start from {{course_offering.start_date}} to  {{course_offering.end_date}}</p>
-        <p>Remark :{{course_offering.remark}}</p>
-     <p> Total No of Students:{{course_offering.student.count}}</p>
-    </a>
-</section>
+    
+    <div class="container text-xl flex flex-col mx-auto gap-4 bg-neutral-100 bottom-round">
+
+        <div class="hidden ml-5" id="more-text">
+            
+            <p> Remark: {{course_offering.remark}}</p>
+            <p> Total Number of Students: {{course_offering.student.count}}</p>
+        </div>
+  
+        <div class="ml-5"> <p class="sub-nav-menu"> <p class="sub-nav-menu"><a href="{% url 'attendance_list' course_offering.pk %}">Attendance</a> </p>  </div>
+        <div class="ml-5"> <p class="sub-nav-menu"> View Students </p> </div>
+        <div class="ml-5"> <p class="sub-nav-menu"> View Results </p> </div>
+    </div>
+</div>
+
+</ul>
 
 {% endblock content %}
+
+<script>
+    const moreTextEl = document.getElementById('more-text');
+    const toggleBtnEl = document.getElementById('toggle-btn');
+    const hideBtnEl = document.getElementById('hide-btn');
+    
+    toggleBtnEl.addEventListener('click', () => {
+    moreTextEl.classList.toggle('hidden');
+    toggleBtnEl.classList.toggle('hidden');
+    hideBtnEl.classList.toggle('hidden');
+    });
+    
+    hideBtnEl.addEventListener('click', () => {
+    moreTextEl.classList.toggle('hidden');
+    toggleBtnEl.classList.toggle('hidden');
+    hideBtnEl.classList.toggle('hidden');
+    });
+</script>
