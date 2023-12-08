@@ -25,7 +25,7 @@
   <header>
     {% include 'components/base/header.html' %}
 
-    <div class="container mx-auto mt-4 flex flex-row gap-4">
+    {% comment %} <div class="container mx-auto mt-4 flex flex-row gap-4">
       <a href={% url 'dashboard' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Dashboard</a>
       
 
@@ -43,7 +43,6 @@
       <a href={% url 'program_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>All Programs </a>
       {% if user.is_authenticated %}
       
-      {% comment %} <a href="{% url 'user-logout' %}" class='px-4 py-2 bg-red-300 rounded-lg'>{{user.username | title}}</a>   {% endcomment %}
       <a href="{% url 'user-logout' %}" class='px-4 py-2 bg-red-300 rounded-lg'>Logout</a>
       <div class='flex  items-center flex-col  h-1 '>
         <img src="{{ user.user_image.url }}" alt="User Image" class="rounded-full h-10 w-10 ">
@@ -51,7 +50,8 @@
         
       </div>
       {% endif %}
-    </div>
+    </div> {% endcomment %}
+    
   </hedaer>
       {% comment %} <h1> username:{{user.username}} <br>
         GroupStatus :{{request.user|user_belongs_to_group:'Teacher' }} 

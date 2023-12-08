@@ -66,7 +66,7 @@ class Student(BaseModel):
     visa_expiry_date=models.DateField(default=None, null=True,blank=True)
 
     def __str__(self):
-        return f"{self.student.first_name} {self.student.last_name}"
+        return f"{self.student.temp_id} "
 
 
 # table for enrolled courses for each course offering linked with each student for result , result status and attendance 

@@ -1,31 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
-    <section>
-        <h1> Course Offering Deatil </h1>
+    <section class='my-2 w-full' >
+       
+        <h1 class='text-center mt-4 text-xl mb-1'><strong>Course Offering Deatil</strong>  </h1>
         <div class="flex justify-end gap-5">
             <a href="{% url 'attendance_list' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Show Attendance</a>
             <a href="{% url 'create-attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Mark Attendance</a>
         </div>
-    
+        <div class="bg-gray-200 p-4 mb-4 w-full gap-5 flex flex-row justify-between items-baseline">
+             
+          <div class='w-1/2'>
+            <h1><strong>Program Detail</strong>  </h1>
+            <h2 class="text-xl font-bold my-2">{{ course_offering.temp_id }} <br> {{course_offering.course.name}} ({{course_offering.offering_mode}})</h2>
+            <p><strong>Description:</strong> {{ course_offering.course.description }}</p>
+            <p><strong>Program Link:</strong> {{ course_offering.course.program_link }}</p>
+            <p><strong>Duration in week:</strong> {{ course_offering.course.duration_in_week }}</p>
+            <p><strong>Start Date:</strong> {{ course_offering.start_date }}</p>
+            <p><strong>End Date:</strong> {{ course_offering.end_date }}</p>
+            <p><strong>Remark:</strong> {{ course_offering.remark }}</p>
+          </div>
+        
+          <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
+            <p class="mb-2">Total Students Enrolled: {{course_offering.student.count}}</p> |
+            <p class="mb-2">Attendnace Percentage: {{course_offering.calculate_attendance_percentage}} %</p> |
+            {% if course_offering.calculate_no_at_risk_student_for_last_week >  0 %}
+            <p class='text-red-500'>Students at Risk: {{course_offering.calculate_no_at_risk_student_for_last_week}}</p>
+            {% else  %}
+            <p>Students at Risk: {{course_offering.calculate_no_at_risk_student_for_last_week}}</p>
+            {% endif %}
+            
+          
+          </div>
+          <!-- Add more course offering details -->
+        </div>
    
-        <div class='bg-gray-400 ml-5 p-5  rounded-xl'>
-       <p>course offering  name :{{course_offering.course.name}} ({{course_offering.offering_mode}})</p>
-       <p>course offering  Start date : {{course_offering.start_date}}</p>
-       <p>course offering  End  date : {{course_offering.end_date}}</p>
-       <p>course offering  remark :{{course_offering.remark}}</p>
-       <p>course offering  Result Status code :{{course_offering.result_status_code}}</p>
-       <p>course offering  Result Status :{{course_offering.result_status}}</p>
+        <div class='my-2 w-full flex flex-row flex-wrap justify-between'>
        
-       <br>
-       <p>Enrolled  Student :{{course_offering.student.count}}</p>
-          {% comment %} {{chart_data_attendance}} {% endcomment %}
-       <div class='w-11/12 bg-gray-100 rounded-lg hidden my-3'>
+  
+        <div class='w-5/12 bg-gray-100 rounded-lg  my-3'>
 
-        {% with data=chart_data_attendance title='Student Attendace' id='students_attedance' chartType='bar' lengendDisplay='true' limitData=10 %}
-          {% include 'charts/chart.html' %}
-        {% endwith %}
-      </div>
-        <div class='w-11/12 bg-gray-100 rounded-lg my-5'>
+          {% with data=chart_data_attendance title='Student performance' id='students_performace' chartType='bar' lengendDisplay='true' limitData=10 %}
+            {% include 'charts/chart.html' %}
+          {% endwith %}
+        </div>
+        <div class='w-5/12 bg-gray-100 rounded-lg my-5'>
 
           {% with data=chart_data_attendance title='Student Attendace' text='Students Attendace' id='students_attedance'%}
           {% include 'charts/lineChart.html' %}

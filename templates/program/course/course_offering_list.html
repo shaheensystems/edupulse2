@@ -1,17 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
-    <section>
-        <h1 class='text-lg font-bold mb-5'> Course Offering List  </h1>
+<section class='w-full'>
+    {% comment %} <h1> Program Offering List  </h1> {% endcomment %}
+    <section class='my-2 w-full'>
+
+      {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
+         <!-- Course_offering_infobar -->
+         <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+          <h2 class="text-xl font-bold mb-2">Course Details</h2>
+          <div class='flex flex-row gap-4 flex-wrap '>
+            <p class="mb-2 ">Current Course: {{course_offerings.count}}</p> |
+            <p class="mb-2">Total Students Enrolled: {{total_students}}</p> |
+            {% if total_no_of_at_risk_student >  0 %}
+                  <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student}}</p>
+                  {% else  %}
+                  <p>Students at Risk: {{total_no_of_at_risk_student}}</p>
+                  {% endif %}
+          </div>
+          <!-- Add more course offering details -->
+        </div>
         
-        <h1 class='flex flex-col gap-3'>
-            {% for course_offering in course_offerings  %}
-               {% with course_offering=course_offering %}
-                 {% include 'components/flash_card/course_offering_FC.html' %}
-               {% endwith %}  
-    
+      </a>
+  </section>
+    <br>
+   
+    <ul class='flex flex-col gap-4 w-3/4'>
+      
+        {% for course_offering in course_offerings %}
+                    {% with course_offering=course_offering %}
+                        {% include 'components/flash_card/course_offering_FC.html' %}
+                    {% endwith %} 
         {% endfor %}
-        </h1>
-        
-    </section>
+      </ul>
+      
+</section>
+  
     
 {% endblock content %}

@@ -13,13 +13,19 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         ('Custom Fields', {'fields': ('gender', 'dob','address','phone','user_image','campus')}),
     )
-    list_display = ('id', 'get_full_name','username', 'email', 'dob', 'gender','phone','address','display_groups','user_image','campus')  # Add 'get_full_name' to display combined name
+    list_display = ('id', 'get_full_name','username', 'get_personal_email_id','email', 'dob', 'gender','phone','address','display_groups','user_image','campus')  # Add 'get_full_name' to display combined name
     list_filter = UserAdmin.list_filter + ('gender','campus',)  # Add 'position' and 'department' to filters
     readonly_fields=('last_login','date_joined')
     # Custom method to get combined first name and last name
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}"
+        
     get_full_name.short_description = 'Full Name'  # Column header in admin
+
+    def get_personal_email_id(self, obj):
+        return f"{obj.student_profile.email_id} "
+    
+    get_personal_email_id.short_description = 'Personal Email Id'  # Column header in admin
 
     def display_groups(self, obj):
         return format_html(', '.join([group.name for group in obj.groups.all()]))
