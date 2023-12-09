@@ -5,7 +5,7 @@
         
         <h1> Programme Detail </h1>
         
-            <div class='container bg-orange-600 py-2 text-3xl font-inter pl-3 flex justify-center top-round gap-6'>
+            <div class='container bg-pastel-orange py-2 text-3xl font-inter pl-3 flex justify-center top-round gap-6'>
                 <b><h1 class="pt-2">{{ program.name }}</h1> </a> </b>
 
                 <button id="programme-toggle-btn">
@@ -54,13 +54,25 @@
                     
                     </div>
                     
-                    <div class="hidden" id="programme-details">
+                    <div class="hidden flex flex-col pl-3 pt-2 pb-2" id="programme-details">
 
-                        <p> Description: {{ program.description }} </p>
-                        <p> Programme Link: {{ program.program_link }} </p>
-                        <p> Total Credits: {{ program.total_credit }} </p>
-                        <p> Duration in Weeks: {{ program.duration_in_week }} </p>
-                        <p> Total Number of Courses: {{program.course.count}} </p>
+                        <div class="flex flex-row gap-20">
+                            <p> <b>Total Credits:</b> {{ program.total_credit }} </p>
+                            <p> <b>Duration in Weeks:</b> {{ program.duration_in_week }} </p>
+                        </div>
+
+                        <br>
+
+                        <div class="flex flex-row gap-20">
+                            <p> <b>Description:</b>  {{ program.description }} </p>
+                        </div>
+
+                        <br>
+                        
+                        <div class="flex flex-row gap-20">
+                            <p> <b>Total Number of Courses:</b>  {{program.course.count}} </p>
+                        </div>
+                        
             
                     </div>
 
@@ -72,14 +84,17 @@
             <h2 class="text-2xl font-semibold"> Courses included in the {{ program.name }}:</h2>
 
 
-            <ul class='ml-10 inline bg-neutral-100 bottom-round'>
+            <div class='grid grid-cols-4 gap-3'></div>
+            
                 
                 {% for course in program.course.all%}
 
+                <ul class='ml-10 inline bg-neutral-100 bottom-round max-course-wdith'>
 
-                <div class='container bg-orange-600 font-inter pl-3 top-round pb-2'>
+
+                <div class='container bg-greenish font-inter pl-3 top-round pb-2'>
                     <div class="flex flex-row gap-20"> 
-                        <p class="text-2xl mt-2 font-semibold"> 'Course Code' </p>
+                        <p class="text-2xl mt-2 font-semibold"> {{course.temp_id}} </p>
 
                         <button id="toggle-btn"> 
                             <svg class="mt-2 mr-2_5" width="25" height="23" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -99,25 +114,33 @@
                     <p class="text-sm text-slate-800"> {{ course.name }} </p>
                 </div>
                 
-            
-
                 <div class="container text-xl flex flex-col mx-auto gap-4 bg-neutral-100 bottom-round">
-
+            
+                    
+                <div class="container text-xl flex flex-col mx-auto gap-4 bg-neutral-100 bottom-round mt-4">
+                    
                     <div class="hidden ml-5" id="more-text">
-                        <p> Total Credit: {{ course.total_credit }} </p>
-                        <p> Duration in Week: {{ course.duration_in_week }} </p>
-                        <p> EFTS: {{ course.course_efts }} </p>
+                        <p> <b>Total Credit:</b> {{ course.total_credit }} </p>
+                        <p> <b>Duration in Week:</b> {{ course.duration_in_week }} </p>
+                        <p> <b>EFTS:</b> {{ course.course_efts }} </p>
                     </div>
               
-                    <div class="ml-5"> <p class="sub-nav-menu"> Attendance </p> </div>
-                    <div class="ml-5"> <p class="sub-nav-menu"> View Students </p> </div>
-                    <div class="ml-5"> <p class="sub-nav-menu"> View Results </p> </div>
+                    <div class="ml-5"> <p class="sub-nav-menu"> <p class="sub-nav-menu">Attendance </p>  </div>
+              <div class="ml-5"> <p class="sub-nav-menu"> View Students </p> </div>
+              <div class="ml-5"> <p class="sub-nav-menu"> View Results </p> </div>
 
-                </div> 
+          </div>
+      </div>
+      
+      </ul>
 
-                {% endfor %}
-            </ul>
-          </a>
+      
+      {% endfor %}
+    </div>
+      
+  
+
+</section>
         </section>
     
         <script>

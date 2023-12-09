@@ -104,7 +104,6 @@
   {% for course in program_offering.program.course.all %}
   
   <br>   
-  <p>Course Name  :{{course.temp_id}}-{{course.name}}</p>
 
      <div class='grid grid-cols-4 gap-3'>
       {% for course_offering  in course.course_offering.all  %}
@@ -163,8 +162,6 @@
       
       </ul>
 
-         
-      </ul>
       
       {% endfor %}
     </div>
