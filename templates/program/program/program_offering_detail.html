@@ -3,17 +3,91 @@
 {% block content %}
 
 <section>
-    <h1> Program Offering Deatil </h1>
-  <p><strong>Title:</strong>{{ program_offering.temp_id }}:{{ program_offering.program.name }}</p>
-  <p><strong>Description:</strong> {{ program_offering.program.description }}</p>
-  <p><strong>Program Link:</strong> {{ program_offering.program.program_link }}</p>
-  <p><strong>Total Credit:</strong> {{ program_offering.program.total_credit }}</p>
-  <p><strong>Duration in week:</strong> {{ program_offering.program.duration_in_week }}</p>
-<br>
-  <p><strong>Start Date:</strong> {{ program_offering.start_date }}</p>
-  <p><strong>End Date:</strong> {{ program_offering.end_date }}</p>
-  <p><strong>Remark:</strong> {{ program_offering.remark }}</p>
-<br>
+
+
+  <div class='container bg-orange-600 py-2 text-3xl font-inter pl-3 flex justify-center top-round gap-6'>
+    <b><h1 class="pt-2">{{ program_offering.program.name }}</h1> </a> </b>
+
+    <button id="programme-toggle-btn">
+    <svg class= "pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
+        <path d="M22.5909 37.0114V18.2614H25.7727V37.0114H22.5909ZM14.8068 29.2273V26.0455H33.5568V29.2273H14.8068Z" fill="rgb(254 252 232"/>
+        </svg>
+    </button>
+
+    <button id="programme-hide-btn" class="hidden focus:outline-none">
+        <svg class="pl-3" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="24" cy="29.0325" rx="24" ry="21.9675" fill="black"/>
+        <rect x="14" y="25" width="20" height="4" fill="rgb(254 252 232)"/>
+        </svg>
+    </button>
+        
+
+        <svg class= "pr-3 pt-2" width="48" height="51" viewBox="0 0 48 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="24" cy="22.715" rx="24" ry="21.9675" fill="black"/>
+            <ellipse cx="10.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+            <ellipse cx="34.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+            <ellipse cx="22.5" cy="23" rx="3.5" ry="3" fill="rgb(254 252 232)"/>
+        </svg>
+            
+        
+</div>
+
+<div class="bg-neutral-100 bottom-round" >
+    <div class="container flex flex-row gap-6 pl-7 bg-neutral-100 mb-1 bottom-round "> <!--gap-4 pl-3 space-x-36 -->
+        
+        <div class="container mx-auto mt-4 flex flex-row gap-6 text-2xl font-semibold w-full mb-1 ">
+             <p class="sub-nav-menu"> Attendance </p>  
+            <div><img src="\media\edupulse-global.icon.png" alt="international students icon" width="45" height="45"></div>
+            <div><img src="\media\edupulse-domestic.icon.png" alt="international students icon" width="45" height="45"></div>
+        </div>
+        
+        <div class="container mx-auto mt-4 flex flex-row gap-6 font-semibold text-2xl">
+             <p class="sub-nav-menu"> Student Directory </p>
+            <div><img class="details-icon" src="\media\edupulse-studentdirectory.icon.png" alt="student directory icon" width="45" height="45"></div>
+        </div>
+       
+        <div class="container mx-auto mt-4 flex flex-row gap-6 font-semibold text-2xl ">
+            <p class="sub-nav-menu"> View Results </p>
+            <div> <img src="\media\edupulse-viewresults.icon.png" alt="view results icon" width="45" height="45"> </div>
+        </div>
+        
+        </div>
+        
+        <div class="hidden flex flex-col pl-3 pt-2 pb-2" id="programme-details">
+
+
+          <div class="flex flex-row gap-20"> 
+            <p><strong>Start Date:</strong> {{ program_offering.start_date }}</p>
+            <p><strong>End Date:</strong> {{ program_offering.end_date }}</p>
+            <p><strong>Code: </strong>{{ program_offering.temp_id }}:</p>
+          </div>
+
+          <br>
+
+          <div class="flex flex-row gap-20"> 
+            <p><strong>Total Credits:</strong> {{ program_offering.program.total_credit }}</p>
+            <p><strong>Duration in Weeks:</strong> {{ program_offering.program.duration_in_week }}</p>
+          </div>
+        <br>
+
+          <p><strong>Description:</strong> {{ program_offering.program.description }}</p>
+          
+          <br>
+
+          <p><strong>Program Link:</strong> {{ program_offering.program.program_link }}</p>
+          <p><strong>Remark:</strong> {{ program_offering.remark }}</p>
+
+        </div>
+
+</div> 
+
+       
+    
+
+<h2 class="text-2xl font-semibold"> Courses included in the {{ program_offering.program.name }}:</h2>
+
+  
 <h1>Total Course Offering : {{total_course_offering_count}} </h1>
     {% comment %} {% for data in poor_performance_data %}
           
@@ -32,73 +106,66 @@
   <br>   
   <p>Course Name  :{{course.temp_id}}-{{course.name}}</p>
 
-      Check Total Course Offring has to be  : {{course.course_offering.count}}
-     <div class='flex flex-col gap-5'>
+     <div class='grid grid-cols-4 gap-3'>
       {% for course_offering  in course.course_offering.all  %}
-      <a href="{% url 'course_offering_detail' course_offering.pk %}">
-         <div class='bg-gray-400 ml-5 p-5  rounded-xl'>
-        {% comment %} <p >course offering object :{{course_offering.student.all}}</p> {% endcomment %}
-        <p>course offering  name :{{course_offering.temp_id}}-{{course_offering.course.name}}</p>
-        <p> Start from {{course_offering.start_date}} to  {{course_offering.end_date}}</p>
-        <p>course offering  remark :{{course_offering.remark}}</p>
-        <p>course offering  Result Status code :{{course_offering.result_status_code}}</p>
-        <p>course offering  Result Status :{{course_offering.result_status}}</p>
-        
-        <br>
-        <p>Total Enrolled  Student :{{course_offering.student.count}}</p>
-        <br>
-       
-        {% comment %} {% for data in poor_performance_data %} {% endcomment %}
-          {% comment %} {% if data.course_offering in course_offering %} {% endcomment %}
-          {% comment %} <p>Course Offering: {{ data.course_offering.temp_id }} compare {{course_offering.temp_id}}</p> {% endcomment %}
-          
-          {% comment %} {% if data.course_offering.temp_id|stringformat:"s" == course_offering.temp_id|stringformat:"s" %} {% endcomment %}
-            {% comment %} <p>Week Number: {{ data.week_number }}</p> {% endcomment %}
-            {% comment %} <p>Total Students: {{ data.total_students }}</p> {% endcomment %}
-            {% comment %} <p>Poor Performance Count: {{ data.poor_performance_count }}</p> {% endcomment %}
-            <hr>
-          
-          
-          {% comment %} {% endif %} {% endcomment %}
-          
-        {% comment %} {% endfor %} {% endcomment %}
-       
+      <ul class='ml-10 inline bg-neutral-100 bottom-round'>
+                
+        <div class='container bg-green-course font-inter pl-3 top-round pb-2'>
+            <div class="flex flex-row"> 
+                <a href="{% url 'course_offering_detail' course_offering.pk %}">
+                    <h2 class="text-lg font-bold">{{course_offering.temp_id}}</h2>
+                    <p>{{course_offering.course.name}}</p> 
+                  </a>
 
-        <div class='ml-5 p-5  rounded-xl flex flex-col flex-wrap gap-1'>
-          {% for student in course_offering.student.all %}
-            <div class='bg-blue-200 m-4 p-4 rounded-lg flex flex-row gap-3'>
-              <p>ID :{{student.student.temp_id}}</p>
-              <p>Name :{{student.student.first_name}} {{student.student.last_name}} </p>
-              {% comment %} <p>Weekly Report :{{student.weekly_reports.all}}  </p> {% endcomment %}
-              <div class='flex flex-col gap-3'>
-              {% for weekly_report in student.weekly_reports.all %}
-              <div class='flex flex-row gap-3'>
-                <p>Week Number {{weekly_report.week_number}} </p>
-                <p>Status : {{weekly_report.assessment_status}}   </p>
+                  <button id="toggle-btn" class="top-0 right-0"> 
+                      <svg class=" mr-2_5" width="25" height="23" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <ellipse cx="12.5833" cy="11.5" rx="11.9903" ry="11.5" fill="black"/>
+                      <path d="M11.4852 15.2045V7.70455H12.758V15.2045H11.4852ZM8.3716 12.0909V10.8182H15.8716V12.0909H8.3716Z" fill="rgb(254 252 232)"/>
+                      </svg> 
+                  </button>
+      
+                  <button id="hide-btn" class="hidden focus:outline-none">
+                      <svg class="mt-2 mr-2_5" width="25" height="23" viewBox="0 0 25 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <ellipse cx="12.5833" cy="11.5" rx="11.9903" ry="11.5" fill="black"/>
+                      <rect x="8" y="11" width="10" height="2" fill="rgb(254 252 232)"/>
+                      </svg>
+                      </button>
               </div>
-              
                   
-                             
-              {% endfor %}
+              
+          </div>
+      <div class="container text-xl flex flex-col mx-auto gap-4 bg-neutral-100 bottom-round">
+          
+          
+          <div class="container text-xl flex flex-col mx-auto gap-4 bg-neutral-100 bottom-round">
+      
+              <div class="hidden ml-5" id="more-text">
+                  
+                <p><b>Start Date:</b> {{course_offering.start_date}} <b>End Date: </b> {{course_offering.end_date}}</p>
+                <p>Remark: {{course_offering.remark}}</p>
+                <p>Result Status code: {{course_offering.result_status_code}}</p>
+                <p>Result Status: {{course_offering.result_status}}</p>
+                
+                <br>
+                <p>Total Number of Enrolled Students: {{course_offering.student.count}}</p>
+                <br>
               </div>
+        
+              <div class="ml-5"> <p class="sub-nav-menu"> <p class="sub-nav-menu"><a href="{% url 'attendance_list' course_offering.pk %}">Attendance</a> </p>  </div>
+              <div class="ml-5"> <p class="sub-nav-menu"> View Students </p> </div>
+              <div class="ml-5"> <p class="sub-nav-menu"> View Results </p> </div>
 
               
-              {% comment %} <p>Student email ID:{{student.student.email}} </p>
-              <p>Student personal Email :{{student.email_id}} </p>
-              <p>Student date of brth :{{student.student.dob}} </p>
-              <p>Student gender :{{student.student.gender}} </p>
-              <p>Student campus :{{student.student.campus.name}} </p>
-              <p>Student Joining date  :{{student.joining_date}} </p>
-              <p>International Studnet Status  :{{student.international_student}} </p>
-              <p>Student passport Number  :{{student.passport_number}} </p>
-              <p>Student Visa Number :{{student.visa_number}} </p>
-              <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p> {% endcomment %}
-              <br>
-            </div>
-          {% endfor %}
-        </div>
-        </div>
-      </a>
+
+
+          </div>
+      </div>
+      
+      </ul>
+
+         
+      </ul>
+      
       {% endfor %}
     </div>
       
@@ -106,5 +173,42 @@
 
 </section>
    
+
+<script>
+  const programmeDetailsEl = document.getElementById('programme-details');
+  const programmetoggleBtnEl = document.getElementById('programme-toggle-btn');
+  const programmehideBtnEl = document.getElementById('programme-hide-btn');
+
+  programmetoggleBtnEl.addEventListener('click', () => {
+  programmeDetailsEl.classList.toggle('hidden');
+  programmetoggleBtnEl.classList.toggle('hidden');
+  programmehideBtnEl.classList.toggle('hidden');
+  });
+
+  programmehideBtnEl.addEventListener('click', () => {
+  programmeDetailsEl.classList.toggle('hidden');
+  programmetoggleBtnEl.classList.toggle('hidden');
+  programmehideBtnEl.classList.toggle('hidden');
+  });
+</script>
+
+<script>
+  const moreTextEl = document.getElementById('more-text');
+  const toggleBtnEl = document.getElementById('toggle-btn');
+  const hideBtnEl = document.getElementById('hide-btn');
+  
+  toggleBtnEl.addEventListener('click', () => {
+  moreTextEl.classList.toggle('hidden');
+  toggleBtnEl.classList.toggle('hidden');
+  hideBtnEl.classList.toggle('hidden');
+  });
+  
+  hideBtnEl.addEventListener('click', () => {
+  moreTextEl.classList.toggle('hidden');
+  toggleBtnEl.classList.toggle('hidden');
+  hideBtnEl.classList.toggle('hidden');
+  });
+</script>
+
 
 {% endblock content %}
