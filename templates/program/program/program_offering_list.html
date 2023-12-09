@@ -1,22 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
    
-    <section>
-        <h1> Program Offering List  </h1>
-        <br>
-        <ul class='flex flex-col gap-4'>
-            {% for program in program_offering %}
-              <li class='flex flex-col bg-sky-300 px-4 py-2 m-2 rounded-lg'>
-                <a href="{% url 'program_offering_detail' program.pk %}">
+    <section class='w-full'>
+        {% comment %} <h1> Program Offering List  </h1> {% endcomment %}
+        <section class='my-2 w-full'>
+    
+          {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
+             <!-- Course_offering_infobar -->
+             <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+              <h2 class="text-xl font-bold mb-2">Program Details</h2>
+              <div class='flex flex-row gap-4 flex-wrap '>
+                <p class="mb-2 ">Current Program : {{program_offerings.count}}</p> |
+                <p class="mb-2">Total Students Enrolled by context : {{total_students}}</p> |
+                {% if total_no_of_at_risk_student >  0 %}
+                  <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student}}</p>
+                  {% else  %}
+                  <p>Students at Risk: {{total_no_of_at_risk_student}}</p>
+                  {% endif %}
                 
-                  <h1>{{ program.temp_id }}:{{ program.program.name }} </h1>
-                  <p> start from {{ program.start_date }} to {{ program.end_date }}</p>
-                  <p> No of course offering : {{program.program.course.count}}</P>
-
-                </a>
-              </li>
-
+              </div>
+              <!-- Add more course offering details -->
+            </div>
+            
+          {% comment %} </a> {% endcomment %}
+      </section>
+        <br>
+        <ul class='flex flex-col gap-4 w-3/4'>
+          {% for program_offering in program_offerings %}      
+                        {% with program_offering=program_offering %}
+                            {% include 'components/flash_card/program_offering_FC.html' %}
+                        {% endwith %} 
             {% endfor %}
+         
           </ul>
+       
     </section>
 {% endblock content %}

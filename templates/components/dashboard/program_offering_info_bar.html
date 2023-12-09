@@ -1,0 +1,20 @@
+{% block content %}
+{% load custom_tags %}
+<section class='my-2'>
+    
+    {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
+       <!-- Course_offering_infobar -->
+       <div class="bg-gray-200 p-4 mb-4">
+        <h2 class="text-xl font-bold mb-2">Program Offering Details</h2>
+        <div class='flex flex-row gap-4 flex-wrap '>
+          <p class="mb-2 ">Current Program : {{program_offerings.count}}</p> |
+          <p class="mb-2">Total Students Enrolled: {{students}}</p> |
+          <p>Students at Risk: 10</p> 
+        </div>
+        <!-- Add more course offering details -->
+      </div>
+      
+    {% comment %} </a> {% endcomment %}
+</section>
+
+{% endblock content %}

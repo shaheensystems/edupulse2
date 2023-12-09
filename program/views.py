@@ -4,6 +4,8 @@ from customUser.models import Staff
 from django.views.generic import ListView,DetailView,UpdateView,CreateView
 from program.models import Course,CourseOffering,Program,ProgramOffering
 from django.contrib.auth.mixins import LoginRequiredMixin
+from datetime import timedelta, datetime
+from django.utils import timezone
 # Create your views here.
 
 class CourseListView(LoginRequiredMixin,ListView):
@@ -31,7 +33,111 @@ class ProgramDetailView(LoginRequiredMixin,DetailView):
 class ProgramOfferingListView(LoginRequiredMixin,ListView):
     model=ProgramOffering
     template_name='program/program/program_offering_list.html'
-    context_object_name='program_offering'
+    context_object_name='program_offerings'
+ 
+    def get_queryset(self):
+        user = self.request.user
+        print("user group :",user.groups.all())
+        # Check if the user is an admin
+        if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
+            print("condition matched admin")
+            return ProgramOffering.objects.all()
+
+        # Check if the user is a teacher
+        elif user.groups.filter(name='Teacher').exists():
+            print("condition matched for teacher")
+            # return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
+            # Teacher has no access for program 
+            # return ProgramOffering.objects.filter(program__course__course_offering__staff=user)
+            return ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
+
+        elif user.groups.filter(name='Program_Leader').exists():
+            # return ProgramOffering.objects.none()
+            return ProgramOffering.objects.filter(program_leader__staff=user)  
+        
+        elif user.groups.filter(name='Student').exists():
+            return ProgramOffering.objects.none()
+        # For other user groups (e.g., students), return an empty queryset
+        return ProgramOffering.objects.none()
+    print(context_object_name)
+    
+    # def get_all_students(self, program_offerings):
+    #     student_count = 0
+    #     for program_offering in program_offerings:
+                # chances of duplicate students
+    #         student_count += program_offering.student.all().count()
+    #     return student_count
+    def get_all_students(self, program_offerings):
+        unique_students = set()
+
+        for program_offering in program_offerings:
+            unique_students.update(program_offering.student.all())
+
+        # get at_risk Students here 
+
+        return unique_students
+    # this code is correct 4 result 
+    def get_no_of_at_risk_student(self,unique_students):
+        from report.models import WeeklyReport
+        current_date = datetime.now().date()
+
+        # Calculate the start and end dates for the last week
+        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
+        start_date_last_week = end_date_last_week - timedelta(days=6)
+        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
+
+        
+        program_offerings=ProgramOffering.objects.all()
+        for program_offering in program_offerings:
+
+            program=program_offering.program
+            courses = program.course.all()
+
+            # Initialize variable to track the count of at-risk students
+            at_risk_students = set()
+            
+            # Get all students associated with the course offering
+            students = unique_students
+           
+            # Iterate over each course to accumulate session counts
+            for course in courses:
+                # Get all CourseOfferings associated with the current course and program offering
+                course_offerings = CourseOffering.objects.filter(course=course)
+
+                # Iterate over each CourseOffering to handle potential multiple objects
+                for course_offering in course_offerings:
+                
+                    # Iterate over each student to check their at-risk status for the last week
+                    for student in students:
+                        # print("studnet :",student)
+                        # Check if there is a weekly report for the student and course offering in the last week
+                        weekly_report_last_week = WeeklyReport.objects.filter(
+                            student=student,
+                            course_offering=course_offering,
+                            sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
+                        ).first()
+                        # print("weekly report found ",weekly_report_last_week)
+                        # If there is a weekly report, check if the student is at risk
+                        if weekly_report_last_week and weekly_report_last_week.at_risk:
+                            print("at _risk status on week report found in PO",student.temp_id)
+                            at_risk_students.add(student)
+                            print("all object PO",at_risk_students)
+
+        return at_risk_students
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # send filtred data according to user group 
+        program_offerings = context['program_offerings']
+        
+        # Calculate total number of students across all program offerings
+        total_students = self.get_all_students(program_offerings)
+        total_no_of_at_risk_student=self.get_no_of_at_risk_student(total_students)
+        # Add the total_students to the context
+        context['total_students'] = len(total_students)   
+        context['total_no_of_at_risk_student'] = len(total_no_of_at_risk_student)
+
+        return context
 
 class ProgramOfferingDetailView(LoginRequiredMixin,DetailView):
     model = ProgramOffering
@@ -79,12 +185,12 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
     template_name='program/course/course_offering_list.html'
     context_object_name='course_offerings'
     
-    print("initialise Course Offering view ")
+    print("initialise Course Offering view :")
     def get_queryset(self):
         user = self.request.user
         print("user group :",user.groups.all())
         # Check if the user is an admin
-        if user.groups.filter(name='Admin').exists():
+        if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
             print("condition matched admin")
             return CourseOffering.objects.all()
 
@@ -94,12 +200,85 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
             # Assuming there is a ForeignKey from CourseOffering to Teacher model
             # only course offering where teacher is equal to current user
             return CourseOffering.objects.filter(teacher__staff=user)
+        elif user.groups.filter(name='Program_Leader').exists():
+
+            return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
+        
         elif user.groups.filter(name='Student').exists():
             return CourseOffering.objects.none()
         # For other user groups (e.g., students), return an empty queryset
         return CourseOffering.objects.none()
-    print(context_object_name)
     
+    print(context_object_name)
+    # def get_all_students(self, course_offerings):
+    #     student_count = 0
+    #     for course_offering in course_offerings:
+    #         #chances are duplicate students counts 
+    #         student_count += course_offering.student.all().count()
+    #     return student_count
+    
+    def get_all_students(self, course_offerings):
+        unique_students = set()
+
+        for course_offering in course_offerings:
+            unique_students.update(course_offering.student.all())
+
+        return unique_students
+
+    
+     #  get all students at_risk  
+    #  wrong code total 3 result 1 result missing 
+    def get_no_of_at_risk_student(self,unique_students):
+        from report.models import WeeklyReport
+        current_date = datetime.now().date()
+
+        # Calculate the start and end dates for the last week
+        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
+        start_date_last_week = end_date_last_week - timedelta(days=6)
+        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
+
+        # Initialize variable to track the count of at-risk students
+        at_risk_students = set()
+         # Get all students associated with the course offering
+        students = unique_students
+         # Get all courses associated with the course offerings
+        courses_offerings = CourseOffering.objects.all()
+
+
+        for student in students:
+                    #  not found this id incorrect  total 3 result 
+                    if student.temp_id=="2020769":
+                        print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
+                        print("id Matched",student.temp_id)
+                    # print("studnet :",student)
+                    # Check if there is a weekly report for the student and course offering in the last week
+                    weekly_report_last_week = WeeklyReport.objects.filter(
+                        student=student,
+                        course_offering__in=courses_offerings,
+                        sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
+                    ).first()
+                    # print("weekly report found ",weekly_report_last_week)
+                    # If there is a weekly report, check if the student is at risk
+                    if weekly_report_last_week and weekly_report_last_week.at_risk:
+                        print("at _risk status on week report found in CO",student.temp_id)
+                        at_risk_students.add(student)
+                        print("all object CO",at_risk_students)
+                    
+                        print("is id  Matched added or not ",student.temp_id)
+        return at_risk_students
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # send filtred data according to user group 
+        course_offerings = context['course_offerings']
+        
+        # Calculate total number of students across all program offerings
+        total_students = self.get_all_students(course_offerings)
+        total_no_of_at_risk_student=self.get_no_of_at_risk_student(total_students)
+        # Add the total_students to the context
+        context['total_students'] = len(total_students)
+        context['total_no_of_at_risk_student'] = len(total_no_of_at_risk_student)
+        return context
 
 class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
     model = CourseOffering

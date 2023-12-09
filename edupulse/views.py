@@ -4,6 +4,7 @@ from base.models import Campus
 from django.views.generic import DetailView,ListView,TemplateView
 from program.models import ProgramOffering,CourseOffering
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Sum
 
 
 
@@ -22,6 +23,43 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         course_offerings=CourseOffering.objects.all()
         campuses=Campus.objects.all()
 
+        # Program Offering Enrollment data for current user
+        print("current user group :",self.request.user.groups.all())
+        user_groups=self.request.user.groups.all()
+        if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
+            program_offerings_for_current_user=program_offerings
+        elif user_groups.filter(name="Program_Leader").exists():
+           program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+        else:
+            program_offerings_for_current_user=None
+
+            
+
+        total_students_in_program_offerings_for_current_user=0
+
+        for program_offering in program_offerings_for_current_user:
+            students_count=program_offering.student.count()
+            total_students_in_program_offerings_for_current_user=total_students_in_program_offerings_for_current_user+students_count
+        
+        print("total students :",total_students_in_program_offerings_for_current_user)
+
+        program_offering_enrollment_data=[]
+        for program_offering in program_offerings_for_current_user:
+            prog_off_enrolled_students=program_offering.student.count()
+            program_offering_enrollment_data.append({
+                "program_name":program_offering.temp_id+":"+program_offering.program.name,
+                'enrolled_students':prog_off_enrolled_students
+            })
+        # Sort enrollment_data based on enrolled_students in descending order
+        sorted_program_offering_enrollment_data = sorted(program_offering_enrollment_data, key=lambda x: x['enrolled_students'], reverse=True)
+        
+       
+        program_offering_student_enrollment = {
+            'labels': [enrollment['program_name'] for enrollment in sorted_program_offering_enrollment_data],
+            'data': [enrollment['enrolled_students'] for enrollment in sorted_program_offering_enrollment_data],
+        }
+        
+        # course offering enrollment data 
         enrollment_data = []
         for course_offering in course_offerings:
             enrolled_students = course_offering.student.count()
@@ -62,14 +100,48 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             'data': [enrollment['staff_count'] for enrollment in campus_enrollment_staff],
         }
 
-   
+
+        #Domestic and international students
+        domestic_students = Student.objects.filter(international_student=False).count()
+        international_students = Student.objects.filter(international_student=True).count()
+
+        # Prepare data for the chart
+        chart_data_student_region = {
+            'labels': ['Domestic Students', 'International Students'],
+            'data': [domestic_students, international_students],
+        } 
+
        
         context['chart_data_campus_enrollment_student'] = chart_data_campus_enrollment_student
         context['chart_data_campus_enrollment_staff'] = chart_data_campus_enrollment_staff
+        context['chart_data_program_offering_student_enrollment'] = program_offering_student_enrollment
         context['chart_data_enrollment'] = chart_data_enrollment
         context['program_offerings']=program_offerings
+        context['program_offerings_for_current_user']=program_offerings_for_current_user
+        context['total_students_in_program_offerings_for_current_user']=total_students_in_program_offerings_for_current_user
         context['course_offerings']=course_offerings
         context['students']=students
+        context['current_user'] = self.request.user
+        # context['staff_profile'] = self.request.user.staff_profile
+        # Check if the user has a staff_profile
+        if hasattr(self.request.user, 'staff_profile'):
+            context['staff_profile'] = self.request.user.staff_profile
+        else:
+            context['staff_profile'] = None
+        context['chart_data_student_region']=chart_data_student_region
+
+        print("current user:", self.request.user)
+        # print("staff profile:", self.request.user.staff_profile)
+        staff_profile = None
+        for staff in Staff.objects.all():
+            if staff.staff == self.request.user:
+                print("user profile by suer:",self.request.user.staff_profile)
+                print("user profile by staff object :",staff.staff)
+                staff_profile = staff
+                break
+
+        context['staff_profile'] = staff_profile
+
 
         # Add other necessary context data
 

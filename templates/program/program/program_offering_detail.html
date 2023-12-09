@@ -2,106 +2,67 @@
 
 {% block content %}
 
-<section>
-    <h1> Program Offering Deatil </h1>
-  <p><strong>Title:</strong>{{ program_offering.temp_id }}:{{ program_offering.program.name }}</p>
-  <p><strong>Description:</strong> {{ program_offering.program.description }}</p>
-  <p><strong>Program Link:</strong> {{ program_offering.program.program_link }}</p>
-  <p><strong>Total Credit:</strong> {{ program_offering.program.total_credit }}</p>
-  <p><strong>Duration in week:</strong> {{ program_offering.program.duration_in_week }}</p>
-<br>
-  <p><strong>Start Date:</strong> {{ program_offering.start_date }}</p>
-  <p><strong>End Date:</strong> {{ program_offering.end_date }}</p>
-  <p><strong>Remark:</strong> {{ program_offering.remark }}</p>
-<br>
-<h1>Total Course Offering : {{total_course_offering_count}} </h1>
-    {% comment %} {% for data in poor_performance_data %}
-          
-          <p>Course Offering: {{ data.course_offering }}</p>
-          <p>Week Number: {{ data.week_number }}</p>
-          <p>Total Students: {{ data.total_students }}</p>
-          <p>Poor Performance Count: {{ data.poor_performance_count }}</p>
-          <hr>
-        
-          
-    {% endfor %} {% endcomment %}
-
-  {% comment %} {{program_offering.program.course.all}} {% endcomment %}
-  {% for course in program_offering.program.course.all %}
-  
-  <br>   
-  <p>Course Name  :{{course.temp_id}}-{{course.name}}</p>
-
-      Check Total Course Offring has to be  : {{course.course_offering.count}}
-     <div class='flex flex-col gap-5'>
-      {% for course_offering  in course.course_offering.all  %}
-      <a href="{% url 'course_offering_detail' course_offering.pk %}">
-         <div class='bg-gray-400 ml-5 p-5  rounded-xl'>
-        {% comment %} <p >course offering object :{{course_offering.student.all}}</p> {% endcomment %}
-        <p>course offering  name :{{course_offering.temp_id}}-{{course_offering.course.name}}</p>
-        <p> Start from {{course_offering.start_date}} to  {{course_offering.end_date}}</p>
-        <p>course offering  remark :{{course_offering.remark}}</p>
-        <p>course offering  Result Status code :{{course_offering.result_status_code}}</p>
-        <p>course offering  Result Status :{{course_offering.result_status}}</p>
-        
-        <br>
-        <p>Total Enrolled  Student :{{course_offering.student.count}}</p>
-        <br>
-       
-        {% comment %} {% for data in poor_performance_data %} {% endcomment %}
-          {% comment %} {% if data.course_offering in course_offering %} {% endcomment %}
-          {% comment %} <p>Course Offering: {{ data.course_offering.temp_id }} compare {{course_offering.temp_id}}</p> {% endcomment %}
-          
-          {% comment %} {% if data.course_offering.temp_id|stringformat:"s" == course_offering.temp_id|stringformat:"s" %} {% endcomment %}
-            {% comment %} <p>Week Number: {{ data.week_number }}</p> {% endcomment %}
-            {% comment %} <p>Total Students: {{ data.total_students }}</p> {% endcomment %}
-            {% comment %} <p>Poor Performance Count: {{ data.poor_performance_count }}</p> {% endcomment %}
-            <hr>
-          
-          
-          {% comment %} {% endif %} {% endcomment %}
-          
-        {% comment %} {% endfor %} {% endcomment %}
-       
-
-        <div class='ml-5 p-5  rounded-xl flex flex-col flex-wrap gap-1'>
-          {% for student in course_offering.student.all %}
-            <div class='bg-blue-200 m-4 p-4 rounded-lg flex flex-row gap-3'>
-              <p>ID :{{student.student.temp_id}}</p>
-              <p>Name :{{student.student.first_name}} {{student.student.last_name}} </p>
-              {% comment %} <p>Weekly Report :{{student.weekly_reports.all}}  </p> {% endcomment %}
-              <div class='flex flex-col gap-3'>
-              {% for weekly_report in student.weekly_reports.all %}
-              <div class='flex flex-row gap-3'>
-                <p>Week Number {{weekly_report.week_number}} </p>
-                <p>Status : {{weekly_report.assessment_status}}   </p>
+<section class='my-2 w-full items-centerflex flex-col '>
+   {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
+            <!-- Course_offering_infobar -->
+    
+              <h1 class='text-center mt-4 text-xl mb-1'><strong>Program Detail</strong>  </h1>
+            
+            
+            <div class="bg-gray-200 p-4 mb-4 w-full gap-5 flex flex-row justify-between items-baseline">
+             
+              <div class='w-1/2'>
+                <h1><strong>Program Detail</strong>  </h1>
+                <h2 class="text-xl font-bold my-2">{{ program_offering.temp_id }} <br> {{ program_offering.program.name }}</h2>
+                <p><strong>Description:</strong> {{ program_offering.program.description }}</p>
+                <p><strong>Program Link:</strong> {{ program_offering.program.program_link }}</p>
+                <p><strong>Total Credit:</strong> {{ program_offering.program.total_credit }}</p>
+                <p><strong>Duration in week:</strong> {{ program_offering.program.duration_in_week }}</p>
+                <p><strong>Start Date:</strong> {{ program_offering.start_date }}</p>
+                <p><strong>End Date:</strong> {{ program_offering.end_date }}</p>
+                <p><strong>Remark:</strong> {{ program_offering.remark }}</p>
               </div>
-              
-                  
-                             
-              {% endfor %}
+            
+              <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
+                <p class="mb-2 ">Total Program Offering: {{course.course_offering.count}}</p> |
+                <h1>Total Course Offering : {{total_course_offering_count}} </h1>|
+                <p class="mb-2">Total Students Enrolled: {{total_students}}</p> |
+                <p class="mb-2">Attendnace Percentage: {{program_offering.calculate_attendance_percentage}} %</p> |
+                <p>Students at Risk: 10</p>
               </div>
-
-              
-              {% comment %} <p>Student email ID:{{student.student.email}} </p>
-              <p>Student personal Email :{{student.email_id}} </p>
-              <p>Student date of brth :{{student.student.dob}} </p>
-              <p>Student gender :{{student.student.gender}} </p>
-              <p>Student campus :{{student.student.campus.name}} </p>
-              <p>Student Joining date  :{{student.joining_date}} </p>
-              <p>International Studnet Status  :{{student.international_student}} </p>
-              <p>Student passport Number  :{{student.passport_number}} </p>
-              <p>Student Visa Number :{{student.visa_number}} </p>
-              <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p> {% endcomment %}
-              <br>
+              <!-- Add more course offering details -->
             </div>
-          {% endfor %}
-        </div>
-        </div>
-      </a>
-      {% endfor %}
-    </div>
+            
+          {% comment %} </a> {% endcomment %}
+
+  {% for course in program_offering.program.course.all %}
+        <section class='my-2 w-5/6 bg-gray-50 justify-end  items-start flex flex-col border-2 p-1 '>
+
+          {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
+            <!-- Course_offering_infobar -->
+            <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+              <h2 class="text-xl font-bold mb-2">{{course.temp_id}}<br>{{course.name}}</h2>
+              <div class='flex flex-row gap-4 flex-wrap '>
+                <p class="mb-2 ">Current Course: {{course.course_offering.count}}</p> |
+                <p class="mb-2">Total Students Enrolled: {{total_students}}</p> |
+                <p>Students at Risk: 10</p> 
+              </div>
+              <!-- Add more course offering details -->
+            </div>
+            
+          {% comment %} </a> {% endcomment %}
       
+       
+            <ul class='flex flex-col gap-4 w-3/4'>  
+              {% for course_offering in course.course_offering.all %}
+                          {% with course_offering=course_offering %}
+                              {% include 'components/flash_card/course_offering_FC.html' %}
+                          {% endwith %} 
+              {% endfor %}
+            </ul>
+
+ 
+    </section>
   {% endfor %}
 
 </section>
