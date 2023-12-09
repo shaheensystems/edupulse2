@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "sucellfully"
-    ]
+    ],
+    "python.pythonPath": "env\\Scripts\\python.exe"
 }
