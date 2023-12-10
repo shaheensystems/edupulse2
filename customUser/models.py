@@ -5,7 +5,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from base.models import BaseModel, Address,Campus
 from django.contrib.auth.models import User
+from datetime import timedelta, datetime
+from django.utils import timezone
 # Create your models here.
+
 
 class NewUser(AbstractUser):
     Gender_Choice=[
@@ -64,6 +67,30 @@ class Student(BaseModel):
     passport_number=models.CharField(max_length=255,null=True,blank=True)
     visa_number=models.CharField(max_length=255,null=True,blank=True)
     visa_expiry_date=models.DateField(default=None, null=True,blank=True)
+
+    def student_is_at_risk_for_last_week_status(self):
+        from report.models import WeeklyReport
+        current_date = datetime.now().date()
+
+        # Calculate the start and end dates for the last week
+        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
+        start_date_last_week = end_date_last_week - timedelta(days=6)
+        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
+        weekly_reports=self.weekly_reports.all()
+        last_week_weekly_reports=weekly_reports.filter(
+           sessions__attendance_date__range=[start_date_last_week, end_date_last_week] 
+        )
+       
+        # print("last Week reports :",last_week_weekly_reports)
+        
+        for weekly_report in last_week_weekly_reports:
+
+            if weekly_report.at_risk:
+                # print(True)
+                # print("student Id :",self.temp_id)
+                # print("course name : ",weekly_report.course_offering)
+                return True
+
 
     def __str__(self):
         return f"{self.student.temp_id} "

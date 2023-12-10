@@ -40,12 +40,12 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         print("user group :",user.groups.all())
         # Check if the user is an admin
         if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
-            print("condition matched admin")
+            # print("condition matched admin")
             return ProgramOffering.objects.all()
 
         # Check if the user is a teacher
         elif user.groups.filter(name='Teacher').exists():
-            print("condition matched for teacher")
+            # print("condition matched for teacher")
             # return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
             # Teacher has no access for program 
             # return ProgramOffering.objects.filter(program__course__course_offering__staff=user)
@@ -59,7 +59,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
             return ProgramOffering.objects.none()
         # For other user groups (e.g., students), return an empty queryset
         return ProgramOffering.objects.none()
-    print(context_object_name)
+    # print(context_object_name)
     
     # def get_all_students(self, program_offerings):
     #     student_count = 0
@@ -102,7 +102,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
             # Iterate over each course to accumulate session counts
             for course in courses:
                 # Get all CourseOfferings associated with the current course and program offering
-                course_offerings = CourseOffering.objects.filter(course=course)
+                course_offerings = course.course_offering.all()
 
                 # Iterate over each CourseOffering to handle potential multiple objects
                 for course_offering in course_offerings:
@@ -119,9 +119,9 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
                         # print("weekly report found ",weekly_report_last_week)
                         # If there is a weekly report, check if the student is at risk
                         if weekly_report_last_week and weekly_report_last_week.at_risk:
-                            print("at _risk status on week report found in PO",student.temp_id)
+                            # print("at _risk status on week report found in PO",student.temp_id)
                             at_risk_students.add(student)
-                            print("all object PO",at_risk_students)
+                            # print("all object PO",at_risk_students)
 
         return at_risk_students
     
@@ -154,7 +154,7 @@ class ProgramOfferingDetailView(LoginRequiredMixin,DetailView):
 
         for course in courses:
             # print("Each Course",course)
-            print("for each course get all course_offering :",course.course_offering.all().count())
+            # print("for each course get all course_offering :",course.course_offering.all().count())
             for course_offering in course.course_offering.all():
                 weekly_reports = course_offering.weekly_reports.values('week_number').annotate(
                 total=Count('pk'),
@@ -188,10 +188,10 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
     print("initialise Course Offering view :")
     def get_queryset(self):
         user = self.request.user
-        print("user group :",user.groups.all())
+        # print("user group :",user.groups.all())
         # Check if the user is an admin
         if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
-            print("condition matched admin")
+            # print("condition matched admin")
             return CourseOffering.objects.all()
 
         # Check if the user is a teacher
@@ -242,29 +242,30 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
          # Get all students associated with the course offering
         students = unique_students
          # Get all courses associated with the course offerings
-        courses_offerings = CourseOffering.objects.all()
+        course_offerings = CourseOffering.objects.all()
 
+        for course_offering in course_offerings:
 
-        for student in students:
-                    #  not found this id incorrect  total 3 result 
-                    if student.temp_id=="2020769":
-                        print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-                        print("id Matched",student.temp_id)
-                    # print("studnet :",student)
-                    # Check if there is a weekly report for the student and course offering in the last week
-                    weekly_report_last_week = WeeklyReport.objects.filter(
-                        student=student,
-                        course_offering__in=courses_offerings,
-                        sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-                    ).first()
-                    # print("weekly report found ",weekly_report_last_week)
-                    # If there is a weekly report, check if the student is at risk
-                    if weekly_report_last_week and weekly_report_last_week.at_risk:
-                        print("at _risk status on week report found in CO",student.temp_id)
-                        at_risk_students.add(student)
-                        print("all object CO",at_risk_students)
-                    
-                        print("is id  Matched added or not ",student.temp_id)
+            for student in students:
+                        #  not found this id incorrect  total 3 result 
+                        # if student.temp_id=="2020769":
+                        #     print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
+                        #     print("id Matched",student.temp_id)
+                        # print("studnet :",student)
+                        # Check if there is a weekly report for the student and course offering in the last week
+                        weekly_report_last_week = WeeklyReport.objects.filter(
+                            student=student,
+                            course_offering=course_offering,
+                            sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
+                        ).first()
+                        # print("weekly report found ",weekly_report_last_week)
+                        # If there is a weekly report, check if the student is at risk
+                        if weekly_report_last_week and weekly_report_last_week.at_risk:
+                            # print("at _risk status on week report found in CO",student.temp_id)
+                            at_risk_students.add(student)
+                            # print("all object CO",at_risk_students)
+                        
+                            # print("is id  Matched added or not ",student.temp_id)
         return at_risk_students
     
     def get_context_data(self, **kwargs):
@@ -297,7 +298,7 @@ class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
         for attendance in all_attendance:
             # Get the attendance date
             date = attendance.attendance_date
-            print("Date :",date)
+            # print("Date :",date)
 
             # If the date is not in the dictionary, add it
             if date not in attendance_count:

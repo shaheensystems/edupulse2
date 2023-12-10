@@ -9,7 +9,11 @@
         <div class='flex flex-row gap-4 flex-wrap '>
           <p class="mb-2 ">Current Program : {{program_offerings.count}}</p> |
           <p class="mb-2">Total Students Enrolled: {{students}}</p> |
-          <p>Students at Risk: 10</p> 
+          {% comment %} <p>Students at Risk: 10</p>  {% endcomment %}
+          <p {% if total_students_at_risk_query_set|length > 0 %}class='text-red-400'{% endif %}>
+            All Students at Risk :{{ total_students_at_risk_query_set|length }}
+         </p>
+        
         </div>
         <!-- Add more course offering details -->
       </div>

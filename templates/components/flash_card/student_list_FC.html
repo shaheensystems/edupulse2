@@ -4,12 +4,15 @@
     
     {% if view == "list" %}
         {% for student in students  %}
-            <div>{{student.student.first_name}} {{student.student.last_name}}</div>
+                {% comment %} {% if student in at_risk_students %}
+                <p class='bg-red-300'>at risk </p>
+                {% endif %} {% endcomment %}
+            <div {% if student in at_risk_students %}class="bg-red-300"{% endif %}>{{student.student.first_name}} {{student.student.last_name}}</div>
         {% endfor %}
    
     {% elif view == "detail" %} 
         {% for student in students  %}
-        <div class='bg-blue-200 m-4 p-4 rounded-lg'>
+        <div class='bg-blue-200 m-4 p-4 rounded-lg {% if student in at_risk_students %} bg-red-300{% endif %}'>
             <p>Student first Name :{{student.student.first_name}} </p>
             <p>Student Last Name :{{student.student.last_name}} </p>
             <p>Student email ID:{{student.student.email}} </p>
@@ -43,11 +46,13 @@
                         <th class="border px-4 py-2">Passport Number</th>
                         <th class="border px-4 py-2">Visa Number</th>
                         <th class="border px-4 py-2">Visa Expiry Date</th>
+                        <th class="border px-4 py-2">At Risk</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for student in students %}
-                        <tr>
+                       
+                        <tr {% if student in at_risk_students %}class="bg-red-300"{% endif %} >
                             <td class="border px-4 py-2">{{ student.student.first_name }}</td>
                             <td class="border px-4 py-2">{{ student.student.last_name }}</td>
                             <td class="border px-4 py-2">{{ student.student.email }}</td>
@@ -60,6 +65,7 @@
                             <td class="border px-4 py-2">{{ student.passport_number }}</td>
                             <td class="border px-4 py-2">{{ student.visa_number }}</td>
                             <td class="border px-4 py-2">{{ student.visa_expiry_date }}</td>
+                            <td class="border px-4 py-2">{{student.student_is_at_risk_for_last_week_status }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

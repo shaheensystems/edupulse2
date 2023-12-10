@@ -6,6 +6,8 @@ from program.models import ProgramOffering,CourseOffering
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 
+from utils.function.helper import get_total_students_at_risk_by_program_offerings
+
 
 
 def home(request):
@@ -40,7 +42,23 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         for program_offering in program_offerings_for_current_user:
             students_count=program_offering.student.count()
             total_students_in_program_offerings_for_current_user=total_students_in_program_offerings_for_current_user+students_count
-        
+        unique_students = set()
+        # Iterate over each program offering in program_offerings_for_current_user
+        for program_offering in program_offerings_for_current_user:
+            # Get all students associated with the current program offering
+            students = program_offering.student.all()
+            for course in program_offering.program.course.all():
+                for program_offering in course.course_offering.all():
+                    students=program_offering.student.all()
+                # Add students to the set
+                unique_students.update(students)
+
+        # Count the number of unique students
+        total_unique_students_in_program_offerings_for_current_user = len(unique_students)
+
+
+
+
         print("total students :",total_students_in_program_offerings_for_current_user)
 
         program_offering_enrollment_data=[]
@@ -111,17 +129,24 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             'data': [domestic_students, international_students],
         } 
 
-       
+        def total_students_at_risk(self,program_offerings_for_current_user):
+            
+            pass
+    
         context['chart_data_campus_enrollment_student'] = chart_data_campus_enrollment_student
         context['chart_data_campus_enrollment_staff'] = chart_data_campus_enrollment_staff
         context['chart_data_program_offering_student_enrollment'] = program_offering_student_enrollment
         context['chart_data_enrollment'] = chart_data_enrollment
         context['program_offerings']=program_offerings
         context['program_offerings_for_current_user']=program_offerings_for_current_user
-        context['total_students_in_program_offerings_for_current_user']=total_students_in_program_offerings_for_current_user
+        # context['total_students_in_program_offerings_for_current_user']=total_students_in_program_offerings_for_current_user
+        context['total_students_in_program_offerings_for_current_user']=total_unique_students_in_program_offerings_for_current_user
         context['course_offerings']=course_offerings
         context['students']=students
         context['current_user'] = self.request.user
+
+        context['total_students_at_risk_query_set']=get_total_students_at_risk_by_program_offerings(program_offerings_for_current_user)
+
         # context['staff_profile'] = self.request.user.staff_profile
         # Check if the user has a staff_profile
         if hasattr(self.request.user, 'staff_profile'):

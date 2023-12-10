@@ -23,10 +23,10 @@
           <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
             <p class="mb-2">Total Students Enrolled: {{course_offering.student.count}}</p> |
             <p class="mb-2">Attendnace Percentage: {{course_offering.calculate_attendance_percentage}} %</p> |
-            {% if course_offering.calculate_no_at_risk_student_for_last_week >  0 %}
-            <p class='text-red-500'>Students at Risk: {{course_offering.calculate_no_at_risk_student_for_last_week}}</p>
+            {% if course_offering.calculate_no_at_risk_student_for_last_week|length >  0 %}
+            <p class='text-red-500'>Students at Risk: {{course_offering.calculate_no_at_risk_student_for_last_week |length}}</p>
             {% else  %}
-            <p>Students at Risk: {{course_offering.calculate_no_at_risk_student_for_last_week}}</p>
+            <p>Students at Risk: {{course_offering.calculate_no_at_risk_student_for_last_week|length}}</p>
             {% endif %}
             
           
@@ -37,30 +37,31 @@
         <div class='my-2 w-full flex flex-row flex-wrap justify-between'>
        
   
-        <div class='w-5/12 bg-gray-100 rounded-lg  my-3'>
+          <div class='w-5/12 bg-gray-100 rounded-lg  my-3'>
 
-          {% with data=chart_data_attendance title='Student performance' id='students_performace' chartType='bar' lengendDisplay='true' limitData=10 %}
-            {% include 'charts/chart.html' %}
-          {% endwith %}
-        </div>
-        <div class='w-5/12 bg-gray-100 rounded-lg my-5'>
+            {% with data=chart_data_attendance title='Student performance' id='students_performace' chartType='bar' lengendDisplay='true' limitData=10 %}
+              {% include 'charts/chart.html' %}
+            {% endwith %}
+          </div>
+          <div class='w-5/12 bg-gray-100 rounded-lg my-5'>
 
-          {% with data=chart_data_attendance title='Student Attendace' text='Students Attendace' id='students_attedance'%}
-          {% include 'charts/lineChart.html' %}
-          {% endwith %}
-        </div>
+            {% with data=chart_data_attendance title='Student Attendace' text='Students Attendace' id='students_attedance'%}
+            {% include 'charts/lineChart.html' %}
+            {% endwith %}
+          </div>
      
 
 
+       
+       </div>
        <div class='mt-3 rounded-xl flex flex-col flex-wrap gap-1'>
         
-          {% with students=course_offering.student.all  view=view %}
-            {% include 'components/flash_card/student_list_FC.html' %}
-          {% endwith %}
-          
-      
-       </div>
-       </div>
+        {% with students=course_offering.student.all at_risk_students=course_offering.calculate_no_at_risk_student_for_last_week view=view %}
+          {% include 'components/flash_card/student_list_FC.html' %}
+        {% endwith %}
+        
+    
+     </div>
    
     </section>
 {% endblock content %}

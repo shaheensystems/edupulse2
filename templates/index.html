@@ -39,11 +39,11 @@
             </div>
             
           </div>
-          {% with program_offerings=program_offerings students=students.count  %}
+          {% with program_offerings=program_offerings students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set  %}
               {% include 'components/dashboard/program_offering_info_bar.html' %}
             {% endwith %}
         
-            {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
+            {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set %}
               {% include 'components/dashboard/program_offering_attendance_info.html' %}
             {% endwith %}
             

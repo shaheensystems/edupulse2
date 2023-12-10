@@ -12,8 +12,10 @@
             
             <p class="mb-2 ">Current Program : {{program_offerings.count}}</p> 
             <p class="mb-2">Total Students Enrolled: {{students}}</p> 
-            <p class="mb-2">Students at Risk: 10</p> 
-        </div>
+            <p {% if total_students_at_risk_query_set|length > 0 %}class='text-red-400'{% endif %}>
+                All Students at Risk :{{ total_students_at_risk_query_set|length }}
+             </p>
+            </div>
             <div class="flex items-center justify-between mb-4">
                 <button id="toggleButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Show More
@@ -44,7 +46,7 @@
                                 <td class="py-2 px-4 border-b">{{ program_offering.program.name }}</td>
                                 <td class="py-2 px-4 border-b">{{ program_offering.student.count }}</td>
                                 <td class="py-2 px-4 border-b">{{ program_offering.calculate_attendance_percentage }}</td>
-                                <td class="py-2 px-4 border-b">{{ program_offering.calculate_no_at_risk_student_for_last_week }}</td>
+                                <td class="py-2 px-4 border-b">{{ program_offering.calculate_no_at_risk_student_for_last_week|length }}</td>
                             </tr>
                             <tr>
                                 

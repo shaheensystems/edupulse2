@@ -20,8 +20,12 @@
               <h1 class="text-gray-300}">Attendance Status: {{program_offering.calculate_attendance_percentage}}%</h1>
               {% endif %} 
              
-              <p class='text-red-500'> No of Studnets at risk : {{program_offering.calculate_no_at_risk_student_for_last_week}}</p>
-
+             
+              {% if program_offering.calculate_no_at_risk_student_for_last_week|length >  0 %}
+              <p class='text-red-500'> Studnets at risk : {{program_offering.calculate_no_at_risk_student_for_last_week |length}}</p>
+            {% else  %}
+            <p > No of Studnets at risk : {{program_offering.calculate_no_at_risk_student_for_last_week |length}}</p>
+            {% endif %}
             </div>
             
           </div>
