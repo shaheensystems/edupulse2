@@ -351,7 +351,7 @@ def Upload_file_view(request):
    
     context = {
         'form': form,
-        'current_user':request.user,
+        # 'current_user':request.user,
         }
    
     return render(request, 'upload/upload_file.html', context)

@@ -346,22 +346,7 @@ class ProgramOffering(BaseModel):
             # Iterate over each CourseOffering to handle potential multiple objects
             for course_offering in course_offerings:
                 students=course_offering.student.all()
-               
-                # Iterate over each student to check their at-risk status for the last week
-                # for student in students:
-                #     # print("studnet :",student)
-                #     # Check if there is a weekly report for the student and course offering in the last week
-                #     weekly_report_last_week = WeeklyReport.objects.filter(
-                #         student=student,
-                #         course_offering=course_offering,
-                #         sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-                #     ).first()
-                #     # print("weekly report found ",weekly_report_last_week)
-                #     # If there is a weekly report, check if the student is at risk
-                #     if weekly_report_last_week and weekly_report_last_week.at_risk:
-                #         # print("at _risk status on week report found PO M",student.temp_id)
-                #         at_risk_students.add(student)
-                #         # print("all object PO M",at_risk_students)
+
                 for student in students:
                             all_weekly_reports_last_week = WeeklyReport.objects.filter(
                                     student=student,

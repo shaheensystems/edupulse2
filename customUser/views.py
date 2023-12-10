@@ -105,7 +105,7 @@ class AllStudentsView(LoginRequiredMixin,ListView):
         # print(Student.objects.all())
         context['total_students']=Student.objects.all()
         context['total_at_risk_students']=self.get_at_risk_students()
-        context['current_user'] = self.request.user
+        # context['current_user'] = self.request.user
         
 
 
