@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <section>
-    <h1> All Students </h1>
+    <div class='flex justify-between mx-10 my-3'>
+        <h1> All Students </h1> 
+        <a href="{% url 'all-students-at-risk' %}" class='px-4 py-2 bg-red-300 rounded-lg'> At Risk Studnets</a>
+    
+    </div>
     {% comment %} <p>{{students}}</P {% endcomment %}
  
         {% with students=students  view="table" %}
