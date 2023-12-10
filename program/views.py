@@ -150,6 +150,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         # Add the total_students to the context
         context['total_students'] = len(total_students)   
         context['total_no_of_at_risk_student'] = total_no_of_at_risk_student
+        context['current_user'] = self.request.user
 
         return context
 
@@ -192,6 +193,7 @@ class ProgramOfferingDetailView(LoginRequiredMixin,DetailView):
 
         # context['poor_performance_data'] = poor_performance_data
         context['total_course_offering_count']=course.course_offering.all().count()
+        context['current_user'] = self.request.user
         return context
 
 class CourseOfferingListView(LoginRequiredMixin,ListView):
@@ -298,6 +300,8 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         # Add the total_students to the context
         context['total_students'] = len(total_students)
         context['total_no_of_at_risk_student'] = len(total_no_of_at_risk_student)
+        context['current_user'] = self.request.user
+
         return context
 
 class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
@@ -341,6 +345,7 @@ class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
         context['chart_data_attendance'] = {
             'labels': formatted_labels,
             'data': data,
+            'current_user' : self.request.user,
         }
 
         print("All attendance:",all_attendance)

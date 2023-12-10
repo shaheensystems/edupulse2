@@ -1,9 +1,18 @@
 {% extends "base.html" %}
+{% load custom_tags %}
 {% block content %}
 <section>
-    <div class='flex justify-between mx-10 my-3'>
-        <h1> All Students </h1> 
-        <a href="{% url 'all-students-at-risk' %}" class='px-4 py-2 bg-red-300 rounded-lg'> At Risk Studnets</a>
+    <div class='flex justify-between mx-10 my-3 items-baseline'>
+        <div class='flex flex-row gap-3'>
+        
+            <p>Total Stduents : {{total_students.count}}</p>|
+            <h1> Allowed Students :{{students.count}} </h1> |
+
+            <p class=" {% if total_at_risk_students|length > 0 %} text-red-400{% endif %} ">At Risk Stduents : {{total_at_risk_students|length}}</p>
+            
+        </div>
+        
+        <a href="{% url 'all-students-at-risk' %}" class='px-4 py-2 bg-red-300 rounded-lg'> At Risk Students</a>
     
     </div>
     {% comment %} <p>{{students}}</P {% endcomment %}
@@ -12,8 +21,6 @@
              {% include 'components/flash_card/student_list_FC.html' %}
          {% endwith %}
 
-    <p></P
-    <p></P
-    <p></P
+  
 </section>
 {% endblock content %}

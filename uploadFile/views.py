@@ -349,7 +349,12 @@ def Upload_file_view(request):
         # url = reverse('upload_file:upload_file')
     
    
-    return render(request, 'upload/upload_file.html', {'form': form})
+    context = {
+        'form': form,
+        'current_user':request.user,
+        }
+   
+    return render(request, 'upload/upload_file.html', context)
 
 
 
