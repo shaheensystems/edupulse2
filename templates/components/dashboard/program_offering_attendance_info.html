@@ -36,7 +36,7 @@
                             <th class="py-2 px-4 border-b">Program Name</th>
                             <th class="py-2 px-4 border-b">Enrolled Students</th>
                             <th class="py-2 px-4 border-b">Attendance Percentage</th>
-                            <th class="py-2 px-4 border-b">At-Risk Students</th>
+                            <th class="py-2 px-4 border-b">At Risk Students</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,9 +44,9 @@
                             <tr>
                                 <td class="py-2 px-4 border-b">{{ program_offering.temp_id }} </td>
                                 <td class="py-2 px-4 border-b">{{ program_offering.program.name }}</td>
-                                <td class="py-2 px-4 border-b">{{ program_offering.student.count }}</td>
-                                <td class="py-2 px-4 border-b">{{ program_offering.calculate_attendance_percentage }}</td>
-                                <td class="py-2 px-4 border-b">{{ program_offering.calculate_no_at_risk_student_for_last_week|length }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program_offering.student.count }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program_offering.calculate_attendance_percentage }}%</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program_offering.calculate_no_at_risk_student_for_last_week|length }}</td>
                             </tr>
                             <tr>
                                 
@@ -81,11 +81,11 @@
                     <tbody>
                         {% for cousre_offering in program_offering.list_course_offerings  %}
                             <tr>
-                                <td class="py-2 px-4 border-b">{{ cousre_offering.temp_id }} </td>
-                                <td class="py-2 px-4 border-b">{{ cousre_offering.course.name }}</td>
-                                <td class="py-2 px-4 border-b">{{ cousre_offering.student.count }}</td>
-                                <td class="py-2 px-4 border-b">{{ cousre_offering.calculate_attendance_percentage }}</td>
-                                <td class="py-2 px-4 border-b">{{ cousre_offering.calculate_no_at_risk_student_for_last_week }}</td>
+                                <td class="py-2 px-4 border-b pl-10">{{ cousre_offering.temp_id }} </td>
+                                <td class="py-2 px-4 border-b pl-10">{{ cousre_offering.course.name }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ cousre_offering.student.count }}</td>
+                                <td class="py-2 px-4 border-b text-center pr-10">{{ cousre_offering.calculate_attendance_percentage }}%</td>
+                                <td class="py-2 px-4 border-b text-center">{{ cousre_offering.calculate_no_at_risk_student_for_last_week |length}}</td>
                             </tr>
               
                         {% endfor %}

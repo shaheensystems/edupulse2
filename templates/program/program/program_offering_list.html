@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_tags%}
 {% block content %}
    
     <section class='w-full'>
@@ -9,13 +10,17 @@
              <!-- Course_offering_infobar -->
              <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
               <h2 class="text-xl font-bold mb-2">Program Details</h2>
-              <div class='flex flex-row gap-4 flex-wrap '>
+              <div class='flex flex-row gap-4 flex-wrap  '>
                 <p class="mb-2 ">Current Program : {{program_offerings.count}}</p> |
                 <p class="mb-2">Total Students Enrolled by context : {{total_students}}</p> |
-                {% if total_no_of_at_risk_student >  0 %}
-                  <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student}}</p>
+                {% if total_no_of_at_risk_student|length >  0 %}
+                    <p class='text-red-500 '>
+                      <a href="{% url 'all-students-at-risk' %}" class='text-red-500'>
+                        Students at Risk: {{ total_no_of_at_risk_student|length }}
+                      </a>
+                      </p>
                   {% else  %}
-                  <p>Students at Risk: {{total_no_of_at_risk_student}}</p>
+                  <p>Students at Risk: {{total_no_of_at_risk_student|length}}</p>
                   {% endif %}
                 
               </div>

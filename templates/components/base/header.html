@@ -36,7 +36,7 @@
           <a href="{% url 'dashboard' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Reports</a>
         {% endif %}
         {% if request.user|user_belongs_to_group:'Teacher' or request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Teacher'    %} 
-         <a href="{% url 'dashboard' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Students</a>
+         <a href="{% url 'all-students' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Students</a>
         {% endif %}
        
         

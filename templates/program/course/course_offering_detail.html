@@ -24,7 +24,7 @@
             <p class="mb-2">Total Students Enrolled: {{course_offering.student.count}}</p> |
             <p class="mb-2">Attendnace Percentage: {{course_offering.calculate_attendance_percentage}} %</p> |
             {% if course_offering.calculate_no_at_risk_student_for_last_week|length >  0 %}
-            <p class='text-red-500'>Students at Risk: {{course_offering.calculate_no_at_risk_student_for_last_week |length}}</p>
+            <p class='text-red-500'>Students at Risk : {{course_offering.calculate_no_at_risk_student_for_last_week |length}}</p>
             {% else  %}
             <p>Students at Risk: {{course_offering.calculate_no_at_risk_student_for_last_week|length}}</p>
             {% endif %}

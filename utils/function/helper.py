@@ -55,7 +55,7 @@ def get_total_students_at_risk_by_program_offerings(program_offerings):
 
         # Initialize a set to track unique at-risk students
         at_risk_students = set()
-
+        
         # Iterate over each program offering in the queryset
         for program_offering in program_offerings:
             # Get all students associated with the program offering

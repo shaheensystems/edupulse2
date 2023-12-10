@@ -32,13 +32,16 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             program_offerings_for_current_user=program_offerings
         elif user_groups.filter(name="Program_Leader").exists():
            program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+        elif user_groups.filter(name="Teacher").exists():
+           program_offerings_for_current_user=program_offerings.filter(program__course__course_offering__teacher__staff=self.request.user)
+        #    ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
         else:
             program_offerings_for_current_user=None
 
             
 
         total_students_in_program_offerings_for_current_user=0
-
+        
         for program_offering in program_offerings_for_current_user:
             students_count=program_offering.student.count()
             total_students_in_program_offerings_for_current_user=total_students_in_program_offerings_for_current_user+students_count

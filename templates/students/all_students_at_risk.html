@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <h1> All Students </h1>
+    {% comment %} <p>{{students}}</P {% endcomment %}
+ 
+        {% with students=students  view="table" %}
+             {% include 'components/flash_card/student_list_FC.html' %}
+         {% endwith %}
+
+    <p></p>
+  
+</section>
+{% endblock content %}

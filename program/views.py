@@ -58,7 +58,9 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         elif user.groups.filter(name='Student').exists():
             return ProgramOffering.objects.none()
         # For other user groups (e.g., students), return an empty queryset
-        return ProgramOffering.objects.none()
+        else:
+            return ProgramOffering.objects.none()
+    
     # print(context_object_name)
     
     # def get_all_students(self, program_offerings):
@@ -69,15 +71,17 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
     #     return student_count
     def get_all_students(self, program_offerings):
         unique_students = set()
-
+        print(program_offerings)
         for program_offering in program_offerings:
             unique_students.update(program_offering.student.all())
+        
+        return unique_students
 
         # get at_risk Students here 
 
         return unique_students
     # this code is correct 4 result 
-    def get_no_of_at_risk_student(self,unique_students):
+    def get_no_of_at_risk_student(self,program_offerings):
         from report.models import WeeklyReport
         current_date = datetime.now().date()
 
@@ -97,7 +101,6 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
             at_risk_students = set()
             
             # Get all students associated with the course offering
-            students = unique_students
            
             # Iterate over each course to accumulate session counts
             for course in courses:
@@ -106,7 +109,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
 
                 # Iterate over each CourseOffering to handle potential multiple objects
                 for course_offering in course_offerings:
-                
+                    students=course_offering.student.all()
                     # Iterate over each student to check their at-risk status for the last week
                     for student in students:
                         # print("studnet :",student)
@@ -132,10 +135,10 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         
         # Calculate total number of students across all program offerings
         total_students = self.get_all_students(program_offerings)
-        total_no_of_at_risk_student=self.get_no_of_at_risk_student(total_students)
+        total_no_of_at_risk_student=self.get_no_of_at_risk_student(program_offerings)
         # Add the total_students to the context
         context['total_students'] = len(total_students)   
-        context['total_no_of_at_risk_student'] = len(total_no_of_at_risk_student)
+        context['total_no_of_at_risk_student'] = total_no_of_at_risk_student
 
         return context
 
@@ -210,13 +213,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         return CourseOffering.objects.none()
     
     print(context_object_name)
-    # def get_all_students(self, course_offerings):
-    #     student_count = 0
-    #     for course_offering in course_offerings:
-    #         #chances are duplicate students counts 
-    #         student_count += course_offering.student.all().count()
-    #     return student_count
-    
+ 
     def get_all_students(self, course_offerings):
         unique_students = set()
 
@@ -228,7 +225,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
     
      #  get all students at_risk  
     #  wrong code total 3 result 1 result missing 
-    def get_no_of_at_risk_student(self,unique_students):
+    def get_no_of_at_risk_student(self, course_offerings):
         from report.models import WeeklyReport
         current_date = datetime.now().date()
 
@@ -240,13 +237,13 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         # Initialize variable to track the count of at-risk students
         at_risk_students = set()
          # Get all students associated with the course offering
-        students = unique_students
+
          # Get all courses associated with the course offerings
-        course_offerings = CourseOffering.objects.all()
+        course_offerings = course_offerings
 
         for course_offering in course_offerings:
 
-            for student in students:
+            for student in course_offering.student.all():
                         #  not found this id incorrect  total 3 result 
                         # if student.temp_id=="2020769":
                         #     print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
@@ -275,7 +272,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         
         # Calculate total number of students across all program offerings
         total_students = self.get_all_students(course_offerings)
-        total_no_of_at_risk_student=self.get_no_of_at_risk_student(total_students)
+        total_no_of_at_risk_student=self.get_no_of_at_risk_student(course_offerings)
         # Add the total_students to the context
         context['total_students'] = len(total_students)
         context['total_no_of_at_risk_student'] = len(total_no_of_at_risk_student)

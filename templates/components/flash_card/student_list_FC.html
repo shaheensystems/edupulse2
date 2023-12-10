@@ -65,7 +65,8 @@
                             <td class="border px-4 py-2">{{ student.passport_number }}</td>
                             <td class="border px-4 py-2">{{ student.visa_number }}</td>
                             <td class="border px-4 py-2">{{ student.visa_expiry_date }}</td>
-                            <td class="border px-4 py-2">{{student.student_is_at_risk_for_last_week_status }}</td>
+                            <td class="border px-4 py-2 ">{{student.student_is_at_risk_for_last_week_status }}</td>
+                            {% comment %} <td class="border px-4 py-2 {% if student.student_is_at_risk_for_last_week_status is True %} bg-red-300{% endif %} ">{{student.student_is_at_risk_for_last_week_status }}</td> {% endcomment %}
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -9,7 +9,11 @@
         <div class='flex flex-row gap-4 flex-wrap '>
           <p class="mb-2 ">Current Courses : {{course_offerings.count}}</p> |
           <p class="mb-2">Total Students Enrolled: {{students.count}}</p> |
-          <p>Students at Risk: 10</p> 
+            {% if total_no_of_at_risk_student|length >  0 %}
+              <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student|length}}</p>
+            {% else  %}
+              <p>Students at Risk: {{total_no_of_at_risk_student|length}}</p>
+            {% endif %}
         </div>
         <!-- Add more course offering details -->
       </div>

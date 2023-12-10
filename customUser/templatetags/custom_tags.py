@@ -14,3 +14,4 @@ def count_poor_performance(student):
 @register.filter(name='user_belongs_to_group')
 def user_belongs_to_group(user,group_name):
         return user.groups.filter(name=group_name).exists()
+
