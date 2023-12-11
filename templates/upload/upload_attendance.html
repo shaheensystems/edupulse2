@@ -3,14 +3,17 @@
 
 {% block content %}
 <section class='flex flex-col gap-3'>
-    <h1> Upload Attendance </h1>
-    <p> course Offering Name : {{course_offering.temp_id}}: {{course_offering.course.name}}<p>
+    <h2 class="text-3xl"> Upload Attendance </h2>
+    <div class='container bg-green-course py-2 text-2xl font-inter pl-3 flex justify-center top-round gap-6'>
+        <b>{{course_offering.course.name}} ({{course_offering.temp_id}}) </a> </b>
+        </div>
+
     {% comment %} #  user double quote otherwise form will get the error {% endcomment %}
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{form.as_p}}
         <br>
-        <button type="submit" ><p class="px-4 py-1 rounded-lg bg-blue-300">Confirm</P></button>
+        <button type="submit" ><p class="button-border-hover py-1 rounded-lg bg-blue-200">Confirm</P></button>
     </form> 
 </section>
 

@@ -4,7 +4,15 @@
     <!-- mark_attendance.html -->
     <form method="post">
         {% csrf_token %}
-        <h2>Mark Attendance for {{ course_offering.course.name }} ({{ course_offering.start_date }} - {{ course_offering.end_date }})</h2>
+        <div class='container bg-green-course py-2 text-2xl font-inter pl-3 flex justify-center top-round gap-6'>
+            <b>{{course_offering.course.name}} ({{course_offering.temp_id}}) </a> </b>
+            </div>
+
+            <br>
+
+        <h2 class="text-xl">Mark Attendance for {{ course_offering.course.name }} ({{ course_offering.start_date }} - {{ course_offering.end_date }})</h2>
+
+        <br>
 
         <label for="attendanceDate">Select Date:</label>
         <input type="date" id="attendanceDate" name="attendanceDate" value="{{ today_date }}" required>

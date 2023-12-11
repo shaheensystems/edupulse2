@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="my-4">
+    <div class='container bg-green-course py-2 text-2xl font-inter pl-3 flex justify-center top-round gap-6'>
+        <b>{{course_offering.course.name}} ({{course_offering.temp_id}}) </a> </b>
+        </div>
+        <br>
     <h1 class='font-semibold text-lg mb-4'>Weekly Report  
-        <br>Course name: {{ course_offering.temp_id }} - {{ course_offering.course.name }}
+        
         <br>{{ course_offering.start_date }} - {{ course_offering.end_date }}
     </h1>
     
@@ -18,10 +22,10 @@
                 </div>
                 <div class='flex flex-col justify-between items-center'>
                     <h1 class='text-center font-medium text-lg'>
-                        Upload Canvas Weekly report for the Week 
+                        Upload Canvas Weekly Report 
                     </h1>
                     <h1>
-                    <a href="{% url 'upload_canvas_report' course_offering.pk week.grouper %} " class='bg-sky-300 px-4 py-2  rounded-lg'>Uplaod Canvas Report</a>
+                    <a href="{% url 'upload_canvas_report' course_offering.pk week.grouper %} " class='button-border-hover bg-blue-200 px-4 py-2  rounded-lg'>Upload Canvas Report</a>
                     </h1>
                 </div>
             </div>
@@ -72,7 +76,7 @@
             </table>
             
         </form>
-        <a href="{% url 'edit_weekly_report' course_offering.pk week.grouper %} " class='bg-sky-300 px-4 py-2  rounded-lg'>Edit report</a>
+        <a href="{% url 'edit_weekly_report' course_offering.pk week.grouper %} " class='button-border-hover bg-blue-200 px-4 py-2  rounded-lg'>Edit Report</a>
         </div>
         
     {% endfor %}

@@ -1,21 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
 <section>
-    <h1 class='my-4 font-semibold text-lg'>Attendance Report
+    <h1 class='my-4 font-semibold text-3xl'>Attendance Report </h1>
         <br>
-        Course name : {{course_offering.temp_id}} : {{course_offering.course.name}}
+        <div class='container bg-green-course py-2 text-2xl font-inter pl-3 flex justify-center top-round gap-6'>
+            <b>{{course_offering.course.name}} ({{course_offering.temp_id}}) </a> </b>
+            </div>
         <br>
-        course starts from  {{course_offering.start_date}} to {{course_offering.end_date}}
-    </h1>
-   <div class='flex flex-row gap-9'>
-    <a href="{% url 'weekly_report_list' course_offering.pk %}" class="px-4 py-2  bg-blue-200 rounded-lg"> Weekly Report</a>
+        <p> <b>Course Start Date:</b> {{course_offering.start_date}}</p>
+        <p> <b>Course End Date: </b>{{course_offering.end_date}}</p> 
+        <br>
     
-    <a href="{% url 'create-attendance' course_offering.pk %}" class="bg-blue-300 m-2 px-4 py-2 rounded-lg">Mark Attendance</a>
+   <div class='flex flex-row gap-9'>
+    
+    <a href="{% url 'create-attendance' course_offering.pk %}" class="button-border-hover px-4 py-2  bg-blue-200 rounded-lg">Mark Attendance</a>
 
-    <a href="{% url 'upload_attendance' course_offering.pk %}" class="px-4 py-2  bg-blue-200 rounded-lg"> Upload Attendance</a>
+    <a href="{% url 'upload_attendance' course_offering.pk %}" class="button-border-hover px-4 py-2  bg-blue-200 rounded-lg"> Upload Attendance</a>
   
+    <a href="{% url 'weekly_report_list' course_offering.pk %}" class="button-border-hover px-4 py-2  bg-blue-200 rounded-lg"> Weekly Report</a>
+
    </div>
     
+   <br>
 
     <h1 class="text-2xl font-semibold mb-0">Attendance for {{ course_offering.course.name }}</h1>
     <h2>Date-wise Attendance</h2>
