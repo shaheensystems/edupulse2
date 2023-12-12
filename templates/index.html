@@ -17,7 +17,7 @@
         {% endif %}
        
 
-        {% if  request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin'   %}
+        {% if  request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin'    %}
             <!-- Program Offering Details Section -->
           <div class='flex flex-col'>
             <p class='text-center text-lg font-bold mb-2'> Student Enrollment Status </p>

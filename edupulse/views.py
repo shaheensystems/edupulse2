@@ -45,16 +45,24 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         for program_offering in program_offerings_for_current_user:
             students_count=program_offering.student.count()
             total_students_in_program_offerings_for_current_user=total_students_in_program_offerings_for_current_user+students_count
+        
         unique_students = set()
         # Iterate over each program offering in program_offerings_for_current_user
+        # print("program offering for current user :",program_offerings_for_current_user)
         for program_offering in program_offerings_for_current_user:
             # Get all students associated with the current program offering
-            students = program_offering.student.all()
-            for course in program_offering.program.course.all():
-                for program_offering in course.course_offering.all():
-                    students=program_offering.student.all()
-                # Add students to the set
-                unique_students.update(students)
+            courses=program_offering.program.course.all()
+
+            # students = program_offering.student.all()
+            for course in courses:
+                course_offerings=course.course_offering.all()
+                print("all Course offeirng", course_offerings)
+                for course_offering in course_offerings:
+
+                    students=course_offering.student.all()
+                    
+                    # Add students to the set
+                    unique_students.update(students)
 
         # Count the number of unique students
         total_unique_students_in_program_offerings_for_current_user = len(unique_students)

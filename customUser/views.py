@@ -46,7 +46,8 @@ class AllStudentsView(LoginRequiredMixin,ListView):
             # pass
         elif user.groups.filter(name='Program_Leader').exists():
             # return ProgramOffering.objects.none()
-            return Student.objects.filter(course_offerings__course__program__program_offerings__program_leader__staff=user)  
+            # return Student.objects.filter(course_offerings__course__program__program_offerings__program_leader__staff=user)  
+            return Student.objects.filter(program_offering__program_leader__staff=user)  
 
         elif user.groups.filter(name='Student').exists():
             return Student.objects.none()
@@ -69,7 +70,7 @@ class AllStudentsView(LoginRequiredMixin,ListView):
             # pass
         elif user.groups.filter(name='Program_Leader').exists():
             # return ProgramOffering.objects.none()
-            return Student.objects.filter(course_offering__course__program__program_offering__program_leader__staff=user)  
+            return Student.objects.filter(course_offerings__course__program__program_offerings__program_leader__staff=user)  
         
         elif user.groups.filter(name='Student').exists():
             return Student.objects.none()
@@ -105,7 +106,8 @@ class AllStudentsView(LoginRequiredMixin,ListView):
         # print(Student.objects.all())
         context['total_students']=Student.objects.all()
         context['total_at_risk_students']=self.get_at_risk_students()
-        # context['current_user'] = self.request.user
+
+       
         
 
 
