@@ -10,7 +10,7 @@ from django.db.models import Sum
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_program_offerings,get_no_of_at_risk_students_by_course_offerings
 
-
+from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program_offerings,get_total_unique_no_of_student_by_program_offerings,get_total_no_of_student_by_course_offerings,get_total_unique_no_of_student_by_course_offerings
 
 def home(request):
     
@@ -40,37 +40,16 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         else:
             program_offerings_for_current_user=None
 
-            
-
-        total_students_in_program_offerings_for_current_user=0
-        
-        for program_offering in program_offerings_for_current_user:
-            students_count=program_offering.student.count()
-            total_students_in_program_offerings_for_current_user=total_students_in_program_offerings_for_current_user+students_count
-        
-        unique_students = set()
-        # Iterate over each program offering in program_offerings_for_current_user
-        # print("program offering for current user :",program_offerings_for_current_user)
-        for program_offering in program_offerings_for_current_user:
-            # Get all students associated with the current program offering
-            courses=program_offering.program.course.all()
-
-            # students = program_offering.student.all()
-            for course in courses:
-                course_offerings=course.course_offering.all()
-                # print("all Course offeirng", course_offerings)
-                for course_offering in course_offerings:
-
-                    students=course_offering.student.all()
-                    
-                    # Add students to the set
-                    unique_students.update(students)
-
-        # Count the number of unique students
-        total_unique_students_in_program_offerings_for_current_user = len(unique_students)
-
-
-
+   
+       
+        # print("compare st by course offerings:")
+        # print(get_total_no_of_student_by_course_offerings(course_offerings=course_offerings),": here unique")
+        # print(len(get_total_unique_no_of_student_by_course_offerings(course_offerings=course_offerings)))
+       
+        # print("compare st by program offerings:")
+        # print(get_total_no_of_student_by_program_offerings(program_offerings=program_offerings),":here unique")
+        # print(len(get_total_unique_no_of_student_by_program_offerings(program_offerings=program_offerings)))
+       
 
         # print("total students :",total_students_in_program_offerings_for_current_user)
 
@@ -142,23 +121,24 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             'data': [domestic_students, international_students],
         } 
 
-        def total_students_at_risk(self,program_offerings_for_current_user):
-            
-            pass
-    
         context['chart_data_campus_enrollment_student'] = chart_data_campus_enrollment_student
         context['chart_data_campus_enrollment_staff'] = chart_data_campus_enrollment_staff
         context['chart_data_program_offering_student_enrollment'] = program_offering_student_enrollment
         context['chart_data_enrollment'] = chart_data_enrollment
+        context['chart_data_student_region']=chart_data_student_region
+
         context['program_offerings']=program_offerings
         context['program_offerings_for_current_user']=program_offerings_for_current_user
-        # context['total_students_in_program_offerings_for_current_user']=total_students_in_program_offerings_for_current_user
-        context['total_students_in_program_offerings_for_current_user']=total_unique_students_in_program_offerings_for_current_user
+        context['total_students_in_program_offerings_for_current_user']=len(get_total_unique_no_of_student_by_program_offerings(program_offerings=program_offerings_for_current_user))
+        context['total_students_in_course_offerings_for_current_user']=len(get_total_unique_no_of_student_by_course_offerings(course_offerings=course_offerings))
+
+        # context['total_students_in_program_offerings_for_current_user']=total_unique_students_in_program_offerings_for_current_user
         context['course_offerings']=course_offerings
         context['students']=students
-        context['current_user'] = self.request.user
+
 
         context['total_students_at_risk_query_set']=get_no_of_at_risk_students_by_program_offerings(program_offerings_for_current_user)
+
 
         # context['staff_profile'] = self.request.user.staff_profile
         # Check if the user has a staff_profile
@@ -166,21 +146,12 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             context['staff_profile'] = self.request.user.staff_profile
         else:
             context['staff_profile'] = None
-        context['chart_data_student_region']=chart_data_student_region
 
-        # print("current user:", self.request.user)
+       
+
+        # print("current user:", self.request.user.staff_profile)
         # print("staff profile:", self.request.user.staff_profile)
-        staff_profile = None
-        for staff in Staff.objects.all():
-            if staff.staff == self.request.user:
-                # print("user profile by suer:",self.request.user.staff_profile)
-                # print("user profile by staff object :",staff.staff)
-                staff_profile = staff
-                break
-
-        context['staff_profile'] = staff_profile
-
-
+    
         # Add other necessary context data
 
         return context

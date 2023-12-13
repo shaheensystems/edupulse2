@@ -24,6 +24,18 @@ class Program(BaseModel):
   
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_program(program=self)
+    
+    def calculate_total_no_of_student(self):
+        # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
+        program_offerings = self.program_offerings.all()
+     
+        unique_students = set()
+        for program_offering in program_offerings:
+            students_in_program = program_offering.student.all()
+            unique_students.update(students_in_program)
+
+        return len(unique_students)
+
         
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
@@ -44,6 +56,20 @@ class Course(BaseModel):
     def calculate_attendance_percentage(self):
         return get_attendance_percentage_by_course(course=self,total_sessions=0,present_sessions=0)
     
+    def calculate_total_no_of_student(self):
+        # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
+        course_offerings = self.course_offering.all()
+
+        # Use a set to store unique students
+        unique_students = set()
+
+        for course_offering in course_offerings:
+            students_in_course = course_offering.student.all()
+            unique_students.update(students_in_course)
+
+        return len(unique_students)
+    
+
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
 
@@ -76,7 +102,10 @@ class CourseOffering(BaseModel):
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_course_offering(course_offering=self)
 
-        
+    def calculate_total_no_of_student(self):
+        # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
+        return self.student.count()
+       
     def get_all_students(self):
         students = self.student.all()
         # print("Students from Program Offering:", students)
@@ -112,6 +141,19 @@ class ProgramOffering(BaseModel):
             course_offerings_list.extend(course_offerings)
 
         return course_offerings_list
+    
+    # this method is incorrect , it will calculate all student based on course Offering no on program offring 
+    def calculate_total_no_of_student(self):
+         # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
+        courses = self.program.course.all()
+
+        # Use a set to store unique students
+        unique_students = set()
+        for course in courses:
+            for course_offering in course.course_offering.all():
+                students_in_course = course_offering.student.all()
+                unique_students.update(students_in_course)
+        return len(unique_students)
     
     def get_all_students(self):
         students = self.student.all()

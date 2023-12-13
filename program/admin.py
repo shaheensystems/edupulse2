@@ -10,14 +10,41 @@ class CourseInline(admin.StackedInline):  # You can use TabularInline if you pre
     extra = 1  # Number of empty forms to display
 
 class ProgramAdmin(admin.ModelAdmin):
-    list_display=['temp_id','name','description']
+    list_display=['temp_id','name','description','calculate_total_no_of_student','calculate_attendance_percentage','calculate_no_at_risk_student_for_last_week']
     inlines = [CourseInline]
+    def calculate_attendance_percentage(self, obj):
+        return obj.calculate_attendance_percentage()
+
+    calculate_attendance_percentage.short_description = 'Attendance Percentage'
+
+    def calculate_no_at_risk_student_for_last_week(self, obj):
+        return len(obj.calculate_no_at_risk_student_for_last_week())
+
+    calculate_no_at_risk_student_for_last_week.short_description = 'No. of At-Risk Students (Last Week)'
+
+    def calculate_total_no_of_student(self,obj):
+        return obj.calculate_total_no_of_student()
+    
+    calculate_total_no_of_student.short_description = 'No. of  Students'
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display=['temp_id','name','description','course_efts']
+    list_display=['temp_id','name','calculate_total_no_of_student','description','course_efts']
+    
+    def calculate_total_no_of_student(self,obj):
+        return obj.calculate_total_no_of_student()
+    
+    calculate_total_no_of_student.short_description = 'No. of  Students'
 
 class ProgramOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','program')
+    list_display=('temp_id','start_date','end_date','calculate_total_no_of_student','get_all_students','program')
+
+    def calculate_total_no_of_student(self,obj):
+        return obj.calculate_total_no_of_student()
+    calculate_total_no_of_student.short_description = 'No. of  Students'
+
+    def get_all_students(self,obj):
+        return obj.get_all_students().count()
+    get_all_students.short_description = 'No. of  Students(D)'
 
 
 
@@ -30,43 +57,18 @@ class WeeklyReportInline(admin.TabularInline):
     extra=0
 
 class CourseOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','course','result_status','result_status_code')
+    list_display=('temp_id','start_date','end_date','calculate_total_no_of_student','get_all_students','course','result_status','result_status_code')
     inlines=[WeeklyReportInline,AttendanceInline]
 
-    # def change_view(self, request, object_id, form_url='', extra_context=None):
-    #     # Get the CourseOffering instance
-    #     course_offering = self.get_object(request, object_id)
+    def calculate_total_no_of_student(self,obj):
+        return obj.calculate_total_no_of_student()
+    
+    calculate_total_no_of_student.short_description = 'No. of  Students Incorrect method '
 
-    #     # Get the students enrolled in the CourseOffering
-    #     students_enrolled = course_offering.student.all()
+    def get_all_students(self,obj):
+        return obj.get_all_students().count()
+    get_all_students.short_description = 'No. of  Students(D)'
 
-    #     print(students_enrolled)
-    #     # Iterate through the students
-    #     for student in students_enrolled:
-    #         # Get the related attendance records for the current student
-    #         attendance_records = Attendance.objects.filter(
-    #             student=student,
-    #             course_offering=course_offering
-    #         )
-
-    #         # Do something with the attendance records for each student
-    #         for attendance_record in attendance_records:
-    #             # You can access and process each attendance record here
-    #             print(f"Student: {student}, Attended: {attendance_record.attended}")
-
-    #     return super().change_view(request, object_id, form_url, extra_context)
-    # def save_formset(self, request, form, formset, change):
-    #     # Get the current user (assuming you're using Django's built-in User model)
-    #     current_user = request.user
-    #     print(current_user)
-    #     # Iterate through the formset and set the "updated by" field
-    #     for form in formset:
-    #         if form.instance.pk is not None:
-    #             form.instance.updated_by = current_user
-    #             form.instance.created_by = current_user
-
-    #     # Save the formset
-    #     super().save_formset(request, form, formset, change)
 
 admin.site.register(Program, ProgramAdmin)
 

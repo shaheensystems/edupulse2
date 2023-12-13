@@ -8,7 +8,7 @@ from customUser.models import Student,Staff
 from django.http import HttpResponseRedirect
 from datetime import timedelta, datetime
 from django.utils import timezone
-
+from utils.function.helperGetAtRiskStudent import get_all_at_risk_student_last_week
 # Create your views here.
 class UserLoginView(LoginView):
     redirect_authenticated_user=True
@@ -78,38 +78,33 @@ class AllStudentsView(LoginRequiredMixin,ListView):
         return Student.objects.none()
 
     def get_at_risk_students(self):
-        from report.models import WeeklyReport
-      
-        current_date = datetime.now().date()
-
-        # Calculate the start and end dates for the last week
-        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
         students=Student.objects.all()
-
-        at_risk_students = set()
-        for student in students:
-            all_weekly_reports_last_week = WeeklyReport.objects.filter(
-                    student=student,
-                    sessions__attendance_date__range=[start_date_last_week, end_date_last_week])                   
-            if all_weekly_reports_last_week:
-                for weekly_report in  all_weekly_reports_last_week:
-                    if weekly_report.at_risk is True:
-                        at_risk_students.add(student)
- 
-        return at_risk_students
+        return get_all_at_risk_student_last_week(students=students)
+       
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # send filtred data according to user group 
-        # print(Student.objects.all())
+
+        count_no_prog_offering=0
+        count_no_course_offering=0
+        count_no_students_have_more_then_one_course_offering=0
+        for student in Student.objects.all():
+            if not student.program_offering.exists():
+                # print("student doesn't have program offering ",student)
+                count_no_prog_offering+=1
+            if student.program_offering.all() and len(student.program_offering.all())>1:
+                count_no_students_have_more_then_one_course_offering+=1
+            if not student.course_offerings.exists():
+                # print("student doesn't have Course offering ",student)
+                count_no_course_offering+=1
+     
+        context['student_not_enrolled_in_any_program_offering']=count_no_prog_offering
+        context['student_not_enrolled_in_any_course_offering']=count_no_course_offering
+        context['student_enrolled_more_then_one_program_offering']=count_no_students_have_more_then_one_course_offering
+
+
         context['total_students']=Student.objects.all()
         context['total_at_risk_students']=self.get_at_risk_students()
-
-       
-        
-
 
         return context
 

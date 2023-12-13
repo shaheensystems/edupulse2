@@ -16,6 +16,8 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('id', 'get_full_name','username', 'get_personal_email_id','email', 'dob', 'gender','phone','address','display_groups','user_image','campus')  # Add 'get_full_name' to display combined name
     list_filter = UserAdmin.list_filter + ('gender','campus',)  # Add 'position' and 'department' to filters
     readonly_fields=('last_login','date_joined')
+    search_fields = ('get_full_name', 'display_groups', 'campus')
+
     # Custom method to get combined first name and last name
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}"
@@ -112,6 +114,16 @@ class StudentAdmin(admin.ModelAdmin):
         'enrolled_course','email_id','enrollment_status','passport_number',
         'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered'
         )
+    list_filter = (
+        'international_student','student__campus','course_offerings__course','program_offering__program',
+    )
+
+    ordering = (
+        'program_offering__program__name', 'id','course_offerings__course__name', 
+    )
+    search_fields = ('student','joining_date','international_student','remark',
+        'enrolled_course','email_id','enrollment_status','passport_number',
+        'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered',)
     inlines=[ProgramOfferingInline,CourseOfferingInline]
 
     def get_programs_offered(self, obj):

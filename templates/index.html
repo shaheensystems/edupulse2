@@ -11,7 +11,7 @@
         {% if request.user|user_belongs_to_group:'Teacher' %}
         {% comment %} {{total_students_at_risk_query_set}} {% endcomment %}
             <!-- Course Offering Details Section -->
-            {% with course_offerings=course_offerings students=students total_no_of_at_risk_student=total_students_at_risk_query_set %}
+            {% with course_offerings=course_offerings students=total_students_in_course_offerings_for_current_user total_no_of_at_risk_student=total_students_at_risk_query_set %}
               {% include 'components/dashboard/course_offering_info_bar.html' %}
             {% endwith %}
         {% endif %}
@@ -34,12 +34,13 @@
               {% endwith %}
             </div>
             <div class='w-4/12 bg-gray-100 rounded-lg'>
-              {% with data=chart_data_student_region title='Domestic and INternational Studnets' id='students_by_country' chartType='bar' lengendDisplay='true' limitData=10 %}
+              {% with data=chart_data_student_region title='Domestic and International Studnets' id='students_by_country' chartType='bar' lengendDisplay='false' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
             
           </div>
+          
           {% with program_offerings=program_offerings students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set  %}
               {% include 'components/dashboard/program_offering_info_bar.html' %}
             {% endwith %}
