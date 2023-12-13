@@ -22,9 +22,9 @@ class NewUser(AbstractUser):
     dob=models.DateField(default=None, blank=True, null=True)
     user_image = models.ImageField(upload_to='user_images/', null=True, blank=True)
     nationality=models.CharField(max_length=255,null=True,blank=True)
-    address=models.ForeignKey(Address, verbose_name="Address", on_delete=models.CASCADE,null=True,blank=True)
+    address=models.ForeignKey(Address, verbose_name="Address", on_delete=models.PROTECT,null=True,blank=True)
     
-    campus=models.ForeignKey(Campus, verbose_name="Campus", on_delete=models.CASCADE,null=True,blank=True, related_name='users')
+    campus=models.ForeignKey(Campus, verbose_name="Campus", on_delete=models.PROTECT,null=True,blank=True, related_name='users')
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     

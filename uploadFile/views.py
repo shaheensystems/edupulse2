@@ -58,6 +58,7 @@ def update_or_create_campus(data):
 
 
 def updated_or_create_user(data):
+    print("initializing  create or update user ")
     if data['student_id'] and data['student_id'].isdigit():
         update_or_create_campus(data)
         try:
@@ -67,7 +68,23 @@ def updated_or_create_user(data):
             user.last_name=data['student_lname']
             user.dob=handle_date_in_correct_format(data['student_dob'])
             user.email=data['student_email']
-            user.phone=data['student_mobile']
+
+            # user.phone=data['student_mobile']
+            
+            student_mobile_raw = data.get('student_mobile', '')
+            if student_mobile_raw.isdigit() and len(student_mobile_raw)<13:
+                
+                student_mobile = int(student_mobile_raw)
+                print("Student Mobile Number :",student_mobile)
+                # Assign the validated integer to user.phone
+                user.phone = student_mobile
+            else:
+                # Handle the case where student_mobile is not a valid integer
+                print(f"Invalid student_mobile value: {student_mobile_raw}")
+                # You can choose to set a default value or handle it as appropriate
+                user.phone = None  # or any other default value
+
+
             user.nationality=data['student_nationality']
             user.campus=Campus.objects.get(temp_id=data['student_campus_temp_id']) # link campus with User while creating new user 
             user.save()
@@ -78,6 +95,17 @@ def updated_or_create_user(data):
 
             
         except NewUser.DoesNotExist:
+            student_mobile_raw = data.get('student_mobile', '')
+            if student_mobile_raw.isdigit() and len(student_mobile_raw)<13:
+                student_mobile = int(student_mobile_raw)
+                print(student_mobile)
+            
+            else:
+                # Handle the case where student_mobile is not a valid integer
+                print(f"Invalid student_mobile value: {student_mobile_raw}")
+                # You can choose to set a default value or handle it as appropriate
+                student_mobile = None  # or any other default value
+
             new_user=NewUser.objects.create(
                 temp_id=data['student_id'],
                 username=data['student_id'],
@@ -85,7 +113,7 @@ def updated_or_create_user(data):
                 last_name=data['student_lname'],
                 dob=handle_date_in_correct_format(data['student_dob']),
                 email=data['student_email'],
-                phone=data['student_mobile'],
+                phone=student_mobile,
                 nationality=data['student_nationality'],
                 campus=Campus.objects.get(temp_id=data['student_campus_temp_id']), # link campus with User while creating new user 
                 )
@@ -98,6 +126,7 @@ def updated_or_create_user(data):
         print(f"Ignoring program with code '{data['student_id']}' is not valid ")
 
 def updated_or_create_student(data):
+    print("Data for update or create students :",data)
     if data['student_id'] and data['student_id'].isdigit():
         # first cerate and updated user then create and updated student 
         updated_or_create_user(data)
@@ -208,12 +237,18 @@ def update_or_create_course_offering(data):
         try:
             course_offering = CourseOffering.objects.get(temp_id=data['student_course_offer_code'])
             # linked_course=Course.objects.get(temp_id=data['student_course_code'])
-            linked_student = Student.objects.get(temp_id=data['student_id'])
-            course_offering.student.add(linked_student)
-            course_offering.course=Course.objects.get(temp_id=data['student_course_code']) # one-to-one relationship
-            course_offering.result_status_code=data['student_course_offer_result_code']
-            course_offering.result_status=data['student_course_offer_result_status']
-            course_offering.save()
+            
+            try:
+                linked_student = Student.objects.get(temp_id=data['student_id'])
+                course_offering.student.add(linked_student)
+                course_offering.course=Course.objects.get(temp_id=data['student_course_code']) # one-to-one relationship
+                course_offering.result_status_code=data['student_course_offer_result_code']
+                course_offering.result_status=data['student_course_offer_result_status']
+                course_offering.save()
+            except Student.DoesNotExist:
+                print("Student not exits cant linked with course offering ")
+
+            
         except course_offering.DoesNotExist:
             # Handle the case where the program doesn't exist
             print(f"CourseOffering has error while creating or updating with code '{data['student_course_offering_code']}' n")        
@@ -262,7 +297,7 @@ def Upload_file_view(request):
         form.save()
         form = CSVModelForm()
         obj = Csv.objects.get(activated=False)
-        with open(obj.file_name.path, 'r') as f:
+        with open(obj.file_name.path, 'r', encoding='utf-8', errors='ignore') as f:
             reader = csv.reader(f)
 
             header = next(reader, None)
@@ -321,7 +356,7 @@ def Upload_file_view(request):
                             data[variable_name] = row[index]
 
                 # Access the data using the variable names
-                student_offer_id = data['student_offer_id']
+                # student_offer_id = data['student_offer_id']
 
                 # create object as needed for data by importing models here 
                 
