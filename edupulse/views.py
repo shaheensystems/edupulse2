@@ -6,7 +6,9 @@ from program.models import ProgramOffering,CourseOffering
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 
-from utils.function.helper import get_total_students_at_risk_by_program_offerings
+
+
+from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_program_offerings,get_no_of_at_risk_students_by_course_offerings
 
 
 
@@ -156,7 +158,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['students']=students
         context['current_user'] = self.request.user
 
-        context['total_students_at_risk_query_set']=get_total_students_at_risk_by_program_offerings(program_offerings_for_current_user)
+        context['total_students_at_risk_query_set']=get_no_of_at_risk_students_by_program_offerings(program_offerings_for_current_user)
 
         # context['staff_profile'] = self.request.user.staff_profile
         # Check if the user has a staff_profile

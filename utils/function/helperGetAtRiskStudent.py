@@ -47,11 +47,35 @@ def get_at_risk_student_list_by_filter(start_date,end_date,students,course_offer
 
     return at_risk_students
 
+def get_all_at_risk_student_last_week(students):
+    from report.models import WeeklyReport
+
+    start_date,end_date=get_last_week_dates()
+  
+    at_risk_students=set()
+
+    # print("students :",students)
+    for student in students:
+        weekly_reports_list=WeeklyReport.objects.filter(
+            student=student,
+            sessions__attendance_date__range=[start_date, end_date]
+        )
+        if weekly_reports_list:
+                for weekly_report in  weekly_reports_list:
+                    if weekly_report.at_risk is True:
+                        # adding one object in set 
+                        at_risk_students.add(student)
+
+    return at_risk_students
+
 
 
 
 def get_no_of_at_risk_students_by_program(program):
+
+    # Get all courses associated with the program
     courses = program.course.all()
+
     # Initialize variable to track the count of at-risk students
     at_risk_students = set()
         # Get all students associated with the course offering
@@ -62,15 +86,32 @@ def get_no_of_at_risk_students_by_program(program):
         at_risk_students.update(at_risk_students_new)
 
     return at_risk_students
-    
+
+# from onr program Offering 
 def get_no_of_at_risk_students_by_program_offering(program_offering):
         at_risk_students = set()
         # Get all courses associated with the program
         courses = program_offering.program.course.all()
+
         # Iterate over each course to accumulate session counts
         for course in courses:
             at_risk_students_new=get_no_of_at_risk_students_by_course(course=course)
             at_risk_students.update(at_risk_students_new)
+               
+        return at_risk_students
+
+# from query set of multiple program Offering 
+def get_no_of_at_risk_students_by_program_offerings(program_offerings):
+
+        at_risk_students = set()
+        # Get all courses associated with the program
+        for program_offering in program_offerings:
+            courses = program_offering.program.course.all()
+
+            # Iterate over each course to accumulate session counts
+            for course in courses:
+                at_risk_students_new=get_no_of_at_risk_students_by_course(course=course)
+                at_risk_students.update(at_risk_students_new)
                
         return at_risk_students
 
@@ -91,6 +132,20 @@ def get_no_of_at_risk_students_by_course_offering(course_offering):
     # Initialize variable as tuple to avoid duplicate student track the count of at-risk students 
     at_risk_students=get_at_risk_student_list_by_filter(start_date=start_date,end_date=end_date,students=students,course_offering=course_offering)
                 
+
+    # print("at Risk students ",at_risk_students)
+    return at_risk_students
+
+def get_no_of_at_risk_students_by_course_offerings(course_offerings):
+    start_date,end_date=get_last_week_dates()
+    # students only belong to course offering
+    at_risk_students = set()
+    for course_offering in course_offerings:
+         
+        students = course_offering.student.all()
+        # Initialize variable as tuple to avoid duplicate student track the count of at-risk students 
+        at_risk_students_new=get_at_risk_student_list_by_filter(start_date=start_date,end_date=end_date,students=students,course_offering=course_offering)
+        at_risk_students.update(at_risk_students_new)
 
     # print("at Risk students ",at_risk_students)
     return at_risk_students

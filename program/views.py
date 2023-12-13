@@ -6,6 +6,8 @@ from program.models import Course,CourseOffering,Program,ProgramOffering
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import timedelta, datetime
 from django.utils import timezone
+
+from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offerings,get_no_of_at_risk_students_by_program_offerings
 # Create your views here.
 
 class CourseListView(LoginRequiredMixin,ListView):
@@ -60,15 +62,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         # For other user groups (e.g., students), return an empty queryset
         else:
             return ProgramOffering.objects.none()
-    
-    # print(context_object_name)
-    
-    # def get_all_students(self, program_offerings):
-    #     student_count = 0
-    #     for program_offering in program_offerings:
-                # chances of duplicate students
-    #         student_count += program_offering.student.all().count()
-    #     return student_count
+
     def get_all_students(self, program_offerings):
         unique_students = set()
         # print(program_offerings)
@@ -76,54 +70,6 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
             unique_students.update(program_offering.student.all())
         
         return unique_students
-
-        # get at_risk Students here 
-
-        return unique_students
-    # this code is correct 4 result 
-    def get_no_of_at_risk_student(self,program_offerings):
-        from report.models import WeeklyReport
-        current_date = datetime.now().date()
-
-        # Calculate the start and end dates for the last week
-        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-
-        
-        program_offerings=ProgramOffering.objects.all()
-        for program_offering in program_offerings:
-
-            program=program_offering.program
-            courses = program.course.all()
-
-            # Initialize variable to track the count of at-risk students
-            at_risk_students = set()
-            
-            # Get all students associated with the course offering
-           
-            # Iterate over each course to accumulate session counts
-            for course in courses:
-                # Get all CourseOfferings associated with the current course and program offering
-                course_offerings = course.course_offering.all()
-
-                # Iterate over each CourseOffering to handle potential multiple objects
-                for course_offering in course_offerings:
-                    students=course_offering.student.all()
-                  
-                    for student in students:
-                            all_weekly_reports_last_week = WeeklyReport.objects.filter(
-                                    student=student,
-                                    course_offering=course_offering,
-                                    sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-                                )
-                                    
-                            if all_weekly_reports_last_week:
-                                for weekly_report in  all_weekly_reports_last_week:
-                                    if weekly_report.at_risk is True:
-                                        at_risk_students.add(student)
-
-        return at_risk_students
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -132,10 +78,10 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         
         # Calculate total number of students across all program offerings
         total_students = self.get_all_students(program_offerings)
-        total_no_of_at_risk_student=self.get_no_of_at_risk_student(program_offerings)
+
         # Add the total_students to the context
         context['total_students'] = len(total_students)   
-        context['total_no_of_at_risk_student'] = total_no_of_at_risk_student
+        context['total_no_of_at_risk_student'] = get_no_of_at_risk_students_by_program_offerings(program_offerings)
         context['current_user'] = self.request.user
 
         return context
@@ -144,42 +90,22 @@ class ProgramOfferingDetailView(LoginRequiredMixin,DetailView):
     model = ProgramOffering
     template_name = 'program/program/program_offering_detail.html'  
     context_object_name = 'program_offering'  
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+       
         # Assuming 'performance' is a field in the WeeklyReport model
         courses = self.object.program.course.all()  # Adjust the related name accordingly
-        # print("All course",courses)
-        # Dictionary to store poor performance count for each course
-        poor_performance_data = []
-
+        course_offering_count=0
         for course in courses:
-            # print("Each Course",course)
-            # print("for each course get all course_offering :",course.course_offering.all().count())
+            
             for course_offering in course.course_offering.all():
-                weekly_reports = course_offering.weekly_reports.values('week_number').annotate(
-                total=Count('pk'),
-                # poor_performance=Count('pk', filter=Q(performance='poor'))
-                )
-
-                for report in weekly_reports:
-                    week_number = report['week_number']
-                    total_count = report['total']
-                    # poor_count = report['poor_performance']
-
-                     # Create a dictionary for each course offering and week
-                    offering_data = {
-                    'course_offering': course_offering,
-                    'week_number': week_number,
-                    'total_students': total_count,
-                    # 'poor_performance_count': poor_count,
-                    }
-
-                    # poor_performance_data.append(offering_data)
+                course_offering_count+=1
+              
 
         # context['poor_performance_data'] = poor_performance_data
-        context['total_course_offering_count']=course.course_offering.all().count()
-        context['current_user'] = self.request.user
+        context['total_course_offering_count']=course_offering_count
+   
         return context
 
 class CourseOfferingListView(LoginRequiredMixin,ListView):
@@ -211,49 +137,15 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         # For other user groups (e.g., students), return an empty queryset
         return CourseOffering.objects.none()
     
-    print(context_object_name)
+    
  
     def get_all_students(self, course_offerings):
         unique_students = set()
-
         for course_offering in course_offerings:
             unique_students.update(course_offering.student.all())
 
         return unique_students
 
-    
-     #  get all students at_risk  
-    #  wrong code total 3 result 1 result missing 
-    def get_no_of_at_risk_student(self, course_offerings):
-        from report.models import WeeklyReport
-        current_date = datetime.now().date()
-
-        # Calculate the start and end dates for the last week
-        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-
-        # Initialize variable to track the count of at-risk students
-        at_risk_students = set()
-         # Get all students associated with the course offering
-
-         # Get all courses associated with the course offerings
-        course_offerings = course_offerings
-
-        for course_offering in course_offerings:
-
-            for student in course_offering.student.all():
-                            all_weekly_reports_last_week = WeeklyReport.objects.filter(
-                                    student=student,
-                                    course_offering=course_offering,
-                                    sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-                                )
-                                    
-                            if all_weekly_reports_last_week:
-                                for weekly_report in  all_weekly_reports_last_week:
-                                    if weekly_report.at_risk is True:
-                                        at_risk_students.add(student)
-        return at_risk_students
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -262,11 +154,11 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         
         # Calculate total number of students across all program offerings
         total_students = self.get_all_students(course_offerings)
-        total_no_of_at_risk_student=self.get_no_of_at_risk_student(course_offerings)
+        total_no_of_at_risk_student=get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings)
+
         # Add the total_students to the context
         context['total_students'] = len(total_students)
         context['total_no_of_at_risk_student'] = len(total_no_of_at_risk_student)
-        context['current_user'] = self.request.user
 
         return context
 

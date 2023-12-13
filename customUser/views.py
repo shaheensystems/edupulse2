@@ -113,6 +113,7 @@ class AllStudentsView(LoginRequiredMixin,ListView):
 
         return context
 
+from utils.function.helperGetAtRiskStudent import get_all_at_risk_student_last_week
 
 class AllStudentsAtRiskView(LoginRequiredMixin, ListView):
     model = Student
@@ -120,25 +121,11 @@ class AllStudentsAtRiskView(LoginRequiredMixin, ListView):
     context_object_name = 'students'
 
     def get_queryset(self):
-        from report.models import WeeklyReport
-      
-        current_date = datetime.now().date()
-
-        # Calculate the start and end dates for the last week
-        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
+        
         students=Student.objects.all()
 
-        at_risk_students = set()
-        for student in students:
-            all_weekly_reports_last_week = WeeklyReport.objects.filter(
-                    student=student,
-                    sessions__attendance_date__range=[start_date_last_week, end_date_last_week])                   
-            if all_weekly_reports_last_week:
-                for weekly_report in  all_weekly_reports_last_week:
-                    if weekly_report.at_risk is True:
-                        at_risk_students.add(student)
+        at_risk_students = get_all_at_risk_student_last_week(students)
+      
  
         return at_risk_students
     
