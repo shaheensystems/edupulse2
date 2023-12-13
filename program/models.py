@@ -7,6 +7,8 @@ from django.utils import timezone
 from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering
 
 
+from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
+
 
 
 class Program(BaseModel):
@@ -17,56 +19,12 @@ class Program(BaseModel):
     total_credit=models.PositiveIntegerField(null=True,blank=True)
     duration_in_week=models.PositiveIntegerField(null=True,blank=True)
     
-    
     def calculate_attendance_percentage(self):
         return get_attendance_percentage_by_program(program=self,total_sessions=0,present_sessions=0)
   
-    
     def calculate_no_at_risk_student_for_last_week(self):
-        program=self
-        # print("all program offering from model ",program_offerings)
-        from report.models import WeeklyReport
-        current_date = datetime.now().date()
-
-        # Calculate the start and end dates for the last week
-        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-
-        # Get all courses associated with the program
-        courses = program.course.all()
-
-        # Initialize variable to track the count of at-risk students
-        at_risk_students = set()
-         # Get all students associated with the course offering
-        # print("count students :",students.count())
-        # Iterate over each course to accumulate session counts
-        for course in courses:
-            # Get all CourseOfferings associated with the current course and program offering
-            course_offerings = course.course_offering.all()
-
-            # Iterate over each CourseOffering to handle potential multiple objects
-            for course_offering in course_offerings:
-                students=course_offering.student.all()
-               
-                # Iterate over each student to check their at-risk status for the last week
-                for student in students:
-                    # print("studnet :",student)
-                    # Check if there is a weekly report for the student and course offering in the last week
-                    weekly_report_last_week = WeeklyReport.objects.filter(
-                        student=student,
-                        course_offering=course_offering,
-                        sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-                    ).first()
-                    # print("weekly report found ",weekly_report_last_week)
-                    # If there is a weekly report, check if the student is at risk
-                    if weekly_report_last_week and weekly_report_last_week.at_risk:
-                        # print("at _risk status on week report found PO M",student.temp_id)
-                        at_risk_students.add(student)
-                        # print("all object PO M",at_risk_students)
-
-        return at_risk_students
-    
+        return get_no_of_at_risk_students_by_program(program=self)
+        
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
 
@@ -81,53 +39,13 @@ class Course(BaseModel):
     course_efts=models.FloatField(null=True,blank=True)
 
     def calculate_no_at_risk_student_for_last_week(self):
-        course=self
-        # print("all program offering from model ",program_offerings)
-        from report.models import WeeklyReport
-        current_date = datetime.now().date()
-
-        # Calculate the start and end dates for the last week
-        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-
-
-        # Initialize variable to track the count of at-risk students
-        at_risk_students = set()
-         # Get all students associated with the course offering
-        # print("count students :",students.count())
-        # Iterate over each course to accumulate session counts
-         # Get all CourseOfferings associated with the current course and program offering
-        course_offerings = course.course_offering.all()
-
-        # Iterate over each CourseOffering to handle potential multiple objects
-        for course_offering in course_offerings:
-            students=course_offering.student.all()
-            
-            # Iterate over each student to check their at-risk status for the last week
-            for student in students:
-                # print("studnet :",student)
-                # Check if there is a weekly report for the student and course offering in the last week
-                weekly_report_last_week = WeeklyReport.objects.filter(
-                    student=student,
-                    course_offering=course_offering,
-                    sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-                ).first()
-                # print("weekly report found ",weekly_report_last_week)
-                # If there is a weekly report, check if the student is at risk
-                if weekly_report_last_week and weekly_report_last_week.at_risk:
-                    # print("at _risk status on week report found PO M",student.temp_id)
-                    at_risk_students.add(student)
-                    # print("all object PO M",at_risk_students)
-
-        return at_risk_students
+        return get_no_of_at_risk_students_by_course(course=self)
+    
+    def calculate_attendance_percentage(self):
+        return get_attendance_percentage_by_course(course=self,total_sessions=0,present_sessions=0)
     
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
-   
-    def calculate_attendance_percentage(self):
-        return get_attendance_percentage_by_course(course=self,total_sessions=0,present_sessions=0)
-
 
 
 class CourseOffering(BaseModel):
@@ -154,55 +72,10 @@ class CourseOffering(BaseModel):
 
     def calculate_attendance_percentage(self): 
         return get_attendance_percentage_by_course_offering(course_offering=self,total_sessions=0,present_sessions=0)
-    
-    #  this code working  fine total 4 result  
+     
     def calculate_no_at_risk_student_for_last_week(self):
-        from report.models import WeeklyReport
-        current_date = datetime.now().date()
+        return get_no_of_at_risk_students_by_course_offering(course_offering=self)
 
-        # Calculate the start and end dates for the last week
-        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-
-        students = self.student.all()
-
-        # Initialize variable to track the count of at-risk students
-        at_risk_students = set()
-         # Get all students associated with the course offering
-        students = self.student.all()
-
-        # for student in students:
-        #             #  this on working fine total 4 result 
-        #             # if student.temp_id=="2020792":
-        #             #     print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-        #             #     print("id Matched in CO M",student.temp_id)
-        #             # print("student :",student)
-        #             # Check if there is a weekly report for the student and course offering in the last week
-        #             weekly_report_last_week = WeeklyReport.objects.filter(
-        #                 student=student,
-        #                 course_offering=self,
-        #                 sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-        #             ).first()
-        #             # print("weekly report found ",weekly_report_last_week)
-        #             # If there is a weekly report, check if the student is at risk
-        #             if weekly_report_last_week and weekly_report_last_week.at_risk:
-        #                 # print("at _risk status on week report found CO M:",student.temp_id)
-        #                 at_risk_students.add(student)
-        #                 # print("all object CO M",at_risk_students)
-        for student in students:
-                            all_weekly_reports_last_week = WeeklyReport.objects.filter(
-                                    student=student,
-                                    course_offering=self,
-                                    sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-                                )
-                                    
-                            if all_weekly_reports_last_week:
-                                for weekly_report in  all_weekly_reports_last_week:
-                                    if weekly_report.at_risk is True:
-                                        at_risk_students.add(student)
-        
-        return at_risk_students
         
     def get_all_students(self):
         students = self.student.all()
@@ -222,49 +95,10 @@ class ProgramOffering(BaseModel):
 
     def calculate_attendance_percentage(self):
         return get_attendance_percentage_by_program_offering(program_offering=self,total_sessions=0,present_sessions=0)
-        
-   
 
     def calculate_no_at_risk_student_for_last_week(self):
-        # program_offerings=self
-        # print("all program offering from model ",program_offerings)
-        from report.models import WeeklyReport
-        current_date = datetime.now().date()
-
-        # Calculate the start and end dates for the last week
-        end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-
-        # Get all courses associated with the program
-        courses = self.program.course.all()
-
-        # Initialize variable to track the count of at-risk students
-        at_risk_students = set()
-         # Get all students associated with the course offering
-        # print("count students :",students.count())
-        # Iterate over each course to accumulate session counts
-        for course in courses:
-            # Get all CourseOfferings associated with the current course and program offering
-            course_offerings = course.course_offering.all()
-
-            # Iterate over each CourseOffering to handle potential multiple objects
-            for course_offering in course_offerings:
-                students=course_offering.student.all()
-
-                for student in students:
-                            all_weekly_reports_last_week = WeeklyReport.objects.filter(
-                                    student=student,
-                                    course_offering=course_offering,
-                                    sessions__attendance_date__range=[start_date_last_week, end_date_last_week]
-                                )
-                                    
-                            if all_weekly_reports_last_week:
-                                for weekly_report in  all_weekly_reports_last_week:
-                                    if weekly_report.at_risk is True:
-                                        at_risk_students.add(student)
-
-        return at_risk_students
+        return get_no_of_at_risk_students_by_program_offering(program_offering=self)
+        
 
     def list_course_offerings(self):
         courses = self.program.course.all()
