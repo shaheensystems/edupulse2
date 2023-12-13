@@ -4,6 +4,7 @@ from customUser.models import Student, Staff
 from datetime import timedelta, datetime
 from django.utils import timezone
 
+from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering
 
 
 
@@ -18,42 +19,8 @@ class Program(BaseModel):
     
     
     def calculate_attendance_percentage(self):
-       
-        # Get all the courses associated with the program
-        courses = self.course.all()
-        # print("all courses linked with program_offering :",courses)
-        # Initialize variables to track total and present sessions
-        total_sessions = 0
-        present_sessions = 0
-
-        # Iterate over each course to accumulate session counts
-        for course in courses:
-            # Get the CourseOffering associated with the current course and program offering
-            try:
-                course_offerings = CourseOffering.objects.filter(course=course)
-                # print("get all course_offering linked is course:",course_offerings)
-            except CourseOffering.DoesNotExist:
-                # Handle the case where there is no associated CourseOffering for the current course and program offering
-                continue
-            
-            if course_offerings:
-                for course_offering in course_offerings:
-                    total_sessions+=course_offering.attendance.count()
-                    present_sessions += course_offering.attendance.filter(is_present='present').count()
-                    # print("total attendance sessions:",total_sessions)
-                    # print("total present attendance sessions:",present_sessions)
-            
-
-        # Check if there are any sessions before calculating the percentage to avoid division by zero
-        if total_sessions > 0:
-            # Calculate the attendance percentage as (present_sessions / total_sessions) * 100
-            attendance_percentage = (present_sessions / total_sessions) * 100
-
-            # Round the percentage to two decimal places for better readability
-            return round(attendance_percentage, 2)
-
-        # If there are no sessions, return 0.0 as the default attendance percentage
-        return 0.0
+        return get_attendance_percentage_by_program(program=self,total_sessions=0,present_sessions=0)
+  
     
     def calculate_no_at_risk_student_for_last_week(self):
         program=self
@@ -159,21 +126,7 @@ class Course(BaseModel):
         return f'{self.temp_id}-{self.name}'
    
     def calculate_attendance_percentage(self):
-        total_sessions = 0
-        present_sessions = 0
-        course_offerings=self.course_offering.all()
-        for course_offering in course_offerings:
-            total_sessions+=course_offering.attendance.count()
-            present_sessions += course_offering.attendance.filter(is_present='present').count()
-        if total_sessions > 0:
-            # Calculate the attendance percentage as (present_sessions / total_sessions) * 100
-            attendance_percentage = (present_sessions / total_sessions) * 100
-
-            # Round the percentage to two decimal places for better readability
-            return round(attendance_percentage, 2)
-
-        # If there are no sessions, return 0.0 as the default attendance percentage
-        return 0.0
+        return get_attendance_percentage_by_course(course=self,total_sessions=0,present_sessions=0)
 
 
 
@@ -199,19 +152,9 @@ class CourseOffering(BaseModel):
     )
     
 
-    def calculate_attendance_percentage(self):
-        
-        total_sessions=self.attendance.count()
-        present_sessions = self.attendance.filter(is_present='present').count()
-        if total_sessions > 0:
-            # Calculate the attendance percentage as (present_sessions / total_sessions) * 100
-            attendance_percentage = (present_sessions / total_sessions) * 100
-
-            # Round the percentage to two decimal places for better readability
-            return round(attendance_percentage, 2)
-
-        # If there are no sessions, return 0.0 as the default attendance percentage
-        return 0.0
+    def calculate_attendance_percentage(self): 
+        return get_attendance_percentage_by_course_offering(course_offering=self,total_sessions=0,present_sessions=0)
+    
     #  this code working  fine total 4 result  
     def calculate_no_at_risk_student_for_last_week(self):
         from report.models import WeeklyReport
@@ -278,47 +221,9 @@ class ProgramOffering(BaseModel):
     student=models.ManyToManyField(Student,blank=True,related_name='program_offering')
 
     def calculate_attendance_percentage(self):
-       
-        # Get all the courses associated with the program
-        courses = self.program.course.all()
-        # print("all courses linked with program_offering :",courses)
-        # Initialize variables to track total and present sessions
-        total_sessions = 0
-        present_sessions = 0
-
-        # Iterate over each course to accumulate session counts
-        for course in courses:
-            # Get the CourseOffering associated with the current course and program offering
-            try:
-                course_offerings = CourseOffering.objects.filter(course=course)
-                # print("get all course_offering linked is course:",course_offerings)
-            except CourseOffering.DoesNotExist:
-                # Handle the case where there is no associated CourseOffering for the current course and program offering
-                continue
-            
-            if course_offerings:
-                for course_offering in course_offerings:
-                    total_sessions+=course_offering.attendance.count()
-                    present_sessions += course_offering.attendance.filter(is_present='present').count()
-                    # print("total attendance sessions:",total_sessions)
-                    # print("total present attendance sessions:",present_sessions)
-            
-
-        # Check if there are any sessions before calculating the percentage to avoid division by zero
-        if total_sessions > 0:
-            # Calculate the attendance percentage as (present_sessions / total_sessions) * 100
-            attendance_percentage = (present_sessions / total_sessions) * 100
-
-            # Round the percentage to two decimal places for better readability
-            return round(attendance_percentage, 2)
-
-        # If there are no sessions, return 0.0 as the default attendance percentage
-        return 0.0
-    # wrong code total 2 result , 4 result are correct
-
-
-    # at_risk_student_for_last_week=get_total_students_at_risk_by_program_offerings(self.objects.all())
-
+        return get_attendance_percentage_by_program_offering(program_offering=self,total_sessions=0,present_sessions=0)
+        
+   
 
     def calculate_no_at_risk_student_for_last_week(self):
         # program_offerings=self

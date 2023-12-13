@@ -26,7 +26,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         campuses=Campus.objects.all()
 
         # Program Offering Enrollment data for current user
-        print("current user group :",self.request.user.groups.all())
+        # print("current user group :",self.request.user.groups.all())
         user_groups=self.request.user.groups.all()
         if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
             program_offerings_for_current_user=program_offerings
@@ -56,7 +56,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             # students = program_offering.student.all()
             for course in courses:
                 course_offerings=course.course_offering.all()
-                print("all Course offeirng", course_offerings)
+                # print("all Course offeirng", course_offerings)
                 for course_offering in course_offerings:
 
                     students=course_offering.student.all()
@@ -70,7 +70,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
 
 
-        print("total students :",total_students_in_program_offerings_for_current_user)
+        # print("total students :",total_students_in_program_offerings_for_current_user)
 
         program_offering_enrollment_data=[]
         for program_offering in program_offerings_for_current_user:
@@ -108,7 +108,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         campus_enrollment_staff=[]
 
         for campus in campuses:
-            print("campus",campus.name)
+            # print("campus",campus.name)
             students_in_campus = Student.objects.filter(student__campus=campus)
             appointed_staff_in_campus=Staff.objects.filter(staff__campus=campus)
             campus_enrollment_student.append({
@@ -166,13 +166,13 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             context['staff_profile'] = None
         context['chart_data_student_region']=chart_data_student_region
 
-        print("current user:", self.request.user)
+        # print("current user:", self.request.user)
         # print("staff profile:", self.request.user.staff_profile)
         staff_profile = None
         for staff in Staff.objects.all():
             if staff.staff == self.request.user:
-                print("user profile by suer:",self.request.user.staff_profile)
-                print("user profile by staff object :",staff.staff)
+                # print("user profile by suer:",self.request.user.staff_profile)
+                # print("user profile by staff object :",staff.staff)
                 staff_profile = staff
                 break
 

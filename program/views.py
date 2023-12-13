@@ -37,7 +37,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
  
     def get_queryset(self):
         user = self.request.user
-        print("user group :",user.groups.all())
+        # print("user group :",user.groups.all())
         # Check if the user is an admin
         if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
             # print("condition matched admin")
@@ -71,7 +71,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
     #     return student_count
     def get_all_students(self, program_offerings):
         unique_students = set()
-        print(program_offerings)
+        # print(program_offerings)
         for program_offering in program_offerings:
             unique_students.update(program_offering.student.all())
         
@@ -187,7 +187,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
     template_name='program/course/course_offering_list.html'
     context_object_name='course_offerings'
     
-    print("initialise Course Offering view :")
+    # print("initialise Course Offering view :")
     def get_queryset(self):
         user = self.request.user
         # print("user group :",user.groups.all())
@@ -198,7 +198,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
 
         # Check if the user is a teacher
         elif user.groups.filter(name='Teacher').exists():
-            print("condition matched for teacher")
+            # print("condition matched for teacher")
             # Assuming there is a ForeignKey from CourseOffering to Teacher model
             # only course offering where teacher is equal to current user
             return CourseOffering.objects.filter(teacher__staff=user)
@@ -305,7 +305,7 @@ class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
         # set initial value 0 and empty to get a good chart view 
         formatted_labels.insert(0, "")
         data.insert(0, 0)   
-        print("labels :",formatted_labels)       
+        # print("labels :",formatted_labels)       
 
         # Add the labels and data to the context
         context['chart_data_attendance'] = {
@@ -314,7 +314,7 @@ class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
             'current_user' : self.request.user,
         }
 
-        print("All attendance:",all_attendance)
+        # print("All attendance:",all_attendance)
         return context
    
 

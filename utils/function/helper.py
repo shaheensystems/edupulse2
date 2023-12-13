@@ -1,4 +1,4 @@
-from report.models import WeeklyReport
+
 from datetime import timedelta, datetime
 from django.utils import timezone
 
@@ -46,6 +46,7 @@ def get_total_students_at_risk_by_course_offering(course_offering):
 
 
 def get_total_students_at_risk_by_program_offerings(program_offerings):
+        from report.models import WeeklyReport
         # this function return a query set of unique students at risk  
         current_date = datetime.now().date()
 
