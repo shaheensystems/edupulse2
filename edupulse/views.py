@@ -32,19 +32,26 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         # Program Offering Enrollment data for current user
         # print("current user group :",self.request.user.groups.all())
         user_groups=self.request.user.groups.all()
+        
         if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
             program_offerings_for_current_user=program_offerings
             course_offerings_for_current_user=course_offerings
+            students=students
         elif user_groups.filter(name="Program_Leader").exists():
-           program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
-           course_offerings_for_current_user=course_offerings
+            program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+            course_offerings_for_current_user=course_offerings.filter(course__program__program_offerings__program_leader=self.request.user.staff_profile)
+            students=students.filter(program_offering__program_leader__staff=self.request.user)
+            
         elif user_groups.filter(name="Teacher").exists():
            program_offerings_for_current_user=program_offerings.filter(program__course__course_offering__teacher__staff=self.request.user)
            course_offerings_for_current_user=course_offerings.filter(teacher__staff=self.request.user)
+           students=students.filter(course_offerings__teacher__staff=self.request.user)
+           
         #    ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
         else:
             program_offerings_for_current_user=None
             course_offerings_for_current_user=None
+            students=None
 
    
        
