@@ -40,10 +40,7 @@ class AllStudentsView(LoginRequiredMixin,ListView):
             return Student.objects.all()
 
         elif user.groups.filter(name='Teacher').exists():
-            
             return Student.objects.filter(course_offerings__teacher__staff=user)
-        
-            # pass
         elif user.groups.filter(name='Program_Leader').exists():
             # return ProgramOffering.objects.none()
             # return Student.objects.filter(course_offerings__course__program__program_offerings__program_leader__staff=user)  
@@ -64,8 +61,9 @@ class AllStudentsView(LoginRequiredMixin,ListView):
             return Student.objects.all()
 
         elif user.groups.filter(name='Teacher').exists():
-            
+           
             return Student.objects.filter(course_offerings__teacher__staff=user)
+        
         
             # pass
         elif user.groups.filter(name='Program_Leader').exists():
@@ -77,18 +75,19 @@ class AllStudentsView(LoginRequiredMixin,ListView):
         # For other user groups (e.g., students), return an empty queryset
         return Student.objects.none()
 
-    def get_at_risk_students(self):
-        students=Student.objects.all()
+    def get_at_risk_students(self,students):
+     
         return get_all_at_risk_student_last_week(students=students)
        
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        students = context['students']
 
         count_no_prog_offering=0
         count_no_course_offering=0
         count_no_students_have_more_then_one_course_offering=0
-        for student in Student.objects.all():
+        for student in students:
             if not student.program_offering.exists():
                 # print("student doesn't have program offering ",student)
                 count_no_prog_offering+=1
@@ -104,7 +103,9 @@ class AllStudentsView(LoginRequiredMixin,ListView):
 
 
         context['total_students']=Student.objects.all()
-        context['total_at_risk_students']=self.get_at_risk_students()
+
+       
+        context['total_at_risk_students']=self.get_at_risk_students(students)
 
         return context
 

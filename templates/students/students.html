@@ -10,7 +10,7 @@
             <p>Total Stduents : {{total_students.count}}</p>|
             <p> Allowed Students :{{students.count}} </p> |
 
-            <p class=" {% if total_at_risk_students|length > 0 %} text-red-400{% endif %} ">At Risk Stduents : {{total_at_risk_students|length}}</p>|
+            <p class=" {% if total_at_risk_students|length > 0 %} text-red-400{% endif %} ">At Risk Students : {{total_at_risk_students|length}}</p>|
            
             {% if student_not_enrolled_in_any_program_offering > 0 %}
                 <p class='flex flex-row text-red-400'> Students not enrolled in any program :{{student_not_enrolled_in_any_program_offering}}</p>|
@@ -19,7 +19,7 @@
                 <p>Students not enrolled in any course :{{student_not_enrolled_in_any_course_offering}}</p>|
             {% endif %}
             {% if student_enrolled_more_then_one_program_offering > 0 %}
-                <p class='font-semibold text-gray-400'>Students not enrolled in more then one program :{{student_enrolled_more_then_one_program_offering}}</p>
+                <p class='font-semibold text-gray-400'>Students enrolled in more then one program :{{student_enrolled_more_then_one_program_offering}}</p>
             {% endif %}
             
 

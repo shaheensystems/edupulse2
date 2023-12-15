@@ -12,6 +12,7 @@ from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_
 
 from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program_offerings,get_total_unique_no_of_student_by_program_offerings,get_total_no_of_student_by_course_offerings,get_total_unique_no_of_student_by_course_offerings
 
+from utils.function.helperGetChartData import get_chart_data_program_offering_student_enrollment
 def home(request):
     
     return render(request,'index.html')
@@ -32,13 +33,17 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         user_groups=self.request.user.groups.all()
         if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
             program_offerings_for_current_user=program_offerings
+            course_offering_for_current_user=course_offerings
         elif user_groups.filter(name="Program_Leader").exists():
            program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
+           course_offering_for_current_user=course_offerings
         elif user_groups.filter(name="Teacher").exists():
            program_offerings_for_current_user=program_offerings.filter(program__course__course_offering__teacher__staff=self.request.user)
+           course_offering_for_current_user=course_offerings.filter(teacher__staff=self.request.user)
         #    ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
         else:
             program_offerings_for_current_user=None
+            course_offering_for_current_user=None
 
    
        
@@ -123,14 +128,19 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
         context['chart_data_campus_enrollment_student'] = chart_data_campus_enrollment_student
         context['chart_data_campus_enrollment_staff'] = chart_data_campus_enrollment_staff
-        context['chart_data_program_offering_student_enrollment'] = program_offering_student_enrollment
+        # context['chart_data_program_offering_student_enrollment'] = program_offering_student_enrollment
+        context['chart_data_program_offering_student_enrollment'] = get_chart_data_program_offering_student_enrollment(program_offerings_for_current_user)
+
+
+
         context['chart_data_enrollment'] = chart_data_enrollment
         context['chart_data_student_region']=chart_data_student_region
 
         context['program_offerings']=program_offerings
         context['program_offerings_for_current_user']=program_offerings_for_current_user
+        context['course_offerings_for_current_user']=course_offering_for_current_user
         context['total_students_in_program_offerings_for_current_user']=len(get_total_unique_no_of_student_by_program_offerings(program_offerings=program_offerings_for_current_user))
-        context['total_students_in_course_offerings_for_current_user']=len(get_total_unique_no_of_student_by_course_offerings(course_offerings=course_offerings))
+        context['total_students_in_course_offerings_for_current_user']=len(get_total_unique_no_of_student_by_course_offerings(course_offerings=course_offering_for_current_user))
 
         # context['total_students_in_program_offerings_for_current_user']=total_unique_students_in_program_offerings_for_current_user
         context['course_offerings']=course_offerings

@@ -11,7 +11,7 @@
         {% if request.user|user_belongs_to_group:'Teacher' %}
         {% comment %} {{total_students_at_risk_query_set}} {% endcomment %}
             <!-- Course Offering Details Section -->
-            {% with course_offerings=course_offerings students=total_students_in_course_offerings_for_current_user total_no_of_at_risk_student=total_students_at_risk_query_set %}
+            {% with course_offerings=course_offerings_for_current_user students=total_students_in_course_offerings_for_current_user total_no_of_at_risk_student=total_students_at_risk_query_set %}
               {% include 'components/dashboard/course_offering_info_bar.html' %}
             {% endwith %}
         {% endif %}
