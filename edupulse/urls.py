@@ -20,7 +20,7 @@ from django.urls import path,include
 from django.conf.urls.static import static
 
 
-from .views import DashboardView, home
+from .views import DashboardView
 
 urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
