@@ -68,7 +68,7 @@ class AttendanceListView(LoginRequiredMixin,DetailView):
         #     print(f'Attendance PK: {attendance.pk}')
 
         context['attendance_list'] = attendance_list
-        print("attendance List:",attendance_list)
+        # print("attendance List:",attendance_list)
         return context
     
    
@@ -144,17 +144,17 @@ class WeeklyReportView(LoginRequiredMixin, DetailView):
     
 @login_required(login_url='user-login') 
 def edit_weekly_report(request, pk,week_number):
-    print(week_number)
-    print("PK: ",pk)
+    # print(week_number)
+    # print("PK: ",pk)
     course_offering = get_object_or_404(CourseOffering, id=pk)
     # Retrieve a list of WeeklyReport objects for the given week_number and course_offering
     weekly_reports = WeeklyReport.objects.filter(week_number=week_number, course_offering=course_offering)
     students = course_offering.student.filter(weekly_reports__week_number=week_number).distinct()
-    print(weekly_reports)
-    for weekly_report in weekly_reports:
-        print(f"Weekly Report: {weekly_report.week_number}")
-        for session in weekly_report.sessions.all():
-            print(f"  Session: {session.attendance_date}, Is Present: {session.is_present}")
+    # print(weekly_reports)
+    # for weekly_report in weekly_reports:
+    #     print(f"Weekly Report: {weekly_report.week_number}")
+    #     for session in weekly_report.sessions.all():
+    #         print(f"  Session: {session.attendance_date}, Is Present: {session.is_present}")
 
     if request.method == 'POST':
         print("saving report initialise")
@@ -180,7 +180,7 @@ def edit_weekly_report(request, pk,week_number):
                 weekly_report.at_risk = None  # or handle the case when the value is not True or False
             
             weekly_report.save()
-            print("weekly report saved : ",weekly_report)
+            # print("weekly report saved : ",weekly_report)
             # print("weekly report at risk value saved : ",weekly_report.at_risk)
             # print("weekly report at assessment status  saved : ",weekly_report.assessment_status)
             

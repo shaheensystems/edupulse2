@@ -39,7 +39,9 @@
                     <td>{{ attendance.total_students }}</td>
                     <td>
                         {% if attendance.attendance_date %}
-                                <a href="{% url 'edit-attendance' attendance_date=attendance.attendance_date pk=course_offering.pk %}" class="text-blue-500 hover:underline">Edit</a>
+                                <a href="{% url 'edit-attendance' attendance_date=attendance.attendance_date pk=course_offering.pk %}" class="text-blue-500 hover:underline">
+                                    <i class="fa fa-pencil-alt @apply ml-2 p-2"></i> 
+                                </a>
                         {% else %}
                             <!-- Handle the case where attendance.pk is empty or None -->
                             N/A
