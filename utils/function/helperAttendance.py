@@ -62,3 +62,12 @@ def get_attendance_percentage_by_program_offering(program_offering,total_session
 
         return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
 
+def get_attendance_percentage_by_student(student):
+    # Get all the courses associated with the program
+        all_attendances=student.attendances.all()
+        total_sessions=all_attendances.count()
+        present_sessions=all_attendances.filter(is_present='present').count()
+    
+
+        return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+

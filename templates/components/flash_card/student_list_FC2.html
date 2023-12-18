@@ -1,0 +1,94 @@
+{% block content %}
+<section class='rounded-lg '>
+   
+    
+    {% if view == "list" %}
+        {% for student in students  %}
+                {% comment %} {% if student in at_risk_students %}
+                <p class='bg-red-300'>at risk </p>
+                {% endif %} {% endcomment %}
+            <div {% if student in at_risk_students %}class="bg-red-300"{% endif %}>{{student.student.first_name}} {{student.student.last_name}}</div>
+        {% endfor %}
+   
+    {% elif view == "detail" %} 
+        {% for student in students  %}
+        <div class='bg-blue-200 m-4 p-4 rounded-lg {% if student in at_risk_students %} bg-red-300{% endif %}'>
+            <p>Student first Name :{{student.student.first_name}} </p>
+            <p>Student Last Name :{{student.student.last_name}} </p>
+            <p>Student email ID:{{student.student.email}} </p>
+            <p>Student personal Email :{{student.email_id}} </p>
+            <p>Student date of brth :{{student.student.dob}} </p>
+            <p>Student gender :{{student.student.gender}} </p>
+            <p>Student campus :{{student.student.campus.name}} </p>
+            <p>Student Joining date  :{{student.joining_date}} </p>
+            <p>International Studnet Status  :{{student.international_student}} </p>
+            <p>Student passport Number  :{{student.passport_number}} </p>
+            <p>Student Visa Number :{{student.visa_number}} </p>
+            <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p>
+            <br>
+        </div>
+        {% endfor %}
+    
+    {% elif view == "table" %}
+        {% if students %}
+            <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+                <thead class="bg-gray-200">
+                    <tr>
+                        {% comment %} <th class="border px-4 py-2">UUID</th> {% endcomment %}
+                        <th class="border px-4 py-2">Roll Number</th>
+                        <th class="border px-4 py-2">Name</th>
+                        <th class="border px-4 py-2">Campus</th>
+                        <th class="border px-4 py-2">Program Offering</th>
+                        <th class="border px-4 py-2">Course Offering</th>
+                        <th class="border px-4 py-2">International Student</th>
+                        <th class="border px-4 py-2">Attendance Percentage</th>
+                        <th class="border px-4 py-2">At Risk</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                       
+                        <tr {% if student in at_risk_students %}class="bg-red-300"{% endif %} >
+                            {% comment %} <td class="border px-4 py-2">{{ student.id }}</td> {% endcomment %}
+                            <td class="border px-4 py-2">{{ student.student.temp_id }}</td>
+                            <td class="border px-4 py-2 w-auto">{{ student.student.first_name }} {{ student.student.last_name }}</td>
+                            <td class="border px-4 py-2">{{ student.student.campus.name }}</td>
+                            <td class="border px-4 py-2">
+                                {% for program_offering in student.program_offering.all %}
+                                    {{ program_offering.program.name }}
+                                    {% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td class="border px-4 py-2">
+                                {% for course_offering in student.course_offerings.all %}
+                                    {{ course_offering.course.name }}
+                                    {% if not forloop.last %}, {% endif %}
+                                    <br>
+                                {% endfor %}
+                            </td>
+                          
+                            <td class="border px-4 py-2 text-center align-middle">{{ student.international_student }}</td>
+                            <td class="border px-4 py-2 text-center align-middle">{{ student.calculate_attendance_percentage}} %</td>
+                            <td class="border px-4 py-2 text-center align-middle ">{{student.student_is_at_risk_for_last_week_status }}</td>
+                            {% comment %} <td class="border px-4 py-2 {% if student.student_is_at_risk_for_last_week_status is True %} bg-red-300{% endif %} ">{{student.student_is_at_risk_for_last_week_status }}</td> {% endcomment %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No students available.</p>
+        {% endif %}
+   
+    {% endif %}
+  
+    {% comment %} <a href="{% url 'student_detail.html' student.pk %}" > {% endcomment %}
+        
+      
+        
+          
+       
+       
+    {% comment %} </a> {% endcomment %}
+</section>
+
+{% endblock content %}

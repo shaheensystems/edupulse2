@@ -9,6 +9,9 @@ from django.http import HttpResponseRedirect
 from datetime import timedelta, datetime
 from django.utils import timezone
 from utils.function.helperGetAtRiskStudent import get_all_at_risk_student_last_week
+from django.db.models import Q
+
+
 # Create your views here.
 class UserLoginView(LoginView):
     redirect_authenticated_user=True
@@ -30,50 +33,77 @@ class AllStudentsView(LoginRequiredMixin,ListView):
     model=Student
     template_name='students/students.html'
     context_object_name='students'
-    
+
+
+   
     def get_queryset(self):
         user = self.request.user
         # print("user group :",user.groups.all())
         # Check if the user is an admin
         if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
-            # print("condition matched admin")
-            return Student.objects.all()
-
+            students=Student.objects.all()
+            # print("S1:",students.count())
         elif user.groups.filter(name='Teacher').exists():
-            return Student.objects.filter(course_offerings__teacher__staff=user)
+            students= Student.objects.filter(course_offerings__teacher__staff=user)
         elif user.groups.filter(name='Program_Leader').exists():
-            # return ProgramOffering.objects.none()
-            # return Student.objects.filter(course_offerings__course__program__program_offerings__program_leader__staff=user)  
-            return Student.objects.filter(program_offering__program_leader__staff=user)  
-
+            students= Student.objects.filter(program_offering__program_leader__staff=user)  
         elif user.groups.filter(name='Student').exists():
-            return Student.objects.none()
-        # For other user groups (e.g., students), return an empty queryset
-        return Student.objects.none()
+            students= Student.objects.none()
+        else:
+            students=Student.objects.none()
+        
+        # for student in students:
+            # print(student.student.campus)
+            # print(student.course_offerings.all())
+            # print(student.student.first_name)
+        sort_by = self.request.GET.get('sort_by', 'student__first_name')  # Default to sorting by id
+        search_query = self.request.GET.get('search', '')
+
+
+        # Apply sorting
+        
+         # Apply sorting based on the selected option
+        if sort_by == 'student_is_at_risk_for_last_week_status':
+            students = sorted(students, key=lambda x: x.student_is_at_risk_for_last_week_status() or 0,reverse=True)
+        elif sort_by=='calculate_attendance_percentage':
+            students = sorted(students, key=lambda x: x.calculate_attendance_percentage() or 0 ,reverse=True)
+        elif sort_by=='international_student':
+             students = students.order_by(f"-{sort_by}")
+        elif sort_by=='course_offerings': # filter is not working in any oder check later 
+            students = students.order_by(f"-{sort_by}")
+        elif sort_by=='program_offering': # filter is not working in any oder check later 
+            students = students.order_by(f"-{sort_by}")
+        elif sort_by=='student__campus':
+            students = students.order_by(f"{sort_by}")
+        elif sort_by=='student__first_name':
+            students = students.order_by(f"{sort_by}")
+        elif sort_by=='id':
+            students = students.order_by(f"{sort_by}")
+        else:
+            students = students.order_by(f"-{sort_by}")
+
+        for student in students:
+            if student.student_is_at_risk_for_last_week_status():
+                print("Student at risk ")
+
+
+        # print("S2-1:",students.count())
+        # print("S2-1:",Student.objects.all().count())
+        # Apply filtering
+        if search_query:
+            students = students.filter(
+                Q(student__first_name__icontains=search_query) |
+                Q(student__last_name__icontains=search_query) |
+                Q(student__campus__name__icontains=search_query) |
+                Q(program_offering__program__name__icontains=search_query) |
+                Q(course_offerings__course__name__icontains=search_query)
+            ).distinct()
+
+
+        # print("S2-2:",students.count())
+        return students
     
 
-    def get_allowed_students(self):
-        user = self.request.user
-        # print("user group :",user.groups.all())
-        # Check if the user is an admin
-        if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
-            # print("condition matched admin")
-            return Student.objects.all()
-
-        elif user.groups.filter(name='Teacher').exists():
-           
-            return Student.objects.filter(course_offerings__teacher__staff=user)
-        
-        
-            # pass
-        elif user.groups.filter(name='Program_Leader').exists():
-            # return ProgramOffering.objects.none()
-            return Student.objects.filter(course_offerings__course__program__program_offerings__program_leader__staff=user)  
-        
-        elif user.groups.filter(name='Student').exists():
-            return Student.objects.none()
-        # For other user groups (e.g., students), return an empty queryset
-        return Student.objects.none()
 
     def get_at_risk_students(self,students):
      
@@ -82,8 +112,9 @@ class AllStudentsView(LoginRequiredMixin,ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        students = context['students']
 
+        students = context['students']
+        # print("S3:",students.count())
         count_no_prog_offering=0
         count_no_course_offering=0
         count_no_students_have_more_then_one_course_offering=0
@@ -102,7 +133,7 @@ class AllStudentsView(LoginRequiredMixin,ListView):
         context['student_enrolled_more_then_one_program_offering']=count_no_students_have_more_then_one_course_offering
 
 
-        context['total_students']=Student.objects.all()
+        context['total_students']=students
 
        
         context['total_at_risk_students']=self.get_at_risk_students(students)

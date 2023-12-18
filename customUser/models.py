@@ -7,6 +7,8 @@ from base.models import BaseModel, Address,Campus
 from django.contrib.auth.models import User
 from datetime import timedelta, datetime
 from django.utils import timezone
+
+from utils.function.helperAttendance import get_attendance_percentage_by_student
 # Create your models here.
 
 
@@ -91,6 +93,8 @@ class Student(BaseModel):
                 # print("course name : ",weekly_report.course_offering)
                 return True
 
+    def calculate_attendance_percentage(self):
+        return get_attendance_percentage_by_student(student=self)
 
     def __str__(self):
         return f"{self.student.temp_id} "
