@@ -15,6 +15,7 @@ from datetime import timedelta
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 # from customUser.models import Student
 # Create your views here.
 
@@ -36,6 +37,7 @@ class AttendanceListView(LoginRequiredMixin,DetailView):
 
         # Get attendance data for the course offering in ascending order 
         attendance_list = self.object.attendance.values('attendance_date').annotate(
+        
             total_present=Count(Case(When(is_present='present', then=1))),
             total_students=Count('student')
         ).order_by('attendance_date')
@@ -62,9 +64,11 @@ class AttendanceListView(LoginRequiredMixin,DetailView):
             current_session_number=new_session_number
             current_week_number=new_week_number
 
-
+        # for attendance in attendance_list:
+        #     print(f'Attendance PK: {attendance.pk}')
 
         context['attendance_list'] = attendance_list
+        print("attendance List:",attendance_list)
         return context
     
    
@@ -92,6 +96,7 @@ class AttendanceCreateView(LoginRequiredMixin,CreateView):
         
         context['student_forms'] = student_forms
         return context
+    
 @login_required(login_url='user-login') 
 def mark_attendance(request, pk):
     course_offering = get_object_or_404(CourseOffering, id=pk)
@@ -192,3 +197,57 @@ def edit_weekly_report(request, pk,week_number):
        
     })
 
+@login_required(login_url='user-login') 
+def edit_attendance(request,attendance_date , pk):
+    course_offering = get_object_or_404(CourseOffering, id=pk)
+    students = course_offering.student.all()
+    attendance_date = attendance_date
+    # print("attendance date:",attendance_date)
+     # Convert the selected date to a datetime object
+    # attendance_date = datetime.strptime(attendance_date, '%Y-%m-%d')
+
+    # Fetch attendance records for the specified date
+    attendance_records = Attendance.objects.filter(
+        course_offering=course_offering,
+        attendance_date=attendance_date
+    ).values('student_id', 'is_present')
+    # Create a dictionary to store attendance information for each student
+    attendance_dict = {record['student_id']: record['is_present'] for record in attendance_records}
+
+    # print("Attendance record :",attendance_dict)
+    # print("attendance date:",attendance_date)
+    if request.method == 'POST':
+        # Get the selected date from the form
+        selected_date = request.POST.get('attendanceDate')
+        selected_date = attendance_date
+
+       
+    #     # Use the selected date for attendance_date
+        for student in students:
+            is_present = request.POST.get(f'is_present_{student.id}')
+            remark = request.POST.get(f'remark_{student.id}')
+            attendance, created = Attendance.objects.get_or_create(
+                student=student, course_offering=course_offering, attendance_date=selected_date)
+            attendance.is_present = is_present 
+            attendance.remark = remark
+            attendance.save()
+        
+        # Add a success message
+        messages.success(request, f'Attendance edited for {course_offering.course.name} on {selected_date}')
+
+            
+    #     # Redirect to a success page or do something else
+    #     # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    #     return HttpResponseRedirect(reverse('edit-attendance', args=[pk]))
+        attendance_list_url = reverse('attendance_list', kwargs={'pk': pk})
+        return redirect(attendance_list_url)
+
+
+
+    return render(request, 'report/attendance/edit_attendance.html', {
+        'course_offering': course_offering,
+        'students': students,
+        'attendance_date': attendance_date,
+        'attendance_dict': attendance_dict,  # Pass the dictionary to the template
+ 
+    })

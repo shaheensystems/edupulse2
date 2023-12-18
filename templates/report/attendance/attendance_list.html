@@ -26,6 +26,7 @@
                 <th>Date</th>
                 <th>Total Students Present</th>
                 <th>Total Students</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -36,6 +37,14 @@
                     <td>{{ attendance.attendance_date|date:'Y-m-d' }}</td>
                     <td>{{ attendance.total_present|default:'0' }}</td>
                     <td>{{ attendance.total_students }}</td>
+                    <td>
+                        {% if attendance.attendance_date %}
+                                <a href="{% url 'edit-attendance' attendance_date=attendance.attendance_date pk=course_offering.pk %}" class="text-blue-500 hover:underline">Edit</a>
+                        {% else %}
+                            <!-- Handle the case where attendance.pk is empty or None -->
+                            N/A
+                        {% endif %}
+                    </td>
                     
                 </tr>
             {% endfor %}

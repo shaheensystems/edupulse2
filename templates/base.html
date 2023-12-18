@@ -24,6 +24,7 @@
 
   <header>
     {% include 'components/base/header.html' %}
+      
 
     {% comment %} <div class="container mx-auto mt-4 flex flex-row gap-4">
       <a href={% url 'dashboard' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Dashboard</a>
@@ -61,12 +62,32 @@
          {% endfor %}
       </h1>
    {% endcomment %}
+    <section class="container mx-auto mt-4 flex flex-row gap-4">
+        {% if messages %}
+        <div id="alert-container" class="p-4">
+          {% for message in messages %}
+              <div class="{% if message.tags == 'success' %}bg-blue-500{% elif message.tags == 'error' %}bg-red-500{% elif message.tags == 'warning' %}bg-yellow-500{% elif message.tags == 'info' %}bg-green-500{% endif %} text-white mb-2 p-2 rounded">
+                  <p>{{ message }}</p>
+              </div>
+          {% endfor %}
+      </div>
+        {% endif %}  
+    </section>
   <section class="container mx-auto mt-4 flex flex-row gap-4">
-
+   
     {% block content %}
     {% endblock content %}
   </section>
  
+  <script>
+    // Automatically hide the alert after 2000 milliseconds (2 seconds)
+    setTimeout(function () {
+        var alertContainer = document.getElementById('alert-container');
+        if (alertContainer) {
+            alertContainer.classList.add('hidden');
+        }
+    }, 2000);
+</script>
 </body>
 
 </html>
