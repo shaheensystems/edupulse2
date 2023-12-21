@@ -81,3 +81,4 @@ def get_chart_data_student_enrollment_by_region(students):
     } 
 
     return chart_data_student_region
+
