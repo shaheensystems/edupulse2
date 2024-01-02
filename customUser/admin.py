@@ -1,5 +1,5 @@
 from django.contrib import admin
-from customUser.models import NewUser,Staff,Student
+from customUser.models import NewUser,Staff,Student,Ethnicity
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from django.contrib.auth.models import Group
@@ -11,13 +11,17 @@ from report.models import Attendance
 class CustomUserAdmin(UserAdmin):
     
     fieldsets = UserAdmin.fieldsets + (
-        ('Custom Fields', {'fields': ('gender', 'dob','address','phone','user_image','campus')}),
+        ('Custom Fields', {'fields': ('gender', 'dob','address','phone','user_image','campus','ethnicities')}),
     )
-    list_display = ('id', 'get_full_name','username', 'get_personal_email_id','email', 'dob', 'gender','phone','address','display_groups','user_image','campus')  # Add 'get_full_name' to display combined name
+    list_display = ('id', 'get_full_name','username', 'get_personal_email_id','email', 'dob', 'gender','phone','address','display_groups','user_image','campus','get_ethnicities')  # Add 'get_full_name' to display combined name
     list_filter = UserAdmin.list_filter + ('gender','campus',)  # Add 'position' and 'department' to filters
     readonly_fields=('last_login','date_joined')
     search_fields = ('get_full_name', 'display_groups', 'campus')
 
+    def get_ethnicities(self,obj):
+        return ", ".join(ethnicity.name for ethnicity in obj.ethnicities.all() )
+    
+    get_ethnicities.short_description = 'Ethnicities'
     # Custom method to get combined first name and last name
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}"
@@ -37,8 +41,11 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(NewUser, CustomUserAdmin)
 
 
+class EthnicityAdmin(admin.ModelAdmin):
+    list_display=('name',)
 
 
+admin.site.register(Ethnicity,EthnicityAdmin)
 
 class ProgramOfferingInline(admin.StackedInline):
     model=Student.program_offering.through

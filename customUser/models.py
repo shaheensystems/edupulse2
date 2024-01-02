@@ -11,6 +11,18 @@ from django.utils import timezone
 from utils.function.helperAttendance import get_attendance_percentage_by_student
 # Create your models here.
 
+class Ethnicity(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+
+        verbose_name = 'Ethnicity'
+        verbose_name_plural = 'Ethncitites'
+    def __str__(self):
+        return self.name
+
+
+
 
 class NewUser(AbstractUser):
     Gender_Choice=[
@@ -24,6 +36,7 @@ class NewUser(AbstractUser):
     dob=models.DateField(default=None, blank=True, null=True)
     user_image = models.ImageField(upload_to='user_images/', null=True, blank=True)
     nationality=models.CharField(max_length=255,null=True,blank=True)
+    ethnicities = models.ManyToManyField(Ethnicity, blank=True, null=True)
     address=models.ForeignKey(Address, verbose_name="Address", on_delete=models.PROTECT,null=True,blank=True)
     
     campus=models.ForeignKey(Campus, verbose_name="Campus", on_delete=models.PROTECT,null=True,blank=True, related_name='users')

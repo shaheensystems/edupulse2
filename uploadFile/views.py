@@ -8,7 +8,7 @@ from .models import Csv,CanvasStatsUpload
 from report.models import Attendance,WeeklyReport
 from customUser.models import Student
 from program.models import Program,Course,ProgramOffering,CourseOffering
-from customUser.models import NewUser,Student,Campus
+from customUser.models import NewUser,Student,Campus, Ethnicity
 import csv
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
@@ -16,6 +16,35 @@ from django.urls import reverse
 
 from report.views import get_week_number
 from django.db.models import Q
+
+def handle_ethnicity(user, ethnicity_name):
+    print("Ethnicity name ",ethnicity_name)
+    if ethnicity_name:
+        try:
+            ethnicity = Ethnicity.objects.get(name=ethnicity_name)
+        except Ethnicity.DoesNotExist:
+            ethnicity = Ethnicity.objects.create(name=ethnicity_name)
+
+        # Add the ethnicity to the user's ManyToManyField
+        user.ethnicities.add(ethnicity)
+
+def handle_program_or_course_offering_mode(student_Program_offer_name):
+    if not student_Program_offer_name:
+        raise ValueError("student_Program_offer_name is not exits check student data file ")
+    offering_mode = "blended"
+    if student_Program_offer_name:
+        # Check if the name contains "Micro-cred"
+        if "Micro-cred" in student_Program_offer_name:
+            offering_mode = "micro cred"
+        # Check if the name contains "Distance"
+        elif "Distance" in student_Program_offer_name:
+            offering_mode = "online"
+        # If neither condition is met, default to "Blended"
+        else:
+            offering_mode = "blended"
+
+    return offering_mode
+    
 
 def handle_date_in_correct_format(date_str):
     print("raw data ",date_str)
@@ -86,6 +115,11 @@ def updated_or_create_user(data):
 
 
             user.nationality=data['student_nationality']
+            # update Ethnicities 
+            handle_ethnicity(user,data['student_ethnicity1'])
+            handle_ethnicity(user,data['student_ethnicity2'])
+            handle_ethnicity(user,data['student_ethnicity3'])
+
             user.campus=Campus.objects.get(temp_id=data['student_campus_temp_id']) # link campus with User while creating new user 
             user.save()
             # print(user.first_name)
@@ -117,6 +151,11 @@ def updated_or_create_user(data):
                 nationality=data['student_nationality'],
                 campus=Campus.objects.get(temp_id=data['student_campus_temp_id']), # link campus with User while creating new user 
                 )
+            # add ethnicity 
+            handle_ethnicity(new_user,data['student_ethnicity1'])
+            handle_ethnicity(new_user,data['student_ethnicity2'])
+            handle_ethnicity(new_user,data['student_ethnicity3'])
+
              # Set the user's password
             password = f'WC{data["student_id"]}@{data["student_fname"]}'
             new_user.password = make_password(password)
@@ -213,6 +252,8 @@ def update_or_create_course(data):
 
 def update_or_create_course_offering(data):
     print("start course offering :",data['student_course_offer_code'])
+    print("start course offering start date  :",data['student_course_offer_start_date'])
+    print("start course offering end date :",data['student_course_offer_end_date'])
     # Check if the program_code exits and doesn't contain spaces
     if data['student_course_offer_code'] and  ' ' not in data['student_course_offer_code']:
         # validation for course_offering_name with linked course name
@@ -221,6 +262,7 @@ def update_or_create_course_offering(data):
             # If found, update the program_desc
             course_offering.start_date=handle_date_in_correct_format(data['student_course_offer_start_date'])
             course_offering.end_date=handle_date_in_correct_format(data['student_course_offer_end_date'])
+            course_offering.offering_mode=handle_program_or_course_offering_mode(data['student_Program_offer_name'])
             course_offering.save()
             print("course offering updated successfully")
         except CourseOffering.DoesNotExist:
@@ -231,6 +273,7 @@ def update_or_create_course_offering(data):
                 temp_id=data['student_course_offer_code'],
                 start_date=start_date,
                 end_date=end_date,
+                offering_mode=handle_program_or_course_offering_mode(data['student_Program_offer_name']),
             )
             print("Course offering created successfully")
         # linked student and course with course_offering
@@ -265,6 +308,7 @@ def update_or_create_program_offering(data):
             # If found, update the program_desc
             program_offering.start_date=handle_date_in_correct_format(data['student_program_offer_start_date'])
             program_offering.end_date=handle_date_in_correct_format(data['student_program_offer_end_date'])
+            program_offering.offering_mode=handle_program_or_course_offering_mode(data['student_Program_offer_name'])
             program_offering.save()
             print("program offering updated successfully")
         except ProgramOffering.DoesNotExist:
@@ -273,6 +317,7 @@ def update_or_create_program_offering(data):
                 temp_id=data['student_program_offer_code'], 
                 start_date=handle_date_in_correct_format(data['student_program_offer_start_date']),
                 end_date=handle_date_in_correct_format(data['student_program_offer_end_date']),
+                offering_mode=handle_program_or_course_offering_mode(data['student_Program_offer_name']),
                 )
             print("program offering created successfully")
         # linked student and course with course_offering
@@ -343,6 +388,9 @@ def Upload_file_view(request):
                                 "unit efts factor":"student_course_efts",
                                 "outcome code":"student_course_offer_result_code",
                                 "outcome desc":"student_course_offer_result_status",
+                                # new field
+                                "client passport number":"student_passport_number",
+                                
             }
 
             # Create variables for each column

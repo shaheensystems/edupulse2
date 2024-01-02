@@ -36,7 +36,7 @@ class CourseAdmin(admin.ModelAdmin):
     calculate_total_no_of_student.short_description = 'No. of  Students'
 
 class ProgramOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','calculate_total_no_of_student','get_all_students','program')
+    list_display=('temp_id','offering_mode','start_date','end_date','calculate_total_no_of_student','get_all_students','program')
 
     def calculate_total_no_of_student(self,obj):
         return obj.calculate_total_no_of_student()
@@ -57,7 +57,7 @@ class WeeklyReportInline(admin.TabularInline):
     extra=0
 
 class CourseOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','start_date','end_date','calculate_total_no_of_student','get_all_students','course','result_status','result_status_code')
+    list_display=('temp_id','offering_mode','start_date','end_date','calculate_total_no_of_student','get_all_students','course','result_status','result_status_code')
     inlines=[WeeklyReportInline,AttendanceInline]
 
     def calculate_total_no_of_student(self,obj):

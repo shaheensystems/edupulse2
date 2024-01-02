@@ -9,7 +9,16 @@ from utils.function.helperAttendance import get_attendance_percentage,get_attend
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
 
+from utils.function.helperProgram import OFFERING_CHOICES
+class ProgramAndCourseType(models.Model):
+    name=models.CharField(max_length=50, unique=True)
 
+    class Meta:
+        verbose_name = 'Program and Course Type'
+        verbose_name_plural = 'Program and Course Type'
+        
+    def __str__(self):
+        return self.name
 
 class Program(BaseModel):
     name=models.CharField(max_length=255,null=True,blank=True)
@@ -75,11 +84,7 @@ class Course(BaseModel):
 
 
 class CourseOffering(BaseModel):
-    OFFERING_CHOICES = [
-        ('online', 'ONLINE'),
-        ('offline', 'OFFLINE'),
-        ('blended', 'BLENDED'),
-    ]
+ 
 
     course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True,related_name='course_offering')
     start_date=models.DateField( auto_now=False, auto_now_add=False)
@@ -121,7 +126,8 @@ class ProgramOffering(BaseModel):
     remark=models.TextField(max_length=255,blank=True,null=True)
     program_leader=models.ManyToManyField(Staff,blank=True ,null=True,related_name='program_offerings')
     student=models.ManyToManyField(Student,blank=True,related_name='program_offering')
-
+    offering_mode = models.CharField(max_length=10,choices=OFFERING_CHOICES,default='online',blank=True, null=True,help_text='Select the mode of course offering: Online, Offline, or Blended'
+    )
     def calculate_attendance_percentage(self):
         return get_attendance_percentage_by_program_offering(program_offering=self,total_sessions=0,present_sessions=0)
 
