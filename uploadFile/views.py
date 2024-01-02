@@ -8,7 +8,7 @@ from .models import Csv,CanvasStatsUpload
 from report.models import Attendance,WeeklyReport
 from customUser.models import Student
 from program.models import Program,Course,ProgramOffering,CourseOffering
-from customUser.models import NewUser,Student,Campus, Ethnicity
+from customUser.models import NewUser,Student,Campus, Ethnicity, StudentFundSource
 import csv
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
@@ -27,6 +27,21 @@ def handle_ethnicity(user, ethnicity_name):
 
         # Add the ethnicity to the user's ManyToManyField
         user.ethnicities.add(ethnicity)
+        user.save()
+
+def handle_student_fund_source(student,student_fund_source_code,student_fund_source_desc):
+    
+    if student_fund_source_code:
+        fund_source, created = StudentFundSource.objects.get_or_create(
+            name=student_fund_source_code,
+            defaults={'description': student_fund_source_desc}
+        )
+
+        # Assign the fund_source to the student
+        student.fund_source = fund_source
+        if student_fund_source_code==2 or student_fund_source_code=='2':
+            student.international_student=True
+        student.save()
 
 def handle_program_or_course_offering_mode(student_Program_offer_name):
     if not student_Program_offer_name:
@@ -180,9 +195,11 @@ def updated_or_create_student(data):
             student.enrollment_status=data['student_enrolment_status']
             student.passport_number=data['student_passport_number']
             student.visa_number=data['student_visa_number']
+            
             # student.visa_expiry_date=handle_date_in_correct_format(data['student_visa_expiry_date']),
             print('student object before save ,',student.enrollment_status)
             student.save()
+            handle_student_fund_source(student,data['student_fund_source_code'],data['student_fund_source_desc'])
             print('student object after save ,',student.enrollment_status)
             # print(user.first_name)
             # print(data['student_id'])
@@ -201,6 +218,7 @@ def updated_or_create_student(data):
                 student=NewUser.objects.get(temp_id=data['student_id']) # link user with student while creating new user not while update
                 )
             new_student.save()
+            handle_student_fund_source(new_student,data['student_fund_source_code'],data['student_fund_source_desc'])
             print(f'new student:{new_student.student.first_name} cerated successfully')
     else:
         print(f"Ignoring program with code '{data['student_id']}' is not valid ")
@@ -390,6 +408,8 @@ def Upload_file_view(request):
                                 "outcome desc":"student_course_offer_result_status",
                                 # new field
                                 "client passport number":"student_passport_number",
+                                "cuor fund source code":"student_fund_source_code",
+                                "cuor fund source description":"student_fund_source_desc",
                                 
             }
 

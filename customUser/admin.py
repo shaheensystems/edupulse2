@@ -1,5 +1,5 @@
 from django.contrib import admin
-from customUser.models import NewUser,Staff,Student,Ethnicity
+from customUser.models import NewUser,Staff,Student,Ethnicity,StudentFundSource
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from django.contrib.auth.models import Group
@@ -44,8 +44,12 @@ admin.site.register(NewUser, CustomUserAdmin)
 class EthnicityAdmin(admin.ModelAdmin):
     list_display=('name',)
 
+class StudentFundSourceAdmin(admin.ModelAdmin):
+    list_display=('name','description')
+
 
 admin.site.register(Ethnicity,EthnicityAdmin)
+admin.site.register(StudentFundSource,StudentFundSourceAdmin)
 
 class ProgramOfferingInline(admin.StackedInline):
     model=Student.program_offering.through
@@ -119,10 +123,10 @@ class StudentAdmin(admin.ModelAdmin):
     list_display=(
         'id','student','joining_date','international_student','remark',
         'enrolled_course','email_id','enrollment_status','passport_number',
-        'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered'
+        'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered','fund_source'
         )
     list_filter = (
-        'international_student','student__campus','course_offerings__course','program_offering__program',
+        'international_student','student__campus','course_offerings__course','program_offering__program','fund_source',
     )
 
     ordering = (

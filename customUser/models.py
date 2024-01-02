@@ -7,6 +7,8 @@ from base.models import BaseModel, Address,Campus
 from django.contrib.auth.models import User
 from datetime import timedelta, datetime
 from django.utils import timezone
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 from utils.function.helperAttendance import get_attendance_percentage_by_student
 # Create your models here.
@@ -22,7 +24,18 @@ class Ethnicity(models.Model):
         return self.name
 
 
+class StudentFundSource(models.Model):
+    name = models.PositiveIntegerField(
+        unique=True,
+        validators=[
+            MaxValueValidator(999),  # Set the maximum value to 999
+            MinValueValidator(1),    # Set the minimum value to 1 (positive integer)
+        ]
+    )
+    description = models.TextField()
 
+    def __str__(self):
+        return str(self.name)
 
 class NewUser(AbstractUser):
     Gender_Choice=[
@@ -82,6 +95,7 @@ class Student(BaseModel):
     passport_number=models.CharField(max_length=255,null=True,blank=True)
     visa_number=models.CharField(max_length=255,null=True,blank=True)
     visa_expiry_date=models.DateField(default=None, null=True,blank=True)
+    fund_source=models.ForeignKey(StudentFundSource, verbose_name=("Student Fund Source"), on_delete=models.CASCADE, null=True,blank=True)
 
     def student_is_at_risk_for_last_week_status(self):
         from report.models import WeeklyReport
