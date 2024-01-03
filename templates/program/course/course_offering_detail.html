@@ -10,7 +10,7 @@
         <div class="bg-gray-200 p-4 mb-4 w-full gap-5 flex flex-row justify-between items-baseline">
              
           <div class='w-1/2'>
-            <h1><strong>Program Detail</strong>  </h1>
+            {% comment %} <h1><strong>Program Detail</strong>  </h1> {% endcomment %}
             <h2 class="text-xl font-bold my-2">{{ course_offering.temp_id }} <br> {{course_offering.course.name}} ({{course_offering.offering_mode}})</h2>
             <p><strong>Description:</strong> {{ course_offering.course.description }}</p>
             <p><strong>Program Link:</strong> {{ course_offering.course.program_link }}</p>

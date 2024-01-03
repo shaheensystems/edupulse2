@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+    <section>
+        {% comment %} <h1> Program Deatil </h1> {% endcomment %}
+        <div>
+            
+            <p class='text-lg font-semibold'>Program Name :{{ program.name }}</P>
+            <p> Description :{{ program.description }} </p>
+            <p> Program Link :{{ program.program_link }} </p>
+            <p> Total Credit :{{ program.total_credit }} </p>
+            <p> Duration in Week :{{ program.duration_in_week }} </p>
+            <p> Total Course : {{program.course.count}} </p>
+            
+            <div class='bg-green-200 px-4 py-2 ml-10 rounded-lg flex flex-row  flex-wrap gap-3'>
+                
+                {% for course in program.course.all%}
+                <a href="{% url 'course_detail' course.pk %}">
+                    <div class='flex flex-col'>
+                        <p> Course Name :{{ course.name }} </p>
+                        <p> Course Description :{{ course.description }} </p>
+                        <p> Total Credit :{{ course.total_credit }} </p>
+                        <p> Duration in Week :{{ course.duration_in_week }} </p>
+                        <p> EFTS :{{ course.course_efts }} </p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            <div class='flex flex-row flex-wrap'>
+                
+                {% for program_offering in program.program_offerings.all%}
+                <a href="{% url 'program_offering_detail' program_offering.pk %}">
+                    <div class='flex flex-col  bg-sky-400 px-4 py-2 m-2 rounded-lg'>
+                        <p class='text-center'> {{program_offering.temp_id}}</P>
+                        <p> from {{ program_offering.start_date}} to {{ program_offering.end_date}}</p>
+                    </div>
+                </a>
+                {% endfor %}
+              
+            </div>
+          
+        </div>
+    </section>
+    
+{% endblock content %}

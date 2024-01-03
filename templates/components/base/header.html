@@ -23,12 +23,19 @@
         {% if request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Program_Leader'   %} 
           <a href="{% url 'upload_file:upload_csv' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Upload Data</a>
         {% endif %}
+        {% if request.user|user_belongs_to_group:'Head_of_School' %} 
+        <a href="{% url 'program_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Programs</a>
+       {% endif %}
+        {% if request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Teacher'  %} 
+        <a href="{% url 'program_offering_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Program Offerings</a>
+       {% endif %}
+       {% if request.user|user_belongs_to_group:'Head_of_School' %} 
+        <a href="{% url 'course_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Course</a>
+       {% endif %}
         {% if request.user|user_belongs_to_group:'Teacher' or request.user|user_belongs_to_group:'Head_of_School'  or request.user|user_belongs_to_group:'Program_Leader'    %} 
-          <a href="{% url 'course_offering_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Courses</a>
+          <a href="{% url 'course_offering_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Course Offerings</a>
         {% endif %}
-        {% if request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School'  or request.user|user_belongs_to_group:'Teacher'  %} 
-         <a href="{% url 'program_offering_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Programs</a>
-        {% endif %}
+       
         {% if request.user|user_belongs_to_group:'Teacher'  or request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School'    %} 
           <a href="{% url 'dashboard' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Attendance</a>
         {% endif %}

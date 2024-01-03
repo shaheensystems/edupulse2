@@ -13,7 +13,29 @@ from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_
 class CourseListView(LoginRequiredMixin,ListView):
     model=Course
     template_name='program/course/course_list.html'
-    context_object_name='course'
+    context_object_name='courses'
+
+    def get_all_students_and_at_risk_students(self, courses):
+        unique_students = set()
+        no_of_at_risk_students=set()
+        for course in courses:
+            no_of_at_risk_students.update(get_no_of_at_risk_students_by_course_offerings(course.course_offering.all()))
+            for course_offering in course.course_offering.all():
+                unique_students.update(course_offering.student.all())
+
+        return unique_students,no_of_at_risk_students
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course_offerings=CourseOffering.objects.all()
+        courses=Course.objects.all()
+        total_students,at_risk_students=self.get_all_students_and_at_risk_students(courses)
+        context['total_no_of_at_risk_student'] = at_risk_students
+        # Add the total_students to the context
+        context['total_students'] = total_students
+        
+
+        return context
 
 class CourseDetailView(LoginRequiredMixin,DetailView):
     model=Course
@@ -26,6 +48,20 @@ class ProgramListView(LoginRequiredMixin,ListView):
     model=Program
     template_name='program/program/program_list.html'
     context_object_name='programs'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        program_offerings=ProgramOffering.objects.all()
+        programs=Program.objects.all()
+        total_students=0
+        for programs in programs:
+            total_students+=programs.calculate_total_no_of_student()
+        # Calculate total number of students across all program offerings
+        
+        context['total_no_of_at_risk_student'] = get_no_of_at_risk_students_by_program_offerings(program_offerings)
+        # Add the total_students to the context
+        context['total_students'] = total_students   
+
+        return context
 
 class ProgramDetailView(LoginRequiredMixin,DetailView):
     model=Program

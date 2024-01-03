@@ -29,7 +29,7 @@
             {% endwith %}
             </div>
             <div class='w-4/12 bg-gray-100 rounded-lg'>
-              {% with data=chart_data_campus_enrollment_student title='Student Enrollment By Course Type' id='students_by_course_type' chartType='pie' lengendDisplay='true' limitData=10 %}
+              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode' chartType='pie' lengendDisplay='true' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
@@ -40,13 +40,35 @@
             </div>
             
           </div>
+          <div class='flex flex-col'>
+            <p class='text-center text-lg font-bold my-2'> Student Enrollment Status 2</p>
+            
+            <div class='flex flex-row gap-0 flex-wrap justify-center'>
+              <div class='w-4/12 bg-gray-100 rounded-lg'>
+            {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program' id='program_students_enrollment'%}
+              {% include 'charts/barChartHorizontal.html' %}
+            {% endwith %}
+            </div>
+            <div class='w-4/12 bg-gray-100 rounded-lg hidden'>
+              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode1' chartType='pie' lengendDisplay='true' limitData=10 %}
+                {% include 'charts/chart.html' %}
+              {% endwith %}
+            </div>
+            <div class='w-4/12 bg-gray-100 rounded-lg hidden'>
+              {% with data=chart_data_student_region title='Domestic and International Studnets' id='students_by_country1' chartType='bar' lengendDisplay='false' limitData=10 %}
+                {% include 'charts/chart.html' %}
+              {% endwith %}
+            </div>
+            
+          </div>
           
           {% with program_offerings=program_offerings students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set  %}
               {% include 'components/dashboard/program_offering_info_bar.html' %}
             {% endwith %}
         
-            {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set %}
-              {% include 'components/dashboard/program_offering_attendance_info.html' %}
+            {% with programs=programs_for_current_user students=students total_students_at_risk_query_set=total_students_at_risk_query_set %}
+              {% include 'components/dashboard/programs_attendance_info.html' %}
+            
             {% endwith %}
             
         </div>
@@ -58,7 +80,7 @@
           {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
             {% include 'components/dashboard/program_offering_info_bar.html' %}
           {% endwith %}
-          {% with data=chart_data_program_offering_student_enrollment text='Students Enrollment' id='students_enrollment'%}
+          {% with data=chart_data_offering_mode_enrollment_students text='Students Enrollment' id='students_enrollment'%}
             {% include 'charts/barChartHorizontal.html' %}
           {% endwith %}
 

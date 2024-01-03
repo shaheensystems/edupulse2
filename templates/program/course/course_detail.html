@@ -1,4 +1,86 @@
 {% extends "base.html" %}
+
 {% block content %}
-    <h1> Course Deatil </h1>
+
+<section class='my-2 w-full items-centerflex flex-col '>
+   {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
+            <!-- Course_offering_infobar -->
+    
+              <h1 class='text-center mt-4 text-xl mb-1'><strong>Course Detail</strong>  </h1>
+            
+            
+            <div class="bg-gray-200 p-4 mb-4 w-full gap-5 flex flex-row justify-between items-baseline">
+             
+              <div class='w-1/2'>
+                {% comment %} <h1><strong>Program Detail</strong>  </h1> {% endcomment %}
+                <h2 class="text-xl font-bold my-2">{{ course.temp_id }} : 
+                  <br> {{ course.name }}</h2>
+                <p><strong>Description:</strong> {{ course.description|default:"" }}</p>
+                <p><strong>Program Link:</strong> {{ course.program_link }}</p>
+                <p><strong>Total Credit:</strong> {{ course.total_credit }}</p>
+                <p><strong>Duration in week:</strong> {{ course.duration_in_week }}</p>
+               
+                <p><strong>Remark:</strong> {{ course.remark }}</p>
+              </div>
+            
+              <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
+                <p class="mb-2 ">Total Course: {{course.course.count}}</p> |
+                <p class="mb-2">Total Students Enrolled: {{course.calculate_total_no_of_student}}</p> |
+                <p class="mb-2">Attendnace Percentage: {{course.calculate_attendance_percentage}} %</p> |
+                {% if course.calculate_no_at_risk_student_for_last_week|length  >  0 %}
+                <p class='text-red-500'>Students at Risk: {{course.calculate_no_at_risk_student_for_last_week|length}}</p>
+                {% else  %}
+                <p>Students at Risk: {{course.calculate_no_at_risk_student_for_last_week|length}}</p>
+                {% endif %}
+                
+              </div>
+              <!-- Add more course offering details -->
+            </div>
+            
+          {% comment %} </a> {% endcomment %}
+          <div class='flex flex-row flex-wrap gap-4'>
+            {% for course_offering in course.course_offering.all%}
+            <a href="{% url 'course_offering_detail' course_offering.pk %}"> 
+              <p class='bg-blue-200 rounded-lg px-4 py-2'>
+                {{course_offering.temp_id}} ({{course_offering.offering_mode |title}})<br>{{course_offering.course.name}}
+              </p>
+            </a>
+            
+            
+  {% endfor %}
+          </div>
+ 
+  {% for course_offering in course.course_offering.all %}
+        <section class='my-2 w-5/6 bg-gray-50 justify-end  items-start flex flex-col border-2 p-1 '>
+
+          {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
+            <!-- Course_offering_infobar -->
+            <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+              <h2 class="text-xl font-bold mb-2">{{course_offering.temp_id}}<br>{{course_offering.name}}</h2>
+              <div class='flex flex-row gap-4 flex-wrap '>
+                <p class="mb-2 ">Current Course offering: {{course.course_offering.count}}</p> |
+                <p class="mb-2">Total Students Enrolled: {{course.calculate_total_no_of_student}}</p> |
+                <p>Students at Risk: 10</p> 
+              </div>
+              <!-- Add more course offering details -->
+            </div>
+            
+          {% comment %} </a> {% endcomment %}
+      
+       
+            <ul class='flex flex-col gap-4 w-3/4'>  
+              {% for course_offering in course.course_offering.all %}
+                          {% with course_offering=course_offering %}
+                              {% include 'components/flash_card/course_offering_FC.html' %}
+                          {% endwith %} 
+              {% endfor %}
+            </ul>
+
+ 
+    </section>
+  {% endfor %}
+
+</section>
+   
+
 {% endblock content %}

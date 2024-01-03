@@ -6,14 +6,15 @@
    {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
             <!-- Course_offering_infobar -->
     
-              <h1 class='text-center mt-4 text-xl mb-1'><strong>Program Detail</strong>  </h1>
+              <h1 class='text-center mt-4 text-xl mb-1'><strong>Program Offering Detail</strong>  </h1>
             
             
             <div class="bg-gray-200 p-4 mb-4 w-full gap-5 flex flex-row justify-between items-baseline">
              
               <div class='w-1/2'>
-                <h1><strong>Program Detail</strong>  </h1>
-                <h2 class="text-xl font-bold my-2">{{ program_offering.temp_id }} <br> {{ program_offering.program.name }}</h2>
+                {% comment %} <h1><strong>Program Detail</strong>  </h1> {% endcomment %}
+                <h2 class="text-xl font-bold my-2">{{ program_offering.temp_id }} : ({{program_offering.offering_mode |title }})
+                  <br> {{ program_offering.program.name }}</h2>
                 <p><strong>Description:</strong> {{ program_offering.program.description }}</p>
                 <p><strong>Program Link:</strong> {{ program_offering.program.program_link }}</p>
                 <p><strong>Total Credit:</strong> {{ program_offering.program.total_credit }}</p>

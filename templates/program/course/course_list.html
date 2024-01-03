@@ -1,11 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
-<section>
-    <h1> Course List  </h1>
-    <ul>
-        {% for course in courses %}
-          <li><a href="{% url 'course_detail' course.pk %}">{{ course.title }}</a></li>
-        {% endfor %}
+<section class='w-full'>
+    {% comment %} <h1> Program Offering List  </h1> {% endcomment %}
+    <section class='my-2 w-full'>
+
+      {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
+         <!-- Course_offering_infobar -->
+         <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+          <h2 class="text-xl font-bold mb-2">Course List</h2>
+          <div class='flex flex-row gap-4 flex-wrap '>
+            <p class="mb-2 ">Total Course: {{courses.count}}</p> |
+            <p class="mb-2">Total Students Enrolled: {{total_students|length}}</p> |
+            {% if total_no_of_at_risk_student >  0 %}
+                  <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student }}</p>
+                  {% else  %}
+                  <p>Students at Risk: {{total_no_of_at_risk_student|length}}</p>
+                  {% endif %}
+          </div>
+          <!-- Add more course offering details -->
+        </div>
+        
+      </a>
+  </section>
+    <br>
+   
+    <ul class='flex flex-col gap-4 w-3/4'>
+      {% for course in courses %}
+        {% with course=course %}
+            {% include 'components/flash_card/course_FC.html' %}
+        {% endwith %} 
+      {% comment %} <p>{{course.temp_id}}:{{course.name}}</p>
+        {% for course_offering in course.course_offering.all %}
+                    {% with course_offering=course_offering %}
+                        {% include 'components/flash_card/course_offering_FC.html' %}
+                    {% endwith %} 
+        {% endfor %} {% endcomment %}
+      {% endfor %}
       </ul>
+      
 </section>
+  
+    
 {% endblock content %}
