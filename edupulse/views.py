@@ -5,7 +5,10 @@ from django.views.generic import DetailView,ListView,TemplateView
 from program.models import ProgramOffering,CourseOffering,Program,Course
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
-
+from datetime import datetime
+from .forms import DateFilterForm
+from django.db.models import Q
+from datetime import datetime, timedelta
 
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_program_offerings,get_no_of_at_risk_students_by_course_offerings
@@ -62,8 +65,45 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             courses_for_current_user=None
             students=None
 
-   
-       
+        # filter data with start and end date
+ 
+        date_filter_form = DateFilterForm(self.request.GET)
+        if date_filter_form.is_valid():
+            start_date=date_filter_form.cleaned_data['start_date']
+            end_date=date_filter_form.cleaned_data['end_date']
+            if not start_date:
+                    # default_start_date = datetime.now() - timedelta(days=365)  # One year ago
+                    default_start_date = datetime(datetime.now().year - 1, 1, 1)  # 1st Jan of lst year 
+                    start_date = default_start_date.strftime('%Y-%m-%d')
+            if not end_date:
+                default_end_date=datetime.now().strftime('%Y-%m-%d')
+                end_date=default_end_date
+
+
+            
+            # filter data according to start and end date 
+            if start_date and end_date:
+                if program_offerings_for_current_user is not None :
+                    program_offerings_for_current_user=program_offerings_for_current_user.filter(start_date__gte=start_date,end_date__lte=end_date)
+                if course_offerings_for_current_user is not None :
+                    course_offerings_for_current_user=course_offerings_for_current_user.filter(start_date__gte=start_date,end_date__lte=end_date)
+                if programs_for_current_user is not None:
+                    programs_for_current_user = programs_for_current_user.filter(
+                                                                    Q(program_offerings__start_date__gte=start_date) &
+                                                                    Q(program_offerings__end_date__lte=end_date)
+                                                              ).distinct()
+                if courses_for_current_user is not None:
+                    courses_for_current_user = courses_for_current_user.filter(
+                                                                    Q(course_offering__start_date__gte=start_date) &
+                                                                    Q(course_offering__end_date__lte=end_date)
+                                                                ).distinct()
+                
+
+                print(start_date,":",end_date)
+                context['start_date']=start_date
+                context['end_date']=end_date
+        context['date_filter_form']=date_filter_form
+
         # print("compare st by course offerings:")
         # print(get_total_no_of_student_by_course_offerings(course_offerings=course_offerings),": here unique")
         # print(len(get_total_unique_no_of_student_by_course_offerings(course_offerings=course_offerings)))

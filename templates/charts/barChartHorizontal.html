@@ -19,11 +19,18 @@
         },
         options: {
             indexAxis: 'y',  // Set indexAxis to 'y' for horizontal bars
+          
             legend: { display: true },
             title: {
                 display: true,
                 text: "{{ text }}"
+            },
+            scales: {
+                y: {
+                    beginAtZero: true  // Set the suggestedMin to 0 for the y-axis
+                }
             }
-        }
+        },
+        
     });
 </script>

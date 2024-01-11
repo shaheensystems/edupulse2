@@ -2,6 +2,8 @@
 {% load custom_tags %}
 {% block content %}
     <section class='flex w-full flex-col'>
+
+
         <!-- User Profile Section -->
         {% with current_user=current_user  %}
            {% include 'components/dashboard/user_profile_FC.html' %}
@@ -16,6 +18,47 @@
             {% endwith %}
         {% endif %}
        
+        <!-- date Filter -->
+        
+        <div class='flex flex-col bg-gray-200 p-4'>
+        
+          <div class='flex flex-row gap-4 mb-3'>
+            <!-- Year Dropdown -->
+            <p class='bg-blue-200 px-4 py-2 rounded-lg'> Year :
+              <select id="yearDropdown" class='pl-3 pr-10 text-sm'>
+                <!-- Options will be dynamically populated by JavaScript -->
+            </select>
+            </p>
+
+            <!-- Semester Dropdown -->
+            <p class='bg-blue-200 px-4 py-2 rounded-lg'> Duration :
+              <select id="durationTypeDropdown" class='pl-3 pr-10 text-sm' onchange="populateDurationValues()">
+                  <option value="semester">Semester</option>
+                  <option value="quarter">Quarter</option>
+                  <option value="month">Month</option>
+              </select>
+          </p>
+         <!-- Dynamic Dropdown for Semester, Quarter, or Month -->
+          <p class='bg-blue-200 px-4 py-2 rounded-lg' id="durationValueContainer">
+
+          </p>
+
+            <!-- Button to trigger date selection -->
+            <button onclick="setDate()"><p class='bg-blue-200 px-4 py-2 rounded-lg'>Set Date</p> </button>
+        </div>
+          <div class='flex left-0 '>
+            <form method='get' action="{% url 'dashboard' %}" class='flex flex-row gap-4 justify-center items-center '>
+              {% csrf_token %}
+              {{ date_filter_form.as_p }}
+  
+              <button type="submit"> <p class='bg-blue-200 px-4 py-2 rounded-lg m-3'>Filter By Date </p> </button>
+            </form>
+          </div>
+  
+        </div>
+        
+
+
 
         {% if  request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin'    %}
             <!-- Program Offering Details Section -->
@@ -45,10 +88,17 @@
             
             <div class='flex flex-row gap-0 flex-wrap justify-center'>
               <div class='w-4/12 bg-gray-100 rounded-lg'>
-            {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program' id='program_students_enrollment'%}
-              {% include 'charts/barChartHorizontal.html' %}
-            {% endwith %}
-            </div>
+                
+                {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program' id='program_students_enrollment'%}
+                  {% include 'charts/barChartHorizontal.html' %}
+                {% endwith %}
+              </div>
+              {% comment %} <div class='w-4/12 bg-gray-100 rounded-lg'>
+                
+                {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program test' id='test_chart'%}
+                  {% include 'charts/testchart.html' %}
+                {% endwith %}
+              </div> {% endcomment %}
             <div class='w-4/12 bg-gray-100 rounded-lg hidden'>
               {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode1' chartType='pie' lengendDisplay='true' limitData=10 %}
                 {% include 'charts/chart.html' %}
@@ -62,10 +112,10 @@
             
           </div>
           
-          {% with program_offerings=program_offerings students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set  %}
+          {% comment %} {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set  %}
               {% include 'components/dashboard/program_offering_info_bar.html' %}
             {% endwith %}
-        
+         {% endcomment %}
             {% with programs=programs_for_current_user students=students total_students_at_risk_query_set=total_students_at_risk_query_set %}
               {% include 'components/dashboard/programs_attendance_info.html' %}
             
@@ -186,6 +236,108 @@
 
      
     <section>
+      <script>
+
+           // Populate year dropdown on page load
+            window.onload = function () {
+              populateDropdown('yearDropdown', 2020, 2024);
+              
+               // Set default values for duration type and quarter
+              document.getElementById('yearDropdown').value=new Date().getFullYear()
+              document.getElementById('durationTypeDropdown').value = 'quarter';
+              setDefaultQuarter();
+              // Initial population for duration values
+              populateDurationValues();
+          };
+
+          function populateDurationValues() {
+            //console.log("drop drown creation started")
+            var durationType = document.getElementById('durationTypeDropdown').value;
+            var durationValueContainer = document.getElementById('durationValueContainer');
+            var dropdownId = durationType + 'Dropdown';
+            
+            // Clear previous options
+            durationValueContainer.innerHTML = '';
+            // Create a new dropdown element
+            var dropdown = document.createElement('select');
+            dropdown.id = dropdownId;
+            dropdown.className = 'pl-3 pr-10 text-sm';
+            
+            //console.log("console:",durationType, "with id :",dropdownId)
+            // Append the dropdown to the container
+            durationValueContainer.appendChild(dropdown);  
+            // Populate dropdown options based on duration type
+            if (durationType === 'semester') {
+                populateDropdown(dropdownId, 1, 2);
+            } else if (durationType === 'quarter') {
+                populateDropdown(dropdownId, 1, 4);
+            } else if (durationType === 'month') {
+                populateDropdown(dropdownId, 1, 12);
+            }
+            setDate()
+
+            }
+
+            function populateDropdown(dropdownId, start, end) {
+              //console.log("ID :",dropdownId)
+              var dropdown = document.getElementById(dropdownId);
+      
+              for (var i = start; i <= end; i++) {
+                  var option = document.createElement('option');
+                  option.value = i;
+                  option.text = i;
+                  dropdown.add(option);
+              }
+              
+          }
+          function setDate() {
+            var year = document.getElementById('yearDropdown').value;
+            var durationType = document.getElementById('durationTypeDropdown').value;
+            var durationValue = document.getElementById(durationType + 'Dropdown').value;
+    
+            // Use the selected values to set the date inputs in the form
+            var [start_date,end_date]=formatDate(year, durationType, durationValue, 1).split(' to ');
+            document.getElementById('id_start_date').value = start_date;
+            document.getElementById('id_end_date').value = end_date;
+           
+        }
+    
+        function formatDate(year, durationType, durationValue, day) {
+    
+            if (durationType === 'semester') {
+               
+                var startMonth = (durationValue - 1) * 6 + 1;
+                var endMonth = startMonth + 5;
+            } else if (durationType === 'quarter') {
+              
+                var startMonth = (durationValue - 1) * 3 + 1;
+                var endMonth = startMonth + 2;
+            } else if (durationType === 'month') {
+              
+                var startMonth = durationValue;
+                var endMonth = durationValue;
+            }
+            
+            return `${year}-${padZero(startMonth)}-${padZero(day)} to ${year}-${padZero(endMonth)}-${getDaysInMonth(year, endMonth)}`;
+        }
+    
+        function padZero(value) {
+            return value.toString().padStart(2, '0');
+        }
+    
+        function getDaysInMonth(year, month) {
+            return new Date(year, month, 0).getDate();
+        }
+        function setDefaultQuarter() {
+          var currentMonth = new Date().getMonth() + 1;
+          var defaultQuarter = Math.ceil(currentMonth / 3);
+  
+          // Set the default quarter value in the dropdown
+          //document.getElementById('quarterDropdown').value = defaultQuarter;
+          populateDurationValues();  // Populate quarter dropdown options
+          document.getElementById('quarterDropdown').value = defaultQuarter;
+      }
+    </script>
    </section>
 {% endblock content %}
     
