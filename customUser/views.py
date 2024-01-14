@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView,LogoutView
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView,DetailView,UpdateView,CreateView
+from django.views.generic import ListView,DetailView,UpdateView,CreateView,TemplateView
 from customUser.models import Student,Staff
 from django.http import HttpResponseRedirect
 from datetime import timedelta, datetime

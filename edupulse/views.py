@@ -106,6 +106,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                                                                     Q(course_offering__start_date__gte=start_date) &
                                                                     Q(course_offering__end_date__lte=end_date)
                                                                 ).distinct()
+                
+                
                 if attendances is not None:
                     attendances=attendances.filter(
                         Q(attendance_date__gte=start_date)&
@@ -146,6 +148,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
         context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
         context['chart_data_attendance_report_action']=chart_data_attendance_report_action
+        context['attendances']=attendances
 
         context['program_offerings']=program_offerings
 
