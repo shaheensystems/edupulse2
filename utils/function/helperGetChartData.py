@@ -1,4 +1,5 @@
-
+from collections import Counter
+from report.models import WeeklyReport
 def get_chart_data_offering_type_student_enrollment(course_offerings):
     
     offering_type_data=[]
@@ -163,4 +164,61 @@ def get_chart_data_student_enrollment_by_region(students):
     } 
 
     return chart_data_student_region
+
+def get_chart_data_attendance_report(attendances):
+    attendance_data=[]
+    engagement_data=[]
+    action_data=[]
+    absent_attendances_only=attendances.exclude(is_present='present')
+    weekly_reports_absent_students=WeeklyReport.objects.filter(sessions__in=absent_attendances_only)
+    weekly_reports_absent_students_not_engaged=weekly_reports_absent_students.filter(engagement='not engaged')
+    print("student count for attendance report all:",attendances.count())
+    print("student count for attendance report engagement:",absent_attendances_only.count())
+    print("student count for attendance report action:",weekly_reports_absent_students_not_engaged.count())
+   
+   
+    is_present_counts=Counter(attendance.is_present for attendance in attendances)
+    engagement_counts=Counter(weekly_report.engagement for weekly_report in weekly_reports_absent_students)
+    action_counts=Counter(weekly_report.action for weekly_report in weekly_reports_absent_students_not_engaged)
+    # for wr in weekly_reports_absent_students:
+    #     # print(wr.engagement,":",wr.engagement,":",wr.student)
+    #     if wr.engagement=='na':
+    #         print(wr.week_number,":" ,wr.engagement ,":",wr.action,":",wr.student)
+    #         for attendance in wr.sessions.all():
+    #            print( attendance.attendance_date)
+
+    for is_present , count in is_present_counts.items():
+        attendance_data.append({
+            'attendance_type':is_present,
+            'attendance_count':count
+        })
+
+    for engagement , count in engagement_counts.items():
+        engagement_data.append({
+            'engagement_type':engagement,
+            'engagement_count':count
+        })
+
+    for action , count in action_counts.items():
+        action_data.append({
+            'action_type':action,
+            'action_count':count
+        })
+
+    chart_data_attendance_report_attendance={
+         'labels':[attendance['attendance_type'] for attendance in attendance_data],
+        'data':[attendance['attendance_count'] for attendance in attendance_data], 
+    }
+    chart_data_attendance_report_engagement={
+        'labels':[engagement['engagement_type'] for engagement in engagement_data],
+        'data':[engagement['engagement_count'] for engagement in engagement_data],
+    }
+
+
+    chart_data_attendance_report_action={
+        'labels':[action['action_type'] for action in action_data],
+        'data':[action['action_count'] for action in action_data],
+    }
+
+    return chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action
 

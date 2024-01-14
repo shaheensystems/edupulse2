@@ -25,6 +25,7 @@ class UserLoginView(LoginView):
     
 
 class UserLogOutView(LoginRequiredMixin,LogoutView):
+   
     success_url=reverse_lazy('dashboard')
     template_name='auth/logout.html'
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from customUser.models import Student,Staff
+from report.models import Attendance
 from base.models import Campus
 from django.views.generic import DetailView,ListView,TemplateView
 from program.models import ProgramOffering,CourseOffering,Program,Course
@@ -15,7 +16,7 @@ from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_
 
 from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program_offerings,get_total_unique_no_of_student_by_program_offerings,get_total_no_of_student_by_course_offerings,get_total_unique_no_of_student_by_course_offerings
 
-from utils.function.helperGetChartData import get_chart_data_program_offerings_student_enrollment,get_chart_data_course_offerings_student_enrollment,get_chart_data_student_and_Staff_by_campus,get_chart_data_student_enrollment_by_region,get_chart_data_programs_student_enrollment,get_chart_data_offering_type_student_enrollment
+from utils.function.helperGetChartData import get_chart_data_program_offerings_student_enrollment,get_chart_data_course_offerings_student_enrollment,get_chart_data_student_and_Staff_by_campus,get_chart_data_student_enrollment_by_region,get_chart_data_programs_student_enrollment,get_chart_data_offering_type_student_enrollment,get_chart_data_attendance_report
 
 # def home(request):
     
@@ -31,6 +32,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         program_offerings=ProgramOffering.objects.all()
         students=Student.objects.all()
         course_offerings=CourseOffering.objects.all()
+        attendances=Attendance.objects.all()
+        
 
 
         # Program Offering Enrollment data for current user
@@ -43,19 +46,25 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             programs_for_current_user=programs
             courses_for_current_user=courses
             students=students
+            # Use Q objects to filter attendances for all students in the students queryset
+            attendances = attendances.filter(student__in=students)
         elif user_groups.filter(name="Program_Leader").exists():
             program_offerings_for_current_user=program_offerings.filter(program_leader=self.request.user.staff_profile)
             course_offerings_for_current_user=course_offerings.filter(course__program__program_offerings__program_leader=self.request.user.staff_profile)
             students=students.filter(program_offering__program_leader__staff=self.request.user)
+            
             programs_for_current_user=None
             courses_for_current_user=None
-            
+            attendances = attendances.filter(student__in=students)
+            print(attendances)
+            print(students)
         elif user_groups.filter(name="Teacher").exists():
             program_offerings_for_current_user=program_offerings.filter(program__course__course_offering__teacher__staff=self.request.user)
             course_offerings_for_current_user=course_offerings.filter(teacher__staff=self.request.user)
             students=students.filter(course_offerings__teacher__staff=self.request.user)
             programs_for_current_user=None
             courses_for_current_user=None
+            attendances = attendances.filter(student__in=students)
            
         #    ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
         else:
@@ -64,9 +73,9 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             programs_for_current_user=None
             courses_for_current_user=None
             students=None
+            attendances = None
 
         # filter data with start and end date
- 
         date_filter_form = DateFilterForm(self.request.GET)
         if date_filter_form.is_valid():
             start_date=date_filter_form.cleaned_data['start_date']
@@ -97,7 +106,11 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                                                                     Q(course_offering__start_date__gte=start_date) &
                                                                     Q(course_offering__end_date__lte=end_date)
                                                                 ).distinct()
-                
+                if attendances is not None:
+                    attendances=attendances.filter(
+                        Q(attendance_date__gte=start_date)&
+                        Q(attendance_date__lte=end_date)
+                    ).distinct()
 
                 print(start_date,":",end_date)
                 context['start_date']=start_date
@@ -127,7 +140,12 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['chart_data_program_offering_student_enrollment'] = get_chart_data_program_offerings_student_enrollment(program_offerings=program_offerings_for_current_user)
         context['chart_data_course_offering_student_enrollment'] = get_chart_data_course_offerings_student_enrollment(course_offerings=course_offerings_for_current_user)
         context['chart_data_student_region']=get_chart_data_student_enrollment_by_region(students=students)
-
+        
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
+        
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
 
         context['program_offerings']=program_offerings
 
@@ -144,6 +162,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
 
         context['total_students_at_risk_query_set']=get_no_of_at_risk_students_by_program_offerings(program_offerings_for_current_user)
+        context['attendances']=attendances
 
 
         # context['staff_profile'] = self.request.user.staff_profile
