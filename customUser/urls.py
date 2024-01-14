@@ -1,6 +1,6 @@
 from django.urls import path
 from customUser.views import UserLoginView,UserLogOutView, AllStudentsView, AllStudentsAtRiskView
-
+from django.urls import reverse_lazy
 
 urlpatterns = [
     path("login/",UserLoginView.as_view(),name="user-login"),

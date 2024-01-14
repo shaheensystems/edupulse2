@@ -24,7 +24,7 @@ class UserLoginView(LoginView):
         return self.render_to_response(self.get_context_data(form=form))
     
 
-class UserLogOutView(LoginRequiredMixin,LogoutView):
+class UserLogOutView(LogoutView):
    
     success_url=reverse_lazy('dashboard')
     template_name='auth/logout.html'

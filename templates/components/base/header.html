@@ -64,7 +64,11 @@
             {% endif %} 
               <span class="hidden lg:inline  text-center  text-xs font-semibold text-gray-400">{{ user.first_name }} {{ user.last_name }}</span>
               </div>
-              <a href="{% url 'user-logout' %}" class="text-red-500 md:mr-5 bg-gray-200 px-4 py-2 rounded-lg">Logout</a>
+              <form method='post' action='{% url 'user-logout' %}' class="text-red-500 md:mr-5 bg-gray-300 px-4 py-2 rounded-lg">
+                {% csrf_token %}
+                <button type='submit'> Logout</button>
+              </form>
+              {% comment %} <a href="{% url 'user-logout' %}" class="text-red-500 md:mr-5 bg-gray-200 px-4 py-2 rounded-lg">Logout</a> {% endcomment %}
               {% else %}
               <a href="{% url 'user-login' %}" class="text-blue-500 md:mr-5 bg-gray-200 px-4 py-2 rounded-lg">Login</a>
           {% endif %}
