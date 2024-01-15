@@ -1,5 +1,6 @@
 from collections import Counter
 from report.models import WeeklyReport
+from datetime import datetime,timedelta
 def get_chart_data_offering_type_student_enrollment(course_offerings):
     
     offering_type_data=[]
@@ -169,17 +170,23 @@ def get_chart_data_attendance_report(attendances):
     attendance_data=[]
     engagement_data=[]
     action_data=[]
-    absent_attendances_only=attendances.exclude(is_present='present')
-    weekly_reports_absent_students=WeeklyReport.objects.filter(sessions__in=absent_attendances_only)
-    weekly_reports_absent_students_not_engaged=weekly_reports_absent_students.filter(engagement='not engaged')
-    print("student count for attendance report all:",attendances.count())
-    print("student count for attendance report engagement:",absent_attendances_only.count())
-    print("student count for attendance report action:",weekly_reports_absent_students_not_engaged.count())
+    chart_data_attendance_report_attendance={}
+    chart_data_attendance_report_engagement={}
+    chart_data_attendance_report_action={}
+    # print(attendances)
+    if attendances:
+        absent_attendances_only=attendances.exclude(is_present='present')
+        weekly_reports_absent_students=WeeklyReport.objects.filter(sessions__in=absent_attendances_only)
+        weekly_reports_absent_students_not_engaged=weekly_reports_absent_students.filter(engagement='not engaged')
+        # print("student count for attendance report all:",attendances.count())
+        # print("student count for attendance report engagement:",absent_attendances_only.count())
+        # print("student count for attendance report action:",weekly_reports_absent_students_not_engaged.count())
    
    
-    is_present_counts=Counter(attendance.is_present for attendance in attendances)
-    engagement_counts=Counter(weekly_report.engagement for weekly_report in weekly_reports_absent_students)
-    action_counts=Counter(weekly_report.action for weekly_report in weekly_reports_absent_students_not_engaged)
+        is_present_counts=Counter(attendance.is_present for attendance in attendances)
+        engagement_counts=Counter(weekly_report.engagement for weekly_report in weekly_reports_absent_students)
+        action_counts=Counter(weekly_report.action for weekly_report in weekly_reports_absent_students_not_engaged)
+        
     # for wr in weekly_reports_absent_students:
     #     # print(wr.engagement,":",wr.engagement,":",wr.student)
     #     if wr.engagement=='na':
@@ -187,38 +194,90 @@ def get_chart_data_attendance_report(attendances):
     #         for attendance in wr.sessions.all():
     #            print( attendance.attendance_date)
 
-    for is_present , count in is_present_counts.items():
-        attendance_data.append({
-            'attendance_type':is_present,
-            'attendance_count':count
-        })
+        for is_present , count in is_present_counts.items():
+            attendance_data.append({
+                'attendance_type':is_present,
+                'attendance_count':count
+            })
 
-    for engagement , count in engagement_counts.items():
-        engagement_data.append({
-            'engagement_type':engagement,
-            'engagement_count':count
-        })
+        for engagement , count in engagement_counts.items():
+            engagement_data.append({
+                'engagement_type':engagement,
+                'engagement_count':count
+            })
 
-    for action , count in action_counts.items():
-        action_data.append({
-            'action_type':action,
-            'action_count':count
-        })
+        for action , count in action_counts.items():
+            # print("actions:",action)
+            action_data.append({
+                'action_type':action,
+                'action_count':count
+            })
 
-    chart_data_attendance_report_attendance={
-         'labels':[attendance['attendance_type'] for attendance in attendance_data],
-        'data':[attendance['attendance_count'] for attendance in attendance_data], 
-    }
-    chart_data_attendance_report_engagement={
-        'labels':[engagement['engagement_type'] for engagement in engagement_data],
-        'data':[engagement['engagement_count'] for engagement in engagement_data],
-    }
+        chart_data_attendance_report_attendance={
+            'labels':[attendance['attendance_type'] for attendance in attendance_data],
+            'data':[attendance['attendance_count'] for attendance in attendance_data], 
+        }
+        chart_data_attendance_report_engagement={
+            'labels':[engagement['engagement_type'] for engagement in engagement_data],
+            'data':[engagement['engagement_count'] for engagement in engagement_data],
+        }
 
 
-    chart_data_attendance_report_action={
-        'labels':[action['action_type'] for action in action_data],
-        'data':[action['action_count'] for action in action_data],
-    }
+        chart_data_attendance_report_action={
+            'labels':[action['action_type'] for action in action_data],
+            'data':[action['action_count'] for action in action_data],
+        }
 
     return chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action
 
+
+def get_chart_data_attendance_by_date(attendances):
+
+    attendance_data=[]
+   
+
+    attendance_count={}
+    for attendance in attendances:
+        
+        attendance_date=attendance.attendance_date
+
+        existing_date=next((item for item in attendance_data if item['date'] == attendance_date),None)
+        # Check if the date is already in attendance_data
+        if existing_date is None:
+            attendance_data.append({'date':attendance_date,"total_attendance" : 0,"total_present" : 0})
+        
+        for item in attendance_data:
+            if item['date'] == attendance_date:
+                item['total_attendance'] += 1
+                if attendance.is_present == 'present':
+                    item['total_present'] += 1
+
+        
+        for item in attendance_data:
+            item['attendance_percentage']= (item['total_present']/item['total_attendance'])*100
+         
+        # if attendance_date not in attendance_count:
+        #     attendance_count[attendance_date]=0
+        
+        # if attendance.is_present=='present':
+        #         attendance_count[attendance_date]+=1
+    
+    print(attendance_data)   
+    
+    sorted_attendance_data=sorted(attendance_data,key=lambda x:x['date'],reverse=True)
+
+    labels=[item['date'].strftime("%Y-%m-%d") for item in sorted_attendance_data]
+    data=[item["attendance_percentage"] for item in sorted_attendance_data]
+    # Sort the attendance_count dictionary by date in descending order
+    # sorted_attendance_count = dict(sorted(attendance_count.items(), key=lambda x: x[0], reverse=False))
+
+    # labels=list(sorted_attendance_count.keys())
+    # data=list(sorted_attendance_count.values())
+    # formatted_labels = [date.strftime("%Y-%m-%d") for date in labels]
+    # formatted_labels.insert(0, "")
+    # data.insert(0, 0)   
+    chart_data_attendance_by_date={
+        'labels': labels,
+        'data': data,
+    }
+    return chart_data_attendance_by_date

@@ -117,6 +117,7 @@
               {% include 'components/dashboard/program_offering_info_bar.html' %}
             {% endwith %}
          {% endcomment %}
+         {{programs_for_current_user|length}}
             {% with programs=programs_for_current_user students=students total_students_at_risk_query_set=total_students_at_risk_query_set %}
               {% include 'components/dashboard/programs_attendance_info.html' %}
             
@@ -157,7 +158,7 @@
           <!-- Student Performance Pie Chart Section -->
         {% comment %} {{attendances|length}} {% endcomment %}
         {% if attendances|length > 0 %}
-          {% with  chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
+          {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
             {% include 'components/dashboard/student_performance_pieChart_flow.html' %}
           {% endwith %}
         {% else %}

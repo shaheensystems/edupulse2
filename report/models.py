@@ -19,6 +19,8 @@ class Attendance(BaseModel):
     is_present = models.CharField(max_length=255,choices=ATTENDANCE_CHOICE,default="present", null=True, blank=True)  
     attendance_date = models.DateField(default=timezone.now, null=True, blank=True)
     remark=models.TextField(null=True,blank=True,max_length=255)
+    weekly_reports = models.ManyToManyField('WeeklyReport', related_name='attendances')
+
 
     class Meta:
         unique_together = ('student', 'program_offering', 'course_offering')

@@ -35,6 +35,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         attendances=Attendance.objects.all()
         
 
+        
+
 
         # Program Offering Enrollment data for current user
         # print("current user group :",self.request.user.groups.all())
@@ -46,6 +48,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             programs_for_current_user=programs
             courses_for_current_user=courses
             students=students
+            print(len(programs_for_current_user))
             # Use Q objects to filter attendances for all students in the students queryset
             attendances = attendances.filter(student__in=students)
         elif user_groups.filter(name="Program_Leader").exists():
@@ -96,11 +99,18 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                     program_offerings_for_current_user=program_offerings_for_current_user.filter(start_date__gte=start_date,end_date__lte=end_date)
                 if course_offerings_for_current_user is not None :
                     course_offerings_for_current_user=course_offerings_for_current_user.filter(start_date__gte=start_date,end_date__lte=end_date)
+                
+                # all program and course need to be shown 
                 if programs_for_current_user is not None:
-                    programs_for_current_user = programs_for_current_user.filter(
+
+                    filtered_programs = programs_for_current_user.filter(
                                                                     Q(program_offerings__start_date__gte=start_date) &
                                                                     Q(program_offerings__end_date__lte=end_date)
                                                               ).distinct()
+                    # Get the inactive programs (programs that do not match the date criteria)
+                    inactive_programs = programs_for_current_user.exclude(id__in=filtered_programs.values_list('id', flat=True))
+                    print(inactive_programs)
+                    programs_for_current_user=programs_for_current_user
                 if courses_for_current_user is not None:
                     courses_for_current_user = courses_for_current_user.filter(
                                                                     Q(course_offering__start_date__gte=start_date) &
@@ -114,7 +124,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                         Q(attendance_date__lte=end_date)
                     ).distinct()
 
-                print(start_date,":",end_date)
+                # print(start_date,":",end_date)
                 context['start_date']=start_date
                 context['end_date']=end_date
         context['date_filter_form']=date_filter_form

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<section class='w-full'>
+    <div class='my-2 w-full'>
+        <p>Attendance List </p>
+        {% comment %} {{attendance_data_by_course_offering_for_chart}} {% endcomment %}
+       
+        <p>Total Students for attendance: </p>
+        <p>Attendance List </p>
+        <p>Attendance List </p>
+        <p>Attendance List </p>
+        <p>Attendance List </p>
+        <p>Attendance List </p>
+        {% comment %} {{chart_data_attendance_by_date}} {% endcomment %}
+      <div class='w-12/12 bg-gray-100 rounded-lg my-5 flex justify-center items-center content-center place-items-center'>
+
+        {% with data=chart_data_attendance_by_date title='Student Attendace' text='Students Attendace By Date' id='students_attedance'%}
+            {% include 'charts/lineChart.html' %}
+        {% endwith %}
+      </div>
+       {% for course_offering,chart_data in  attendance_data_by_course_offering_for_chart.items %}
+       {% comment %} <p>Type: {{ course_offering | default:"" }}</p> 
+         <p>1 :{{chart_data.0 }}</p>
+         <p>2 :{{chart_data.1 }}</p>
+         <p>3 :{{chart_data.2 }}</p> {% endcomment %}
+
+            {% if chart_data.0|length > 0 %}       
+                    {% with title=course_offering chart1_data=chart_data.0  chart2_data=chart_data.1  chart3_data=chart_data.2  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id=forloop.counter|add:1 chart2_id=forloop.counter|add:11  chart3_id=forloop.counter|add:111 %}
+                     {% include 'components/dashboard/student_performance_pieChart_flow.html' %}
+                    {% endwith %}
+
+            {% else %}   
+                <div class='bg-gray-200 p-4'>
+                    <p> No students found for students attendance report </p>
+                </div>
+            {% endif %}
+       {% endfor %}
+
+      
+
+      
+
+      
+
+       
+    
+    </div>
+   
+</section>
+  
+    
+{% endblock content %}

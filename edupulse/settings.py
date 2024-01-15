@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'program',
     'report',
     'uploadFile',
+    'attendance',
 ]
 
 MIDDLEWARE = [

@@ -28,6 +28,7 @@ urlpatterns = [
     path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
     path('',DashboardView.as_view(), name='dashboard'),
     path('wc_current_programs/',include('program.urls')),
+    path('all-attendance/',include('attendance.urls')),
     path('user/',include('customUser.urls')),
 ]
 
