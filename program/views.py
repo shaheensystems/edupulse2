@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Count,Q
-from customUser.models import Staff
+from customUser.models import Staff,Student
+from report.models import Attendance
 from django.views.generic import ListView,DetailView,UpdateView,CreateView
 from program.models import Course,CourseOffering,Program,ProgramOffering
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,6 +9,7 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offerings,get_no_of_at_risk_students_by_program_offerings
+from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program
 # Create your views here.
 
 class CourseListView(LoginRequiredMixin,ListView):
@@ -50,16 +52,38 @@ class ProgramListView(LoginRequiredMixin,ListView):
     context_object_name='programs'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        program_offerings=ProgramOffering.objects.all()
-        programs=Program.objects.all()
-        total_students=0
-        for programs in programs:
-            total_students+=programs.calculate_total_no_of_student()
-        # Calculate total number of students across all program offerings
+
+        user_data=filter_database_based_on_current_user(request_user=self.request.user,
+                                                        program_offerings=ProgramOffering.objects.all(),
+                                                        course_offerings=CourseOffering.objects.all(),
+                                                        programs=Program.objects.all(),
+                                                        courses=Course.objects.all(),
+                                                        students=Student.objects.all(),
+                                                        attendances=Attendance.objects.all()
+                                                        )
+        program_offerings_for_current_user=user_data['program_offerings_for_current_user']
+        course_offerings_for_current_user=user_data['course_offerings_for_current_user']
+        programs_for_current_user=user_data['programs_for_current_user']
+        courses_for_current_user=user_data['courses_for_current_user']
+        students=user_data['students']
+        attendances=user_data['attendances']
+        all_programs=user_data['all_programs']
         
-        context['total_no_of_at_risk_student'] = get_no_of_at_risk_students_by_program_offerings(program_offerings)
+        context.update(user_data)
+
+        # program_offerings=ProgramOffering.objects.all()
+        # programs=Program.objects.all()
+        # total_students=0
+        # for programs in programs:
+        #     total_students+=programs.calculate_total_no_of_student()
+        # # Calculate total number of students across all program offerings
+        # calculated online and offline program after all filter, search and query
+        online_and_offline_programs=get_online_offline_program(programs_for_current_user=programs_for_current_user)
+        context.update(online_and_offline_programs)
+        
+        context['total_no_of_at_risk_student'] = get_no_of_at_risk_students_by_program_offerings(program_offerings_for_current_user)
         # Add the total_students to the context
-        context['total_students'] = total_students   
+       
 
         return context
 
