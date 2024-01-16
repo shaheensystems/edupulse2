@@ -9,7 +9,9 @@ from utils.function.helperAttendance import get_attendance_percentage,get_attend
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
 
+from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program,get_total_no_of_student_by_course
 from utils.function.helperProgram import OFFERING_CHOICES
+
 class ProgramAndCourseType(models.Model):
     name=models.CharField(max_length=50, unique=True)
 
@@ -34,18 +36,26 @@ class Program(BaseModel):
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_program(program=self)
     
-    def calculate_total_no_of_student(self):
-        # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
-        program_offerings = self.program_offerings.all()
+    def calculate_total_no_of_student(self,offering_mode='all'):
+        # # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
+        # program_offerings = self.program_offerings.all()
      
-        unique_students = set()
-        for program_offering in program_offerings:
-            students_in_program = program_offering.student.all()
-            unique_students.update(students_in_program)
+        # unique_students = set()
+        # for program_offering in program_offerings:
+        #     students_in_program = program_offering.student.all()
+        #     unique_students.update(students_in_program)
 
-        return len(unique_students)
+        # return len(unique_students)
+        return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
 
-        
+    def calculate_total_no_of_student_for_online_program(self,offering_mode="online"):
+
+        return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
+    
+    def calculate_total_no_of_student_for_offline_program(self,offering_mode="offline"):
+
+        return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
+    
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
 
@@ -65,19 +75,26 @@ class Course(BaseModel):
     def calculate_attendance_percentage(self):
         return get_attendance_percentage_by_course(course=self,total_sessions=0,present_sessions=0)
     
-    def calculate_total_no_of_student(self):
-        # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
-        course_offerings = self.course_offering.all()
-
-        # Use a set to store unique students
-        unique_students = set()
-
-        for course_offering in course_offerings:
-            students_in_course = course_offering.student.all()
-            unique_students.update(students_in_course)
-
-        return len(unique_students)
+    def calculate_total_no_of_student_for_online_course(self,offering_mode="online"):
+        return get_total_no_of_student_by_course(course=self,offering_mode=offering_mode)
     
+    def calculate_total_no_of_student_for_offline_course(self,offering_mode="offline"):
+        return get_total_no_of_student_by_course(course=self,offering_mode=offering_mode)
+    
+    def calculate_total_no_of_student(self,offering_mode='all'):
+       
+        # # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
+        # course_offerings = self.course_offering.all()
+
+        # # Use a set to store unique students
+        # unique_students = set()
+
+        # for course_offering in course_offerings:
+        #     students_in_course = course_offering.student.all()
+        #     unique_students.update(students_in_course)
+
+        # return len(unique_students)
+        return get_total_no_of_student_by_course(course=self,offering_mode=offering_mode)
 
     def __str__(self):
         return f'{self.temp_id}-{self.name}'

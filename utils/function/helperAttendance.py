@@ -3,6 +3,8 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 
 
+
+
 def get_attendance_percentage(present_sessions,total_sessions):
      # Check if there are any sessions before calculating the percentage to avoid division by zero
     if total_sessions > 0:
@@ -19,48 +21,73 @@ def get_attendance_percentage(present_sessions,total_sessions):
 def get_attendance_percentage_by_program(program,total_sessions,present_sessions):
     total_sessions=total_sessions
     present_sessions=present_sessions
-    courses = program.course.all()
+    # print("Course list all",program.course.all())
+    courses = program.course.all().exclude(temp_id__endswith='D')
+    # print("Course list offline",courses)
+
+    # if len(program.course.all()) == len(courses):
+    #      print("no change")
+    # else:
+    #      print("changed")
+
+    # if program.temp_id =="NZ2595":
+    #     print(program.temp_id,":",program.name)
+    #     for course in program.course.all().exclude(temp_id__endswith='D'):
+    #         print(course.temp_id)
+    
    
     # Iterate over each course to accumulate session counts
     for course in courses:
         course_offerings=course.course_offering.all()
         if course_offerings:
             for course_offering in course_offerings:
-                total_sessions+=course_offering.attendance.count()
-                present_sessions += course_offering.attendance.filter(is_present='present').count()
+                if course_offering.offering_mode=="online":
+                     print("error calculating attendance")
+                else:
+                    total_sessions+=course_offering.attendance.count()
+                    present_sessions += course_offering.attendance.filter(is_present='present').count()
 
     return get_attendance_percentage(present_sessions,total_sessions)    
 
 
 def get_attendance_percentage_by_course(course,total_sessions,present_sessions):
-        total_sessions=total_sessions
-        present_sessions=present_sessions
-        course_offerings=course.course_offering.all()
-        for course_offering in course_offerings:
-            total_sessions+=course_offering.attendance.count()
-            present_sessions += course_offering.attendance.filter(is_present='present').count()
+        if course.temp_id[-1] == "D":
+            return "Not Applicable"
+        else:
+            total_sessions=total_sessions
+            present_sessions=present_sessions
+            course_offerings=course.course_offering.all()
+            for course_offering in course_offerings:
+                total_sessions+=course_offering.attendance.count()
+                present_sessions += course_offering.attendance.filter(is_present='present').count()
 
-        return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+            return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
 
 def get_attendance_percentage_by_course_offering(course_offering, total_sessions, present_sessions):
-        total_sessions=course_offering.attendance.count()
-        present_sessions = course_offering.attendance.filter(is_present='present').count()
-        return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+        if course_offering.offering_mode == "online":
+            return "Not Applicable"
+        else:
+            total_sessions=course_offering.attendance.count()
+            present_sessions = course_offering.attendance.filter(is_present='present').count()
+            return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
 
 def get_attendance_percentage_by_program_offering(program_offering,total_sessions,present_sessions):
     # Get all the courses associated with the program
-        total_sessions=total_sessions
-        present_sessions=present_sessions
-        courses = program_offering.program.course.all()
+        if program_offering.offering_mode == "online":
+            return "Not Applicable"
+        else:
+            total_sessions=total_sessions
+            present_sessions=present_sessions
+            courses = program_offering.program.course.all()
 
-        for course in courses:
-            course_offerings=course.course_offering.all()           
-            if course_offerings:                
-                for course_offering in course_offerings:
-                    total_sessions += course_offering.attendance.count()
-                    present_sessions += course_offering.attendance.filter(is_present='present').count()
+            for course in courses:
+                course_offerings=course.course_offering.all()           
+                if course_offerings:                
+                    for course_offering in course_offerings:
+                        total_sessions += course_offering.attendance.count()
+                        present_sessions += course_offering.attendance.filter(is_present='present').count()
 
-        return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+            return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
 
 def get_attendance_percentage_by_student(student):
     # Get all the courses associated with the program

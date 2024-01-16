@@ -10,7 +10,9 @@
             <h2 class="text-xl font-bold mb-2 border-l-2 border-y-2">Program Attendance Info</h2> |
           {% comment %} <div class='flex flex-row gap-4 flex-wrap '> {% endcomment %}
             
-            <p class="mb-2 ">Total Program : {{programs.count}}</p> 
+            <p class="mb-2 ">Total Active Program : {{active_programs_for_current_user|length}}</p> 
+            <p {% if inactive_programs_for_current_user|length > 0 %}class='text-red-400'{% endif %}>
+                Total Inactive Program : {{inactive_programs_for_current_user.count}}</p> 
             <p class="mb-2">Total Students Enrolled: {{students|length}}</p> 
             <p {% if total_students_at_risk_query_set|length > 0 %}class='text-red-400'{% endif %}>
                 All Students at Risk :{{ total_students_at_risk_query_set|length }}
@@ -40,17 +42,36 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for program in programs %}
+                        {% for program in offline_programs %}
                             <tr>
-                                <td class="py-2 px-4 border-b">{{ program.temp_id }} </td>
+                                <td class="py-2 px-4 border-b">{{ program.temp_id }} (Blended)</td>
                                 <td class="py-2 px-4 border-b">{{ program.name }}</td>
-                                <td class="py-2 px-4 border-b text-center">{{ program.calculate_total_no_of_student }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program.calculate_total_no_of_student_for_offline_program }}</td>
                                 <td class="py-2 px-4 border-b text-center">{{ program.calculate_attendance_percentage }}</td>
                                 <td class="py-2 px-4 border-b text-center">{{ program.calculate_no_at_risk_student_for_last_week|length }}</td>
                             </tr>
+
+                        {% endfor %}
+                        {% for program in online_programs %}
                             <tr>
-                                
+                                <td class="py-2 px-4 border-b">{{ program.temp_id }} (Online)</td>
+                                <td class="py-2 px-4 border-b">{{ program.name }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program.calculate_total_no_of_student_for_online_program }}</td>
+                                <td class="py-2 px-4 border-b text-center">Not Applicable</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program.calculate_no_at_risk_student_for_last_week|length }}</td>
                             </tr>
+
+                        {% endfor %}
+                        {% for program in inactive_programs_for_current_user %}
+                            <tr>
+                                <td class="py-2 px-4 border-b">{{ program.temp_id }} (inactive) </td>
+                                <td class="py-2 px-4 border-b">{{ program.name }}</td>
+                                <td class="py-2 px-4 border-b text-center">No Enrollment</td>
+                                <td class="py-2 px-4 border-b text-center">No Enrollment</td>
+                                <td class="py-2 px-4 border-b text-center">No Enrollment</td>
+                               
+                            </tr>
+                          
               
                         {% endfor %}
                     </tbody>
@@ -64,10 +85,17 @@
        {% comment %} {{program_offerings}} {% endcomment %}
        
         <div id="contentDivProgramDetail" class="overflow-x-auto hidden">
-       {% for program in programs  %}
+       {% for program in offline_programs  %}
 
             
-                <h1 class='flex  text-lg font-bold mt-3'> {{program.temp_id}}:{{program.name}} </h1>
+                <div class='flex flex-row gap-4 justify-between text-lg font-bold mt-3'> 
+                    <span class='text-lg font-bold '> {{program.temp_id}}:{{program.name}} (Blended)</span>
+                    <span class='flex flex-col gap-3 font-extralight text-sm text-black-200 px-2'>
+                        <span class=''>Enrolled Student :{{program.calculate_total_no_of_student_for_offline_program }},<span>
+                        <span>Attendance percentage :{{program.calculate_attendance_percentage }}%,<span>
+                        <span>At Risk Student :{{program.calculate_no_at_risk_student_for_last_week|length }}<span> 
+                    </span>
+                </div>
                 <table class="min-w-full bg-white border border-gray-300 shadow">
                     <thead>
                         <tr>
@@ -83,10 +111,51 @@
                             <tr>
                                 <td class="py-2 px-4 border-b pl-10">{{ course.temp_id }} </td>
                                 <td class="py-2 px-4 border-b pl-10">{{ course.name }}</td>
-                                <td class="py-2 px-4 border-b text-center">{{ course.calculate_total_no_of_student }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ course.calculate_total_no_of_student_for_offline_course }}</td>
                                 <td class="py-2 px-4 border-b text-center pr-10">{{ course.calculate_attendance_percentage }}%</td>
                                 <td class="py-2 px-4 border-b text-center">{{ course.calculate_no_at_risk_student_for_last_week |length}}</td>
                             </tr>
+              
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+       {% endfor %}
+       {% for program in online_programs  %}
+
+            
+            
+                <div class='flex flex-row gap-4 justify-between text-lg font-bold mt-3'> 
+                    <span class='text-lg font-bold '> {{program.temp_id}}:{{program.name}}(online) </span>
+                    <span class='flex flex-col gap-3 font-extralight text-sm text-black-200 px-2 '>
+                        <span class=''>Enrolled Student :{{program.calculate_total_no_of_student_for_online_program }},<span>
+                        <span>Attendance percentage :Not Applicable,<span>
+                        <span>At Risk Student :{{program.calculate_no_at_risk_student_for_last_week|length }}<span> 
+                    </span>
+                </div>
+                <table class="min-w-full bg-white border border-gray-300 shadow">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 border-b">Course Code</th>
+                            <th class="py-2 px-4 border-b ">Course Name</th>
+                            <th class="py-2 px-4 border-b">Enrolled Students</th>
+                            <th class="py-2 px-4 border-b">Attendance Percentage</th>
+                            <th class="py-2 px-4 border-b">At-Risk Students</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in program.course.all  %}
+                            {% if course.temp_id|default:""|slice:"-1:" == "D"  %}
+                            <tr>
+                                <td class="py-2 px-4 border-b pl-10">{{ course.temp_id }}  </td>
+                                <td class="py-2 px-4 border-b pl-10">{{ course.name }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ course.calculate_total_no_of_student_for_online_course }}</td>
+                                <td class="py-2 px-4 border-b text-center pr-10">{{course.calculate_attendance_percentage}}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ course.calculate_no_at_risk_student_for_last_week |length}}</td>
+                            </tr>
+                            
+                            {% endif %}
+                            
               
                         {% endfor %}
                     </tbody>

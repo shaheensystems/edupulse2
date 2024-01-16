@@ -117,8 +117,9 @@
               {% include 'components/dashboard/program_offering_info_bar.html' %}
             {% endwith %}
          {% endcomment %}
-         {{programs_for_current_user|length}}
-            {% with programs=programs_for_current_user students=students total_students_at_risk_query_set=total_students_at_risk_query_set %}
+         {% comment %} {{programs_for_current_user|length}}
+         {{active_programs_for_current_user|length}} {% endcomment %}
+            {% with active_programs_for_current_user=active_programs_for_current_user programs_for_current_user=programs_for_current_user online_programs=online_programs_for_current_user offline_programs=offline_programs_for_current_user  inactive_programs_for_current_user=inactive_programs_for_current_user students=students total_students_at_risk_query_set=total_students_at_risk_query_set %}
               {% include 'components/dashboard/programs_attendance_info.html' %}
             
             {% endwith %}
