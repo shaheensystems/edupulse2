@@ -7,7 +7,7 @@
               <h1>{{ course_offering.temp_id }} ({{course_offering.offering_mode| title}})<br>{{ course_offering.course.name }} </h1>
               <p> From {{ course_offering.start_date }} To {{ course_offering.end_date }}</p>
               {% comment %} <p> No of Courses : {{program.list_course_offerings}}</P> {% endcomment %}
-              <p> No of Courses : {{course_offering.list_course_offerings|length}}</P>
+    
                 <p >Total Students Enrolled (by model): {{course_offering.get_all_students.count}}</p>
               <p> No of Enrolled Students : {{course_offering.student.count}}</P>
             </div>

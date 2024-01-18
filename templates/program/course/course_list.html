@@ -9,7 +9,7 @@
          <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
           <h2 class="text-xl font-bold mb-2">Course List</h2>
           <div class='flex flex-row gap-4 flex-wrap '>
-            <p class="mb-2 ">Total Course: {{courses.count}}</p> |
+            <p class="mb-2 ">Total Course: {{courses.count}} (Blended :{{blended_courses_for_current_user|length}}, Online :{{online_courses_for_current_user|length}})</p> |
             <p class="mb-2">Total Students Enrolled: {{total_students|length}}</p> |
             {% if total_no_of_at_risk_student >  0 %}
                   <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student }}</p>
@@ -25,17 +25,31 @@
     <br>
    
     <ul class='flex flex-col gap-4 w-3/4'>
-      {% for course in courses %}
+      {% comment %} {% for course in courses %}
         {% with course=course %}
             {% include 'components/flash_card/course_FC.html' %}
         {% endwith %} 
-      {% comment %} <p>{{course.temp_id}}:{{course.name}}</p>
-        {% for course_offering in course.course_offering.all %}
-                    {% with course_offering=course_offering %}
-                        {% include 'components/flash_card/course_offering_FC.html' %}
-                    {% endwith %} 
-        {% endfor %} {% endcomment %}
+      {% endfor %} {% endcomment %}
+      <div>
+        <div class="text-xl font-bold mb-2"> Blended Course List</div>
+          <div class='flex gap-4 flex-col'>
+          {% for course in blended_courses_for_current_user %}
+        {% with course=course %}
+            {% include 'components/flash_card/course_FC.html' %}
+        {% endwith %} 
       {% endfor %}
+          </div>
+      </div>
+      <div>
+        <div class="text-xl font-bold mb-2"> Online Course List</div>
+           <div class='flex gap-4 flex-col'>
+          {% for course in online_courses_for_current_user %}
+        {% with course=course %}
+            {% include 'components/flash_card/course_FC.html' %}
+        {% endwith %} 
+      {% endfor %}
+        </div>
+      </div>
       </ul>
       
 </section>

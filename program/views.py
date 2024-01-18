@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offerings,get_no_of_at_risk_students_by_program_offerings
 
-from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,filter_data_based_on_date_range,default_start_and_end_date
+from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,filter_data_based_on_date_range,default_start_and_end_date,get_online_offline_courses
 # Create your views here.
 
 class CourseListView(LoginRequiredMixin,ListView):
@@ -31,9 +31,52 @@ class CourseListView(LoginRequiredMixin,ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        course_offerings=CourseOffering.objects.all()
-        courses=Course.objects.all()
-        total_students,at_risk_students=self.get_all_students_and_at_risk_students(courses)
+
+        default_start_date ,default_end_date=default_start_and_end_date()
+        start_date = default_start_date
+        end_date=default_end_date
+        user_data=filter_database_based_on_current_user(request_user=self.request.user,
+                                                        program_offerings=ProgramOffering.objects.all(),
+                                                        course_offerings=CourseOffering.objects.all(),
+                                                        programs=Program.objects.all(),
+                                                        courses=Course.objects.all(),
+                                                        students=Student.objects.all(),
+                                                        attendances=Attendance.objects.all()
+                                                        )
+        program_offerings_for_current_user=user_data['program_offerings_for_current_user']
+        course_offerings_for_current_user=user_data['course_offerings_for_current_user']
+        programs_for_current_user=user_data['programs_for_current_user']
+        courses_for_current_user=user_data['courses_for_current_user']
+        students=user_data['students']
+        attendances=user_data['attendances']
+        all_programs=user_data['all_programs']
+        
+        context.update(user_data)
+
+        filtered_data_by_date_range=filter_data_based_on_date_range(
+                                        start_date=start_date,
+                                        end_date=end_date,
+                                        programs_for_current_user=programs_for_current_user,
+                                        courses_for_current_user=courses_for_current_user,
+                                        program_offerings_for_current_user=program_offerings_for_current_user,
+                                        course_offerings_for_current_user=course_offerings_for_current_user,
+                                        attendances =attendances)
+            
+        program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
+        course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
+        programs_for_current_user=filtered_data_by_date_range['programs_for_current_user']
+        courses_for_current_user=filtered_data_by_date_range['courses_for_current_user']
+        active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
+        inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
+        attendances=filtered_data_by_date_range['attendances']
+        
+       
+        context.update(filtered_data_by_date_range)
+
+        online_and_offline_courses=get_online_offline_courses(courses_for_current_user=courses_for_current_user)
+        context.update(online_and_offline_courses)
+
+        total_students,at_risk_students=self.get_all_students_and_at_risk_students(courses_for_current_user)
         context['total_no_of_at_risk_student'] = at_risk_students
         # Add the total_students to the context
         context['total_students'] = total_students
@@ -45,7 +88,10 @@ class CourseDetailView(LoginRequiredMixin,DetailView):
     model=Course
     template_name='program/course/course_detail.html'
     context_object_name='course'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
+        return context
 
 
 class ProgramListView(LoginRequiredMixin,ListView):
@@ -114,10 +160,7 @@ class ProgramDetailView(LoginRequiredMixin,DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        program=context['program']
 
-
-       
         return context
 
 class ProgramOfferingListView(LoginRequiredMixin,ListView):

@@ -74,6 +74,24 @@ def get_online_offline_program(programs_for_current_user):
            'offline_programs_for_current_user':offline_programs_for_current_user
            }
 
+def get_online_offline_courses(courses_for_current_user):
+    if courses_for_current_user is not None:
+                        online_courses_for_current_user=courses_for_current_user.filter(
+                                        Q(temp_id__endswith="D")
+                                    )
+                        blended_courses_for_current_user=courses_for_current_user.exclude(
+                                    Q(temp_id__endswith="D")
+                        )
+    else:
+            online_courses_for_current_user=None      
+            blended_courses_for_current_user=None    
+
+    return {
+           'online_courses_for_current_user':online_courses_for_current_user,
+           'blended_courses_for_current_user':blended_courses_for_current_user
+           }
+
+
 def default_start_and_end_date():
     # default_start_date = datetime.now() - timedelta(days=365)  # One year ago
     default_start_date = datetime(datetime.now().year - 2, 1, 1).strftime('%Y-%m-%d')  # 1st Jan of lst year

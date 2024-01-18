@@ -105,18 +105,6 @@ class Course(BaseModel):
         return get_total_no_of_student_by_course(course=self,offering_mode=offering_mode)
     
     def calculate_total_no_of_student(self,offering_mode='all'):
-       
-        # # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
-        # course_offerings = self.course_offering.all()
-
-        # # Use a set to store unique students
-        # unique_students = set()
-
-        # for course_offering in course_offerings:
-        #     students_in_course = course_offering.student.all()
-        #     unique_students.update(students_in_course)
-
-        # return len(unique_students)
         return get_total_no_of_student_by_course(course=self,offering_mode=offering_mode)
 
     def __str__(self):
