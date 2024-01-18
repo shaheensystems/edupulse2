@@ -3,7 +3,7 @@
 {% block content %}
 
 <section class='my-2 w-full items-centerflex flex-col '>
-   {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
+  
             <!-- Course_offering_infobar -->
     
               <h1 class='text-center mt-4 text-xl mb-1'><strong>Program Detail</strong>  </h1>
@@ -24,9 +24,10 @@
               </div>
             
               <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
-                <p class="mb-2 ">Total Course: {{program.course.count}}</p> |
+                <p class="mb-2 ">Total Program Offerings: {{program.program_offerings.all|length}} (Blended: {{program.get_list_of_blended_program_offerings_for_selected_program.count}}, Online:{{program.get_list_of_online_program_offerings_for_selected_program.count}})</p> |
+                <p class="mb-2 ">Total Courses: {{program.course.count}} (Blended: {{program.get_list_of_blended_course_for_selected_program.count}}, Online:{{program.get_list_of_online_course_for_selected_program.count}})</p> |
                 <p class="mb-2">Total Students Enrolled: {{program.calculate_total_no_of_student}}</p> |
-                <p class="mb-2">Attendnace Percentage: {{program.calculate_attendance_percentage}} %</p> |
+                <p class="mb-2">Attendance Percentage: {{program.calculate_attendance_percentage}} %</p> |
                 {% if program.calculate_no_at_risk_student_for_last_week|length  >  0 %}
                 <p class='text-red-500'>Students at Risk: {{program.calculate_no_at_risk_student_for_last_week|length}}</p>
                 {% else  %}
@@ -34,51 +35,134 @@
                 {% endif %}
                 
               </div>
+             
               <!-- Add more course offering details -->
             </div>
             
-          {% comment %} </a> {% endcomment %}
-          <div class='flex flex-row flex-wrap gap-4'>
-            {% for program_offering in program.program_offerings.all%}
-            <a href="{% url 'program_offering_detail' program_offering.pk %}"> 
-              <p class='bg-blue-200 rounded-lg px-4 py-2'>
-                {{program_offering.temp_id}} ({{program_offering.offering_mode |title}})<br>{{program_offering.program.name}}
-              </p>
-            </a>
+        
+          {% comment %} <div class='flex flex-row flex-wrap gap-4 hidden'>
+            <h2 class='text-lg font-semibold '>All Program Offerings</h2>
+              <div class='flex flex-row flex-wrap gap-4'>
+              {% for program_offering in program.program_offerings.all%}
+              <a href="{% url 'program_offering_detail' program_offering.pk %}"> 
+                <p class='bg-blue-200 rounded-lg px-4 py-2'>
+                  {{program_offering.temp_id}} ({{program_offering.offering_mode |title}})<br>{{program_offering.program.name}}
+                </p>
+              </a>
+              
+              
+               {% endfor %}
+            </div>
             
+          </div> {% endcomment %}
+
+          <div class='flex flex-row gap-2 justify-between mx-10 items-start my-10 flex-wrap'>
             
-  {% endfor %}
+            <!-- Blended Program Offerings -->
+           
+            {% if program.get_list_of_blended_program_offerings_for_selected_program  %}
+            <div class=' flex items-center flex-col'>
+              <h2 class='text-lg font-semibold '>Blended Program Offerings</h2>
+                  <div class='flex flex-col flex-wrap gap-4'>
+                  {% for program_offering in program.get_list_of_blended_program_offerings_for_selected_program %} 
+                    <a href="{% url 'program_offering_detail' program_offering.pk %}"> 
+                      <p class='bg-blue-200 rounded-lg px-4 py-2'>{{ program_offering.temp_id }} :{{program_offering.program.name}}</p>
+                    </a>
+                  {% endfor %}
+
+                  </div>
+            </div>
+            {% endif %}
+          
+            <!-- Online Program Offerings -->
+        
+            {% if program.get_list_of_online_program_offerings_for_selected_program %}
+            <div class='justify-center items-center  flex flex-col'>
+              <h2 class='text-lg font-semibold'>Online Program Offerings</h2>
+                  <div class='flex flex-col flex-wrap gap-4'>
+                  {% for program_offering in program.get_list_of_online_program_offerings_for_selected_program %}
+                    <a href="{% url 'program_offering_detail' program_offering.pk %}"> 
+                      <p class='bg-blue-200 rounded-lg px-4 py-2'>{{ program_offering.temp_id }} :{{program_offering.program.name}}</p>
+                    </a>
+                  {% endfor %}
+
+                  </div>
+            </div>
+            {% endif %}
+            
           </div>
- 
-  {% for course in program.course.all %}
-        <section class='my-2 w-5/6 bg-gray-50 justify-end  items-start flex flex-col border-2 p-1 '>
+          {% comment %} <div class='flex flex-row gap-2 justify-between mx-10 items-start my-10 flex-wrap '>
+            
+            <!-- Blended Program Offerings -->
+     
+            <div class=' flex items-center flex-col'>
+              <h2 class='text-lg font-semibold '>Blended Program Offerings</h2>
+                  <div class='flex flex-col flex-wrap gap-4'>
+                  {% for program_offering in program.program_offerings.all %}
+                    {% if program_offering.offering_mode == 'blended' or program_offering.offering_mode == 'micro cred' %}
+                    <a href="{% url 'program_offering_detail' program_offering.pk %}"> 
+                      <p class='bg-blue-200 rounded-lg px-4 py-2'>{{ program_offering.temp_id }} :{{program_offering.program.name}}</p>
+                    </a>
+                    {% endif %}
+                  {% endfor %}
 
-          {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
-            <!-- Course_offering_infobar -->
-            <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
-              <h2 class="text-xl font-bold mb-2">{{course.temp_id}}<br>{{course.name}}</h2>
-              <div class='flex flex-row gap-4 flex-wrap '>
-                <p class="mb-2 ">Current Course: {{course.course_offering.count}}</p> |
-                <p class="mb-2">Total Students Enrolled: {{total_students}}</p> |
-                <p>Students at Risk: 10</p> 
-              </div>
-              <!-- Add more course offering details -->
+                  </div>
             </div>
             
-          {% comment %} </a> {% endcomment %}
-      
-       
-            <ul class='flex flex-col gap-4 w-3/4'>  
-              {% for course_offering in course.course_offering.all %}
-                          {% with course_offering=course_offering %}
-                              {% include 'components/flash_card/course_offering_FC.html' %}
-                          {% endwith %} 
-              {% endfor %}
-            </ul>
+          
+            <!-- Online Program Offerings -->
+          
+            <div class='justify-center items-center  flex flex-col'>
+              <h2 class='text-lg font-semibold'>Online Program Offerings</h2>
+                  <div class='flex flex-col flex-wrap gap-4'>
+                  {% for program_offering in program.program_offerings.all %}
+                    {% if program_offering.offering_mode == 'online' %}
+                    <a href="{% url 'program_offering_detail' program_offering.pk %}"> 
+                      <p class='bg-blue-200 rounded-lg px-4 py-2'>{{ program_offering.temp_id }} :{{program_offering.program.name}}</p>
+                    </a>
+                    {% endif %}
+                  {% endfor %}
 
- 
-    </section>
-  {% endfor %}
+                  </div>
+            </div>
+        
+            
+          </div> {% endcomment %}
+          <div class='text-lg font-semibold'>List of Courses </div>
+    
+          <section>
+          
+            
+            {% if program.get_list_of_blended_course_for_selected_program %}
+            <div class='mt-4 p-4 border-2 border-gray-300  rounded-lg'>
+              <h1 class='text-lg font-semibold pt-4'>Blended Courses </h1>
+              {% for course in program.get_list_of_blended_course_for_selected_program%}
+                {% with course=course %}
+                  {% include 'components/flash_card/course_FC.html' %}
+                {% endwith %} 
+              {{course.offering_mode_is_online}}
+                <br>
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if program.get_list_of_online_course_for_selected_program %}
+            <div class='mt-4 p-4 border-2 border-gray-300  rounded-lg'>
+              <h1 class='text-lg font-semibold pt-4'>Online Courses </h1>
+              {% for course in program.get_list_of_online_course_for_selected_program%}
+                {% with course=course %}
+                  {% include 'components/flash_card/course_FC.html' %}
+                {% endwith %} 
+              {{course.offering_mode_is_online}}
+                <br>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+          </section>
+
+
+
+  
 
 </section>
    

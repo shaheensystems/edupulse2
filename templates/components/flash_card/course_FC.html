@@ -11,7 +11,7 @@
              
               {% comment %} <p> No of Courses : {{program.list_course_offerings}}</P> {% endcomment %}
               <p >Total Students Enrolled (by model): {{course.calculate_total_no_of_student}}</p>
-              <p> No of Courses : {{course.course_offering.all|length}}</P>
+              <p> Course Offerings : {{course.course_offering.all|length}}</P>
               <div class='flex flex-row  gap-4 flex-wrap'>
                 {% for course_offering in course.course_offering.all %}
                   <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{course_offering.temp_id}} 

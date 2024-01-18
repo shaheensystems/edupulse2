@@ -76,8 +76,11 @@ def get_online_offline_program(programs_for_current_user):
 
 def default_start_and_end_date():
     # default_start_date = datetime.now() - timedelta(days=365)  # One year ago
-    default_start_date = datetime(datetime.now().year - 1, 1, 1).strftime('%Y-%m-%d')  # 1st Jan of lst year
-    default_end_date=datetime.now().strftime('%Y-%m-%d')
+    default_start_date = datetime(datetime.now().year - 2, 1, 1).strftime('%Y-%m-%d')  # 1st Jan of lst year
+    # default_end_date=datetime.now().strftime('%Y-%m-%d')
+    default_end_date=datetime(datetime.now().year,12,31).strftime('%Y-%m-%d')
+    # default_end_date = datetime(2024, 3, 31).strftime('%Y-%m-%d')
+
     return default_start_date,default_end_date
 
 def filter_data_based_on_date_range(start_date,end_date,programs_for_current_user,courses_for_current_user,program_offerings_for_current_user,course_offerings_for_current_user,attendances):
@@ -99,8 +102,8 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
         if programs_for_current_user is not None:
 
             active_programs = programs_for_current_user.filter(
-                                                            Q(program_offerings__start_date__gte=start_date) &
-                                                            Q(program_offerings__end_date__lte=end_date)
+                                                            Q(program_offerings__start_date__gte=start_date) 
+                                                            & Q(program_offerings__end_date__lte=end_date)
                                                         ).distinct()
             # Get the inactive programs (programs that do not match the date criteria)
             inactive_programs = programs_for_current_user.exclude(id__in=active_programs.values_list('id', flat=True))
@@ -115,8 +118,8 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
 
         if courses_for_current_user is not None:
             courses_for_current_user = courses_for_current_user.filter(
-                                                            Q(course_offering__start_date__gte=start_date) &
-                                                            Q(course_offering__end_date__lte=end_date)
+                                                            Q(course_offering__start_date__gte=start_date) 
+                                                            & Q(course_offering__end_date__lte=end_date)
                                                         ).distinct()
         
         
@@ -134,4 +137,6 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
         'active_programs_for_current_user': active_programs_for_current_user,
         'inactive_programs_for_current_user': inactive_programs_for_current_user,
         'attendances': attendances,
+        'start_date':start_date,
+        'end_date':end_date,
     }

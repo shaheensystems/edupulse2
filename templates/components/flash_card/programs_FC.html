@@ -10,25 +10,72 @@
                 <br>{{ program.name }} </h1>
              
               {% comment %} <p> No of Courses : {{program.list_course_offerings}}</P> {% endcomment %}
-              <p >Total Students Enrolled (by model): {{program.get_all_students.count}}</p>
-              <p> No of Courses : {{program.course.all|length}}</P>
+                
+              <p >Total Students Enrolled : 
+                {% if offering_mode == "offline" %}
+                {{program.calculate_total_no_of_student_for_offline_program }}
+                {% endif %}
+                {% if offering_mode == "online" %}
+                {{program.calculate_total_no_of_student_for_online_program }}
+                {% endif %}
+                {% if offering_mode == "all" %}
+                {{program.calculate_total_no_of_student }}
+                {% endif %}
+              
+              </p>
+              <br>
+              <p> Active Program Offering  : {{program.program_offerings.all|length}}</P>
+                <div class='flex flex-row  gap-4 flex-wrap'>
+                  {% for program_offering in program.program_offerings.all %}
+  
+                  {% if offering_mode == "all"   %}
+                    <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{program_offering.temp_id}} </p>
+                  {% endif %}
+                 
+                  {% if program_offering.temp_id|default:""|slice:"-1:" == "D" and offering_mode == 'online' %}
+                    <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{program_offering.temp_id}} </p>
+                  {% endif %}
+                    
+                  {% if program_offering.temp_id|default:""|slice:"-1:" != "D" and offering_mode == 'offline' %}
+                    <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{program_offering.temp_id}} </p>
+                  {% endif %}
+            
+                  {% endfor %}
+                </div>
+              <br>
+              <p> Courses assign to Programs : {{program.course.all|length}}</P>
               <div class='flex flex-row  gap-4 flex-wrap'>
                 {% for course in program.course.all %}
-                  <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{course.temp_id}} 
-                    {% comment %} {{course.name}} {% endcomment %}
-                  </p>
+
+                {% if offering_mode == "all"   %}
+                  <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{course.temp_id}} </p>
+                {% endif %}
+               
+                {% if course.temp_id|default:""|slice:"-1:" == "D" and offering_mode == 'online' %}
+                  <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{course.temp_id}} </p>
+                {% endif %}
+                  
+                {% if course.temp_id|default:""|slice:"-1:" != "D" and offering_mode == 'offline' %}
+                  <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{course.temp_id}} </p>
+                {% endif %}
+          
                 {% endfor %}
               </div>
+              <br>
+            
+              
             </div>
             <div class='px-4 py-2 m-2 rounded-lg w-1/3'>
-              
-              {% if program_offering.calculate_attendance_percentage < 60  %}
-              <h1 class="text-red-500">Attendance Status: {{program.calculate_attendance_percentage}}%</h1>
+
+              {% if offering_mode == "offline"  %}
+              <h1 class='{% if program.calculate_attendance_percentage < 60  %} text-red-500 {% else %} text-gray-400   {% endif %} '>
+                Attendance Status: {{program.calculate_attendance_percentage}}%
+              </h1>
               {% else %}
-              <h1 class="text-gray-300}">Attendance Status: {{program.calculate_attendance_percentage}}%</h1>
-              {% endif %} 
-             
-             
+                Attendance Status: Not Applicable
+              {% endif %}
+
+ 
               {% if program_offering.calculate_no_at_risk_student_for_last_week|length >  0 %}
               <p class='text-red-500'> Studnets at risk : {{program.calculate_no_at_risk_student_for_last_week |length}}</p>
             {% else  %}

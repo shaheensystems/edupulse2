@@ -10,9 +10,9 @@
          <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
           <h2 class="text-xl font-bold mb-2">Program List</h2>
           <div class='flex flex-row gap-4 flex-wrap  '>
-            <p class="mb-2 ">Current Program : {{programs.count}}</p> |
-            <p class="mb-2 ">Active Program : {{programs.count}}</p> |
-            <p class="mb-2 ">Inactive Program : {{programs.count}}</p> |
+            <p class="mb-2 ">Current Program : {{all_programs|length}}</p> |
+            <p class="mb-2 ">Active Program : {{active_programs_for_current_user|length}}</p> |
+            <p class="mb-2 ">Inactive Program : {{inactive_programs_for_current_user|length}}</p> |
             <p class="mb-2">Total Students Enrolled by context : {{students|length}}</p> |
             {% if total_no_of_at_risk_student|length >  0 %}
                 <p class='text-red-500 '>
@@ -31,14 +31,40 @@
       {% comment %} </a> {% endcomment %}
   </section>
     <br>
+    <div class='flex w-full bg-gray-200 mb-2 px-4 py-2'>Active Program </div>
+    <div class='flex w-3/4 bg-green-200 mb-2 px-4 py-2'>Blended Program ({{offline_programs_for_current_user|length}})</div>
     <ul class='flex flex-col gap-4 w-3/4'>
-      {% for program in programs %}      
-                    {% with program=program %}
+      
+      {% for program in offline_programs_for_current_user %}      
+                    {% with program=program offering_mode='offline'  %}
                         {% include 'components/flash_card/programs_FC.html' %}
                     {% endwith %} 
         {% endfor %}
      
       </ul>
+      <div class='flex w-3/4 bg-blue-200 mb-2 mt-2 px-4 py-2'>Online Program ({{online_programs_for_current_user|length}})</div>
+    <ul class='flex flex-col gap-4 w-3/4'>
+      
+      {% for program in online_programs_for_current_user %}      
+                    {% with program=program offering_mode='online'  %}
+                        {% include 'components/flash_card/programs_FC.html' %}
+                    {% endwith %} 
+        {% endfor %}
+     
+      </ul>
+
+      <div class='flex w-full bg-gray-200 mb-2 mt-2 px-4 py-2'>Inactive Program ({{inactive_programs_for_current_user|length}})</div>
+      <ul class='flex flex-col gap-4 w-3/4'>
+     
+        {% for program in inactive_programs_for_current_user %} 
+        <div class='{% if program.program_offerings.all|length > 0 %} text-red-500 text-sm {% else %} hidden {% endif %}'>program_offering total count is :{{program.program_offerings.all|length}} exits for the selected date creteria  </div>     
+                      {% with program=program offering_mode='all'  %}
+                          {% include 'components/flash_card/programs_FC.html' %}
+                      {% endwith %} 
+                   
+          {% endfor %}
+       
+        </ul>
    
 </section>
 

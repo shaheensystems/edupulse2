@@ -191,6 +191,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
             inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
             attendances=filtered_data_by_date_range['attendances']
+            context.update(filtered_data_by_date_range)
                
         context['date_filter_form']=date_filter_form
 
@@ -221,10 +222,10 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
         # # print("chart data programs and student:",get_chart_data_programs_student_enrollment(programs=programs_for_current_user))
         # print("chart data offering type student enrollment :",get_chart_data_offering_type_student_enrollment(course_offerings=course_offerings_for_current_user))
-
+        print(start_date,":",end_date)
         chart_data_student_enrollment_by_campus,chart_data_staff_enrollment_by_campus=get_chart_data_student_and_Staff_by_campus()
-        context['start_date']=start_date
-        context['end_date']=end_date
+        # context['start_date']=start_date
+        # context['end_date']=end_date
         context['chart_data_campus_enrollment_student'] = chart_data_student_enrollment_by_campus
         context['chart_data_campus_enrollment_staff'] = chart_data_staff_enrollment_by_campus
         context['chart_data_offering_mode_enrollment_students']=get_chart_data_offering_type_student_enrollment(course_offerings=course_offerings_for_current_user)

@@ -3,6 +3,7 @@ from base.models import BaseModel
 from customUser.models import Student, Staff
 from datetime import timedelta, datetime
 from django.utils import timezone
+from django.db.models import Q
 
 from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering
 
@@ -30,22 +31,36 @@ class Program(BaseModel):
     total_credit=models.PositiveIntegerField(null=True,blank=True)
     duration_in_week=models.PositiveIntegerField(null=True,blank=True)
     
+    def get_list_of_online_course_for_selected_program(self):
+        # return self.course.filter(offering_mode_is_online=True)
+        list_of_online_course_for_selected_program=self.course.all().filter(temp_id__endswith = "D")
+        return list_of_online_course_for_selected_program
+
+    def get_list_of_blended_course_for_selected_program(self):
+        list_of_offline_course_for_selected_program=self.course.all().exclude(temp_id__endswith = "D")
+        return list_of_offline_course_for_selected_program
+   
+    
+    def get_list_of_online_program_offerings_for_selected_program(self):
+        list_of_online_program_offerings_for_selected_program = self.program_offerings.filter(offering_mode="online")
+        return list_of_online_program_offerings_for_selected_program
+
+    def get_list_of_blended_program_offerings_for_selected_program(self):
+        list_of_blended_program_offerings_for_selected_program = self.program_offerings.filter(
+            Q(offering_mode="blended") | Q(offering_mode="micro cred")
+        )
+        return list_of_blended_program_offerings_for_selected_program
+
+
+    # attendance percentage is only for blended/offline program, inactive and online program doesn't have attendance
     def calculate_attendance_percentage(self):
         return get_attendance_percentage_by_program(program=self,total_sessions=0,present_sessions=0)
   
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_program(program=self)
     
-    def calculate_total_no_of_student(self,offering_mode='all'):
-        # # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
-        # program_offerings = self.program_offerings.all()
-     
-        # unique_students = set()
-        # for program_offering in program_offerings:
-        #     students_in_program = program_offering.student.all()
-        #     unique_students.update(students_in_program)
 
-        # return len(unique_students)
+    def calculate_total_no_of_student(self,offering_mode='all'):
         return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
 
     def calculate_total_no_of_student_for_online_program(self,offering_mode="online"):
@@ -55,7 +70,9 @@ class Program(BaseModel):
     def calculate_total_no_of_student_for_offline_program(self,offering_mode="offline"):
 
         return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
-    
+   
+
+
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
 
@@ -68,6 +85,12 @@ class Course(BaseModel):
     duration_in_week=models.PositiveIntegerField(null=True,blank=True)
     program = models.ManyToManyField(Program, blank=True, related_name='course')
     course_efts=models.FloatField(null=True,blank=True)
+
+    def get_offering_mode_is_online(self):
+        if self.temp_id and self.temp_id[-1]=="D":
+            return True
+        else:
+            return False
 
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_course(course=self)

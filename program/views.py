@@ -1,3 +1,4 @@
+from typing import Any
 from django.shortcuts import render
 from django.db.models import Count,Q
 from customUser.models import Staff,Student
@@ -9,7 +10,8 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offerings,get_no_of_at_risk_students_by_program_offerings
-from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program
+
+from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,filter_data_based_on_date_range,default_start_and_end_date
 # Create your views here.
 
 class CourseListView(LoginRequiredMixin,ListView):
@@ -52,7 +54,9 @@ class ProgramListView(LoginRequiredMixin,ListView):
     context_object_name='programs'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        default_start_date ,default_end_date=default_start_and_end_date()
+        start_date = default_start_date
+        end_date=default_end_date
         user_data=filter_database_based_on_current_user(request_user=self.request.user,
                                                         program_offerings=ProgramOffering.objects.all(),
                                                         course_offerings=CourseOffering.objects.all(),
@@ -71,26 +75,50 @@ class ProgramListView(LoginRequiredMixin,ListView):
         
         context.update(user_data)
 
-        # program_offerings=ProgramOffering.objects.all()
-        # programs=Program.objects.all()
-        # total_students=0
-        # for programs in programs:
-        #     total_students+=programs.calculate_total_no_of_student()
-        # # Calculate total number of students across all program offerings
+        filtered_data_by_date_range=filter_data_based_on_date_range(
+                                        start_date=start_date,
+                                        end_date=end_date,
+                                        programs_for_current_user=programs_for_current_user,
+                                        courses_for_current_user=courses_for_current_user,
+                                        program_offerings_for_current_user=program_offerings_for_current_user,
+                                        course_offerings_for_current_user=course_offerings_for_current_user,
+                                        attendances =attendances)
+            
+        program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
+        course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
+        programs_for_current_user=filtered_data_by_date_range['programs_for_current_user']
+        courses_for_current_user=filtered_data_by_date_range['courses_for_current_user']
+        active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
+        inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
+        attendances=filtered_data_by_date_range['attendances']
+        
+       
+        context.update(filtered_data_by_date_range)
+        
         # calculated online and offline program after all filter, search and query
         online_and_offline_programs=get_online_offline_program(programs_for_current_user=programs_for_current_user)
         context.update(online_and_offline_programs)
-        
+
         context['total_no_of_at_risk_student'] = get_no_of_at_risk_students_by_program_offerings(program_offerings_for_current_user)
         # Add the total_students to the context
-       
-
+        context['start_date']=start_date
+        context['end_date']=end_date
+        print(start_date,":",end_date)
         return context
 
 class ProgramDetailView(LoginRequiredMixin,DetailView):
     model=Program
     template_name='program/program/program_detail.html'
     context_object_name='program'
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        program=context['program']
+
+
+       
+        return context
 
 class ProgramOfferingListView(LoginRequiredMixin,ListView):
     model=ProgramOffering
