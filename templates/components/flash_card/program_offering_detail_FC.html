@@ -1,0 +1,48 @@
+{% block content %}
+
+<section class='my-2 w-5/6 bg-gray-50 justify-end  items-start flex flex-col border-2 p-1 '>
+
+  {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
+    <!-- Course_offering_infobar -->
+    <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+      <h2 class="text-xl font-bold mb-2">{{course.temp_id}} ({{course.get_offering_mode_is_online}})<br>{{course.name}}</h2>
+      <div class='flex flex-row gap-4 flex-wrap '>
+        <p class="mb-2 ">Total Course offerings : {{course.course_offering.count}}</p> |
+        <p class="mb-2">Total Students Enrolled: 
+          {% if course.get_offering_mode_is_online %}
+          {{course.calculate_total_no_of_student_for_online_course}}</p> |
+          {% else %}
+          {{course.calculate_total_no_of_student_for_offline_course}}</p> |
+          {% endif %}
+          
+        <p>Students at Risk: 10</p> 
+      </div>
+      <!-- Add more course offering details -->
+    </div>
+    
+  {% comment %} </a> {% endcomment %}
+
+
+    <ul class='flex flex-col gap-4 w-3/4'>  
+      {% for course_offering in course.course_offering.all %}
+      {% if  course_offering.offering_mode == "online" %}
+        {% if not course.get_offering_mode_is_online  %}
+        <div class='text-red-300'>Correct course or Course offering, offering mode is incorrect</div>
+        {% endif %}
+      {% else %}
+      {% if course.get_offering_mode_is_online %}
+
+      <div class='text-red-300'>Correct course or Course offering, offering mode is incorrect</div>
+        {% endif %}
+      
+    {% endif %}
+                  {% with course_offering=course_offering %}
+                      {% include 'components/flash_card/course_offering_FC.html' %}
+                  {% endwith %} 
+      {% endfor %}
+    </ul>
+
+
+</section>
+
+{% endblock content %}

@@ -90,6 +90,39 @@ def get_online_offline_courses(courses_for_current_user):
            'online_courses_for_current_user':online_courses_for_current_user,
            'blended_courses_for_current_user':blended_courses_for_current_user
            }
+def get_online_offline_program_offerings(program_offerings_for_current_user):
+    if program_offerings_for_current_user is not None:
+                        online_program_offerings_for_current_user=program_offerings_for_current_user.filter(
+                                        Q(offering_mode="online")
+                                    )
+                        blended_program_offerings_for_current_user=program_offerings_for_current_user.exclude(
+                                     Q(offering_mode="online")
+                        )
+    else:
+            online_program_offerings_for_current_user=None      
+            blended_program_offerings_for_current_user=None    
+
+    return {
+           'online_program_offerings_for_current_user':online_program_offerings_for_current_user,
+           'blended_program_offerings_for_current_user':blended_program_offerings_for_current_user
+           }
+
+def get_online_offline_course_offerings(course_offerings_for_current_user):
+    if course_offerings_for_current_user is not None:
+                        online_course_offerings_for_current_user=course_offerings_for_current_user.filter(
+                                        Q(offering_mode="online")
+                                    )
+                        blended_course_offerings_for_current_user=course_offerings_for_current_user.exclude(
+                                     Q(offering_mode="online")
+                        )
+    else:
+            online_course_offerings_for_current_user=None      
+            blended_program_offerings_for_current_user=None    
+
+    return {
+           'online_course_offerings_for_current_user':online_course_offerings_for_current_user,
+           'blended_course_offerings_for_current_user':blended_course_offerings_for_current_user
+           }
 
 
 def default_start_and_end_date():

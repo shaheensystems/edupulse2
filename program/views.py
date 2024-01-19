@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offerings,get_no_of_at_risk_students_by_program_offerings
 
-from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,filter_data_based_on_date_range,default_start_and_end_date,get_online_offline_courses
+from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,filter_data_based_on_date_range,default_start_and_end_date,get_online_offline_courses,get_online_offline_program_offerings,get_online_offline_course_offerings
 # Create your views here.
 
 class CourseListView(LoginRequiredMixin,ListView):
@@ -168,31 +168,31 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
     template_name='program/program/program_offering_list.html'
     context_object_name='program_offerings'
  
-    def get_queryset(self):
-        user = self.request.user
-        # print("user group :",user.groups.all())
-        # Check if the user is an admin
-        if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
-            # print("condition matched admin")
-            return ProgramOffering.objects.all()
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     # print("user group :",user.groups.all())
+    #     # Check if the user is an admin
+    #     if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
+    #         # print("condition matched admin")
+    #         return ProgramOffering.objects.all()
 
-        # Check if the user is a teacher
-        elif user.groups.filter(name='Teacher').exists():
-            # print("condition matched for teacher")
-            # return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
-            # Teacher has no access for program 
-            # return ProgramOffering.objects.filter(program__course__course_offering__staff=user)
-            return ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
+    #     # Check if the user is a teacher
+    #     elif user.groups.filter(name='Teacher').exists():
+    #         # print("condition matched for teacher")
+    #         # return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
+    #         # Teacher has no access for program 
+    #         # return ProgramOffering.objects.filter(program__course__course_offering__staff=user)
+    #         return ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
 
-        elif user.groups.filter(name='Program_Leader').exists():
-            # return ProgramOffering.objects.none()
-            return ProgramOffering.objects.filter(program_leader__staff=user)  
+    #     elif user.groups.filter(name='Program_Leader').exists():
+    #         # return ProgramOffering.objects.none()
+    #         return ProgramOffering.objects.filter(program_leader__staff=user)  
         
-        elif user.groups.filter(name='Student').exists():
-            return ProgramOffering.objects.none()
-        # For other user groups (e.g., students), return an empty queryset
-        else:
-            return ProgramOffering.objects.none()
+    #     elif user.groups.filter(name='Student').exists():
+    #         return ProgramOffering.objects.none()
+    #     # For other user groups (e.g., students), return an empty queryset
+    #     else:
+    #         return ProgramOffering.objects.none()
 
     def get_all_students(self, program_offerings):
         unique_students = set()
@@ -204,16 +204,69 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # send filtred data according to user group 
-        program_offerings = context['program_offerings']
+       
+        default_start_date ,default_end_date=default_start_and_end_date()
+        start_date = default_start_date
+        end_date=default_end_date
+        user_data=filter_database_based_on_current_user(request_user=self.request.user,
+                                                        program_offerings=ProgramOffering.objects.all(),
+                                                        course_offerings=CourseOffering.objects.all(),
+                                                        programs=Program.objects.all(),
+                                                        courses=Course.objects.all(),
+                                                        students=Student.objects.all(),
+                                                        attendances=Attendance.objects.all()
+                                                        )
+        program_offerings_for_current_user=user_data['program_offerings_for_current_user']
+        course_offerings_for_current_user=user_data['course_offerings_for_current_user']
+        programs_for_current_user=user_data['programs_for_current_user']
+        courses_for_current_user=user_data['courses_for_current_user']
+        students=user_data['students']
+        attendances=user_data['attendances']
+        all_programs=user_data['all_programs']
         
+        context.update(user_data)
+        filtered_data_by_date_range=filter_data_based_on_date_range(
+                                        start_date=start_date,
+                                        end_date=end_date,
+                                        programs_for_current_user=programs_for_current_user,
+                                        courses_for_current_user=courses_for_current_user,
+                                        program_offerings_for_current_user=program_offerings_for_current_user,
+                                        course_offerings_for_current_user=course_offerings_for_current_user,
+                                        attendances =attendances)
+            
+        program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
+        course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
+        programs_for_current_user=filtered_data_by_date_range['programs_for_current_user']
+        courses_for_current_user=filtered_data_by_date_range['courses_for_current_user']
+        active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
+        inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
+        attendances=filtered_data_by_date_range['attendances']
+        
+        
+        online_and_offline_program_offerings_by_current_user = get_online_offline_program_offerings(program_offerings_for_current_user=program_offerings_for_current_user)
+        
+        context.update(online_and_offline_program_offerings_by_current_user)
+        online_program_offerings_for_current_user=online_and_offline_program_offerings_by_current_user['online_program_offerings_for_current_user']
+        blended_program_offerings_for_current_user=online_and_offline_program_offerings_by_current_user['blended_program_offerings_for_current_user']
+        
+        # print(program_offerings_for_current_user)
+        # print("online",online_and_offline_program_offerings_by_current_user['online_program_offerings_for_current_user'])
+        # print("blended",online_and_offline_program_offerings_by_current_user)
+        context.update(filtered_data_by_date_range)
         # Calculate total number of students across all program offerings
-        total_students = self.get_all_students(program_offerings)
+        total_students_for_all_program_offerings_for_current_user = self.get_all_students(program_offerings=program_offerings_for_current_user)
+        total_students_for_online_program_offerings_for_current_user = self.get_all_students(program_offerings=online_program_offerings_for_current_user)
+        total_students_for_blended_program_offerings_for_current_user = self.get_all_students(program_offerings=blended_program_offerings_for_current_user)
 
         # Add the total_students to the context
-        context['total_students'] = len(total_students)   
-        context['total_no_of_at_risk_student'] = get_no_of_at_risk_students_by_program_offerings(program_offerings)
-        context['current_user'] = self.request.user
+        context['total_students_for_all_program_offerings_for_current_user'] = len(total_students_for_all_program_offerings_for_current_user)   
+        context['total_students_for_online_program_offerings_for_current_user'] = len(total_students_for_online_program_offerings_for_current_user)   
+        context['total_students_for_blended_program_offerings_for_current_user'] = len(total_students_for_blended_program_offerings_for_current_user)   
+        
+        context['total_no_of_at_risk_student_by_all_program_offering_for_current_user'] = get_no_of_at_risk_students_by_program_offerings(program_offerings=program_offerings_for_current_user)
+        context['total_no_of_at_risk_student_by_online_program_offering_for_current_user'] = get_no_of_at_risk_students_by_program_offerings(program_offerings=online_program_offerings_for_current_user)
+        context['total_no_of_at_risk_student_by_blended_program_offering_for_current_user'] = get_no_of_at_risk_students_by_program_offerings(program_offerings=blended_program_offerings_for_current_user)
+
 
         return context
 
@@ -225,17 +278,17 @@ class ProgramOfferingDetailView(LoginRequiredMixin,DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
        
-        # Assuming 'performance' is a field in the WeeklyReport model
-        courses = self.object.program.course.all()  # Adjust the related name accordingly
-        course_offering_count=0
-        for course in courses:
+        # # Assuming 'performance' is a field in the WeeklyReport model
+        # courses = self.object.program.course.all()  # Adjust the related name accordingly
+        # course_offering_count=0
+        # for course in courses:
             
-            for course_offering in course.course_offering.all():
-                course_offering_count+=1
+        #     for course_offering in course.course_offering.all():
+        #         course_offering_count+=1
               
 
-        # context['poor_performance_data'] = poor_performance_data
-        context['total_course_offering_count']=course_offering_count
+        # # context['poor_performance_data'] = poor_performance_data
+        # context['total_course_offering_count']=course_offering_count
    
         return context
 
@@ -245,28 +298,28 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
     context_object_name='course_offerings'
     
     # print("initialise Course Offering view :")
-    def get_queryset(self):
-        user = self.request.user
-        # print("user group :",user.groups.all())
-        # Check if the user is an admin
-        if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
-            # print("condition matched admin")
-            return CourseOffering.objects.all()
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     # print("user group :",user.groups.all())
+    #     # Check if the user is an admin
+    #     if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
+    #         # print("condition matched admin")
+    #         return CourseOffering.objects.all()
 
-        # Check if the user is a teacher
-        elif user.groups.filter(name='Teacher').exists():
-            # print("condition matched for teacher")
-            # Assuming there is a ForeignKey from CourseOffering to Teacher model
-            # only course offering where teacher is equal to current user
-            return CourseOffering.objects.filter(teacher__staff=user)
-        elif user.groups.filter(name='Program_Leader').exists():
+    #     # Check if the user is a teacher
+    #     elif user.groups.filter(name='Teacher').exists():
+    #         # print("condition matched for teacher")
+    #         # Assuming there is a ForeignKey from CourseOffering to Teacher model
+    #         # only course offering where teacher is equal to current user
+    #         return CourseOffering.objects.filter(teacher__staff=user)
+    #     elif user.groups.filter(name='Program_Leader').exists():
 
-            return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
+    #         return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
         
-        elif user.groups.filter(name='Student').exists():
-            return CourseOffering.objects.none()
-        # For other user groups (e.g., students), return an empty queryset
-        return CourseOffering.objects.none()
+    #     elif user.groups.filter(name='Student').exists():
+    #         return CourseOffering.objects.none()
+    #     # For other user groups (e.g., students), return an empty queryset
+    #     return CourseOffering.objects.none()
     
     
  
@@ -280,17 +333,65 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # send filtred data according to user group 
-        course_offerings = context['course_offerings']
+
+        default_start_date ,default_end_date=default_start_and_end_date()
+        start_date = default_start_date
+        end_date=default_end_date
+        user_data=filter_database_based_on_current_user(request_user=self.request.user,
+                                                        program_offerings=ProgramOffering.objects.all(),
+                                                        course_offerings=CourseOffering.objects.all(),
+                                                        programs=Program.objects.all(),
+                                                        courses=Course.objects.all(),
+                                                        students=Student.objects.all(),
+                                                        attendances=Attendance.objects.all()
+                                                        )
+        program_offerings_for_current_user=user_data['program_offerings_for_current_user']
+        course_offerings_for_current_user=user_data['course_offerings_for_current_user']
+        programs_for_current_user=user_data['programs_for_current_user']
+        courses_for_current_user=user_data['courses_for_current_user']
+        students=user_data['students']
+        attendances=user_data['attendances']
+        all_programs=user_data['all_programs']
+        
+        context.update(user_data)
+        filtered_data_by_date_range=filter_data_based_on_date_range(
+                                        start_date=start_date,
+                                        end_date=end_date,
+                                        programs_for_current_user=programs_for_current_user,
+                                        courses_for_current_user=courses_for_current_user,
+                                        program_offerings_for_current_user=program_offerings_for_current_user,
+                                        course_offerings_for_current_user=course_offerings_for_current_user,
+                                        attendances =attendances)
+            
+        program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
+        course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
+        programs_for_current_user=filtered_data_by_date_range['programs_for_current_user']
+        courses_for_current_user=filtered_data_by_date_range['courses_for_current_user']
+        active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
+        inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
+        attendances=filtered_data_by_date_range['attendances']
+
+        online_and_offline_course_offerings_by_current_user = get_online_offline_course_offerings(course_offerings_for_current_user=course_offerings_for_current_user)
+        
+        context.update(online_and_offline_course_offerings_by_current_user)
+        online_course_offerings_for_current_user=online_and_offline_course_offerings_by_current_user['online_course_offerings_for_current_user']
+        blended_course_offerings_for_current_user=online_and_offline_course_offerings_by_current_user['blended_course_offerings_for_current_user']
+       
+    
+    
         
         # Calculate total number of students across all program offerings
-        total_students = self.get_all_students(course_offerings)
-        total_no_of_at_risk_student=get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings)
+        # total_students = self.get_all_students(course_offerings_for_current_user)
+        
+        total_no_of_at_risk_student=get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings_for_current_user)
 
         # Add the total_students to the context
-        context['total_students'] = len(total_students)
-        context['total_no_of_at_risk_student'] = len(total_no_of_at_risk_student)
-
+        context['total_students_for_all_course_offerings_for_current_user'] = self.get_all_students(course_offerings=course_offerings_for_current_user)
+        context['total_students_for_online_course_offerings_for_current_user'] = self.get_all_students(course_offerings=online_course_offerings_for_current_user)
+        context['total_students_for_blended_course_offerings_for_current_user'] = self.get_all_students(course_offerings=blended_course_offerings_for_current_user)
+        context['total_no_of_at_risk_student_for_all_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings_for_current_user)
+        context['total_no_of_at_risk_student_for_online_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=online_course_offerings_for_current_user)
+        context['total_no_of_at_risk_student_for_blended_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=blended_course_offerings_for_current_user)
         return context
 
 class CourseOfferingDetailView(LoginRequiredMixin,DetailView):

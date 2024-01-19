@@ -11,16 +11,18 @@
              <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
               <h2 class="text-xl font-bold mb-2">Program Offerings Details</h2>
               <div class='flex flex-row gap-4 flex-wrap  '>
-                <p class="mb-2 ">Current Program : {{program_offerings.count}}</p> |
-                <p class="mb-2">Total Students Enrolled by context : {{total_students}}</p> |
-                {% if total_no_of_at_risk_student|length >  0 %}
+                <p class="mb-2 ">Total Program Offerings : {{ program_offerings_for_current_user|length}} (Blended :{{blended_program_offerings_for_current_user|length}}, Online :{{online_program_offerings_for_current_user |length}})</p> |
+                <p class="mb-2">Total Students Enrolled : {{total_students_for_all_program_offerings_for_current_user}} (Blended :{{total_students_for_blended_program_offerings_for_current_user}}, Online :{{total_students_for_online_program_offerings_for_current_user }})</p> |
+                {% if total_no_of_at_risk_student_by_all_program_offering_for_current_user|length >  0 %}
                     <p class='text-red-500 '>
                       <a href="{% url 'all-students-at-risk' %}" class='text-red-500'>
-                        Students at Risk: {{ total_no_of_at_risk_student|length }}
+                        Students at Risk: {{ total_no_of_at_risk_student_by_all_program_offering_for_current_user|length }} (Blended :{{total_no_of_at_risk_student_by_blended_program_offering_for_current_user|length}}, Online :{{total_no_of_at_risk_student_by_online_program_offering_for_current_user |length}})
                       </a>
                       </p>
                   {% else  %}
-                  <p>Students at Risk: {{total_no_of_at_risk_student|length}}</p>
+                  <p>Students at Risk: {{total_no_of_at_risk_student_by_all_program_offering_for_current_user|length}} 
+                    {% comment %} (Blended :{{total_no_of_at_risk_student_by_blended_program_offering_for_current_user|length}}, Online :{{total_no_of_at_risk_student_by_online_program_offering_for_current_user |length}}) {% endcomment %}
+                  </p>
                   {% endif %}
                 
               </div>
@@ -29,15 +31,34 @@
             
           {% comment %} </a> {% endcomment %}
       </section>
-        <br>
+        {% comment %} <br>
         <ul class='flex flex-col gap-4 w-3/4'>
-          {% for program_offering in program_offerings %}      
+          {% for program_offering in program_offerings_for_current_user %}      
                         {% with program_offering=program_offering %}
                             {% include 'components/flash_card/program_offering_FC.html' %}
                         {% endwith %} 
             {% endfor %}
          
-          </ul>
+          </ul> {% endcomment %}
+
+          <div class='flex w-3/4 bg-green-200 mb-2 px-4 py-2'>Blended Program ({{blended_program_offerings_for_current_user|length}})</div>
+          <ul class='flex flex-col gap-4 w-3/4'>
+            {% for program_offering in blended_program_offerings_for_current_user %}      
+                          {% with program_offering=program_offering %}
+                              {% include 'components/flash_card/program_offering_FC.html' %}
+                          {% endwith %} 
+              {% endfor %}
+           
+            </ul>
+            <div class='flex w-3/4 bg-blue-200 mb-2 mt-2 px-4 py-2'>Online Program ({{online_program_offerings_for_current_user|length}})</div>
+          <ul class='flex flex-col gap-4 w-3/4'>
+            {% for program_offering in online_program_offerings_for_current_user %}      
+                          {% with program_offering=program_offering %}
+                              {% include 'components/flash_card/program_offering_FC.html' %}
+                          {% endwith %} 
+              {% endfor %}
+           
+            </ul>
        
     </section>
 {% endblock content %}
