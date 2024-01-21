@@ -112,7 +112,12 @@ class Course(BaseModel):
 
 
 class CourseOffering(BaseModel):
- 
+    
+    OFFERING_CHOICES1 = [
+        ('online', 'ONLINE'),
+        ('micro cred', 'MICRO CRED'),
+        ('blended', 'BLENDED'),
+    ]
 
     course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True,related_name='course_offering')
     start_date=models.DateField( auto_now=False, auto_now_add=False)
@@ -125,7 +130,7 @@ class CourseOffering(BaseModel):
 
     student = models.ManyToManyField(Student,blank=True ,related_name='course_offerings')
     teacher = models.ManyToManyField(Staff,blank=True ,related_name='course_offerings')
-    offering_mode = models.CharField(max_length=10,choices=OFFERING_CHOICES,default='online',blank=True, null=True,help_text='Select the mode of course offering: Online, Offline, or Blended'
+    offering_mode = models.CharField(max_length=10,choices=OFFERING_CHOICES1,default='online',blank=True, null=True,help_text='Select the mode of course offering: Online, Offline, or Blended'
     )
     
 

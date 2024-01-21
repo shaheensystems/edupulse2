@@ -23,7 +23,7 @@ class Attendance(BaseModel):
 
 
     class Meta:
-        unique_together = ('student', 'program_offering', 'course_offering')
+        unique_together = ('student', 'program_offering', 'course_offering','attendance_date')
 
     def __srt__(self):
         return f"{self.student} - {self.course_offering} - {self.attendance_date}-{self.is_present}"
@@ -72,7 +72,7 @@ class WeeklyReport(BaseModel):
     engagement=models.CharField(choices=ENGAGEMENT_CHOICE,default="n/a",null=True,blank=True, max_length=255)
     action=models.CharField(choices=ACTION_CHOICE,null=True,blank=True, max_length=255,default='n/a')
     follow_up=models.CharField(choices=FOLLOW_UP_CHOICE,null=True,blank=True, max_length=255,default="n/a")
-    course_offering=models.ForeignKey(CourseOffering, verbose_name=("Course Offering"), on_delete=models.CASCADE,related_name='weekly_reports')
+    course_offering=models.ForeignKey(CourseOffering, verbose_name=("Course Offering"), on_delete=models.CASCADE,related_name='weekly_reports',null=True, blank=True )
     student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='weekly_reports')
     no_of_pages_viewed_on_canvas=models.PositiveIntegerField(null=True,blank=True, default=0)
     login_in_on_canvas=models.BooleanField(default=False, blank=True,null=True)
