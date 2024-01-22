@@ -255,29 +255,16 @@ def get_chart_data_attendance_by_date(attendances):
         
         for item in attendance_data:
             item['attendance_percentage']= (item['total_present']/item['total_attendance'])*100
-         
-        # if attendance_date not in attendance_count:
-        #     attendance_count[attendance_date]=0
-        
-        # if attendance.is_present=='present':
-        #         attendance_count[attendance_date]+=1
     
-    print(attendance_data)   
+    # print(attendance_data)   
     
     sorted_attendance_data=sorted(attendance_data,key=lambda x:x['date'],reverse=True)
-
     labels=[item['date'].strftime("%Y-%m-%d") for item in sorted_attendance_data]
     data=[item["attendance_percentage"] for item in sorted_attendance_data]
-    # Sort the attendance_count dictionary by date in descending order
-    # sorted_attendance_count = dict(sorted(attendance_count.items(), key=lambda x: x[0], reverse=False))
-
-    # labels=list(sorted_attendance_count.keys())
-    # data=list(sorted_attendance_count.values())
-    # formatted_labels = [date.strftime("%Y-%m-%d") for date in labels]
-    # formatted_labels.insert(0, "")
-    # data.insert(0, 0)   
+ 
     chart_data_attendance_by_date={
         'labels': labels,
         'data': data,
+        "chart_type":"bar"
     }
     return chart_data_attendance_by_date

@@ -11,7 +11,7 @@
              
           <div class='w-1/2'>
             {% comment %} <h1><strong>Program Detail</strong>  </h1> {% endcomment %}
-            <h2 class="text-xl font-bold my-2">{{ course_offering.temp_id }} <br> {{course_offering.course.name}} ({{course_offering.offering_mode}})</h2>
+            <h2 class="text-xl font-bold my-2">{{ course_offering.temp_id }} <br> {{course_offering.course.name}} ({{course_offering.offering_mode| title}})</h2>
             <p><strong>Description:</strong> {{ course_offering.course.description }}</p>
             <p><strong>Program Link:</strong> {{ course_offering.course.program_link }}</p>
             <p><strong>Duration in week:</strong> {{ course_offering.course.duration_in_week }}</p>
@@ -33,27 +33,49 @@
           </div>
           <!-- Add more course offering details -->
         </div>
-   
-        <div class='my-2 w-full flex flex-row flex-wrap justify-between'>
-       
-  
-          <div class='w-5/12 bg-gray-100 rounded-lg  my-3'>
 
-            {% with data=chart_data_attendance title='Student performance' id='students_performace' chartType='bar' lengendDisplay='true' limitData=10 %}
-              {% include 'charts/chart.html' %}
-            {% endwith %}
+        <section class='my-2 w-full py-4 flex flex-row flex-wrap justify-center'>
+          <span id="chartTypeText" class=" hidden absolute -mt-[20px] text-gray-400">Change Chart Type</span>  
+          <div id="chartToggleBtn" class='w-full text-center py-2 bg-blue-200 hover:bg-blue-300 flex justify-center ' onmouseover="displayChartTypeText(true)" onmouseout="displayChartTypeText(false)" >
+            
+            <button onclick="toggleAttendanceChart()" title="Toggle Chart Type" class='flex flex-row justify-center'> 
+              <span class=''>Student Attendnace Timeline </span> 
+            </button>
+             
           </div>
-          <div class='w-5/12 bg-gray-100 rounded-lg my-5'>
-
-            {% with data=chart_data_attendance title='Student Attendace' text='Students Attendace' id='students_attedance'%}
-            {% include 'charts/lineChart.html' %}
-            {% endwith %}
+          <div id='students_attendance_bar_chart' class='w-full  bg-gray-100 rounded-lg  mb-3' style="display: block; height: 350px"  >
+              {% with data=chart_data_attendance_by_date title='Student Attendance' id='students_attendance_bar' chartType='bar' lengendDisplay='false' limitData=10 %}
+                  {% include 'charts/chart.html' %}
+              {% endwith %}
           </div>
-     
+          <div id='students_attendance_line_chart' class='w-full bg-gray-100 rounded-lg mb-5 ' style="display: block; height: 350px" >
+              {% with data=chart_data_attendance_by_date title='Student Attendace' text='Students Attendace' chartType='line' id='students_attendance_line' lengendDisplay='false' limitData=10 %}
+                  {% include 'charts/chart.html' %}
+              {% endwith %}
+          </div>
+        </section>
+
+        <section class='my-2 w-full  flex flex-row flex-wrap justify-center ='>
+          <div class='w-full text-center py-2 bg-blue-200 hover:bg-blue-300'>
+              <button title="Toggle Chart Type">Student Performance </button>
+          </div>
+          <div id='students_attendance_bar_chart1' class='w-full bg-gray-100 rounded-lg  mb-3' style="display: block; "  >
+
+            {% if course_offering.attendance.all|length > 0 %}
+              {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
+              {% include 'components/dashboard/student_performance_pieChart_flow.html' %}
+              {% endwith %}
+            {% else %}
+              <div class='bg-gray-200 p-4'>
+                  <p> No students found for students attendance report </p>
+              </div>
+              
+            {% endif %}
+            
+            </div>
+        </section>
 
 
-       
-       </div>
        <div class='mt-3 rounded-xl flex flex-col flex-wrap gap-1'>
         
         {% with students=course_offering.student.all at_risk_students=course_offering.calculate_no_at_risk_student_for_last_week view=view %}
@@ -62,6 +84,32 @@
         
     
      </div>
-   
+     <script>
+      function displayChartTypeText(display) {
+        var chartTypeText = document.getElementById('chartTypeText');
+        if (display) {
+            chartTypeText.style.display = 'block';
+        } else {
+            chartTypeText.style.display = 'none';
+        }
+    }
+      document.addEventListener("DOMContentLoaded", function () {
+        // Hide the line chart initially
+        document.getElementById('students_attendance_line_chart').style.display = 'none';
+    });
+      function toggleAttendanceChart() {
+          var barChart = document.getElementById('students_attendance_bar_chart');
+          var lineChart = document.getElementById('students_attendance_line_chart');
+  
+          if (barChart.style.display === 'none' || barChart.style.display === '') {
+              barChart.style.display = 'block';
+              lineChart.style.display = 'none';
+          } else {
+              barChart.style.display = 'none';
+              lineChart.style.display = 'block';
+          }
+      }
+  </script>
+     
     </section>
 {% endblock content %}

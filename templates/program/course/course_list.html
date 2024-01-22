@@ -4,23 +4,21 @@
     {% comment %} <h1> Program Offering List  </h1> {% endcomment %}
     <section class='my-2 w-full'>
 
-      {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
-         <!-- Course_offering_infobar -->
+
+         <!-- infobar -->
          <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
           <h2 class="text-xl font-bold mb-2">Course List</h2>
           <div class='flex flex-row gap-4 flex-wrap '>
             <p class="mb-2 ">Total Course: {{courses.count}} (Blended :{{blended_courses_for_current_user|length}}, Online :{{online_courses_for_current_user|length}})</p> |
-            <p class="mb-2">Total Students Enrolled: {{total_students|length}}</p> |
+            <p class="mb-2">Total Students Enrolled: {{total_students|length}} (Blended :{{total_no_of_student_for_blended_courses|length}}, Online :{{total_no_of_student_for_online_courses|length}})</p> |
             {% if total_no_of_at_risk_student >  0 %}
                   <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student }}</p>
                   {% else  %}
                   <p>Students at Risk: {{total_no_of_at_risk_student|length}}</p>
                   {% endif %}
           </div>
-          <!-- Add more course offering details -->
         </div>
-        
-      </a>
+   
   </section>
     <br>
    
@@ -31,17 +29,62 @@
         {% endwith %} 
       {% endfor %} {% endcomment %}
       <div>
-        <div class="text-xl font-bold mb-2"> Blended Course List</div>
+        <section class='my-2 w-full'>
+             <!-- Course_offering_infobar -->
+             <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+              <h2 class="text-xl font-bold mb-2">Blended Course List</h2>
+              <div class='flex flex-row gap-4 flex-wrap  '>
+                <p class="mb-2 ">Total Blended Course : {{blended_courses_for_current_user|length}}</p> |
+                <p class="mb-2 hidden">Active Program : |</p> 
+                <p class="mb-2 hidden">Inactive Program : |</p> 
+                <p class="mb-2">Total Students Enrolled  : {{total_no_of_student_for_blended_courses|length}}</p> |
+                {% if course.calculate_no_at_risk_student_for_last_week|length >  0 %}
+                    <p class='text-red-500 '>
+                      <a href="{% url 'all-students-at-risk' %}" class='text-red-500'>
+                        Students at Risk: {{ course.calculate_no_at_risk_student_for_last_week|length }}
+                      </a>
+                      </p>
+                  {% else  %}
+                  <p>Students at Risk: {{course.calculate_no_at_risk_student_for_last_week|length}}</p>
+                  {% endif %}
+                
+              </div>
+            </div>
+  
+      </section>
           <div class='flex gap-4 flex-col'>
           {% for course in blended_courses_for_current_user %}
-        {% with course=course %}
-            {% include 'components/flash_card/course_FC.html' %}
-        {% endwith %} 
-      {% endfor %}
+              {% with course=course %}
+                  {% include 'components/flash_card/course_FC.html' %}
+              {% endwith %} 
+            {% endfor %}
           </div>
       </div>
+      <!--Online Course-->
       <div>
-        <div class="text-xl font-bold mb-2"> Online Course List</div>
+        <section class='my-2 w-full'>
+          <!-- Course_offering_infobar -->
+          <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+           <h2 class="text-xl font-bold mb-2">Online Course List</h2>
+           <div class='flex flex-row gap-4 flex-wrap  '>
+             <p class="mb-2 ">Total Bonline Course : {{online_courses_for_current_user|length}}</p> |
+             <p class="mb-2 hidden">Active Program : |</p> 
+             <p class="mb-2 hidden">Inactive Program : |</p> 
+             <p class="mb-2">Total Students Enrolled  : {{total_no_of_student_for_online_courses|length}}</p> |
+             {% if course.calculate_no_at_risk_student_for_last_week|length >  0 %}
+                 <p class='text-red-500 '>
+                   <a href="{% url 'all-students-at-risk' %}" class='text-red-500'>
+                     Students at Risk: {{ course.calculate_no_at_risk_student_for_last_week|length }}
+                   </a>
+                   </p>
+               {% else  %}
+               <p>Students at Risk: {{course.calculate_no_at_risk_student_for_last_week|length}}</p>
+               {% endif %}
+             
+           </div>
+         </div>
+
+   </section>
            <div class='flex gap-4 flex-col'>
           {% for course in online_courses_for_current_user %}
         {% with course=course %}

@@ -1,50 +1,53 @@
 {% load static %} <!-- Load the static template tag -->
 {% block content %} 
    <section class='w-full'>
-    {% comment %} {{id}}
-    <br>
-   All Data : {{data}}
-    <br>
-    Labels :{{data.labels}}
-    <br>
-    Data :{{data.data}}
-    {{title}} {% endcomment %}
+
     <p class='text-center hidden'>Chart </p>
-    <canvas id="chart{{id}}" style="width:100%;max-width:1200px"></canvas>
+    
+    <canvas id="chart{{id}}" style="width:100%;max-width:1200px;max-height:300px"></canvas>
  
 
     <script>
-    var xValues = {{data.labels|safe}};
-    var yValues = {{data.data|safe}};
-    var limit ={{limitData}}
-    var barColors = [
-      "#b91d47",
-      "#00aba9",
-      "#2b5797",
-      "#e8c3b9",
-      "#1e7145"
-    ];
+      var xValues = {{ data.labels|safe }};
+      var yValues = {{ data.data|safe }};
+      var limit = {{ limitData }};
+      var barColors = [
+        "#b91d47",
+        "#00aba9",
+        "#2b5797",
+        "#e8c3b9",
+        "#1e7145"
+      ];
     
-    new Chart("chart{{id}}", {
-      type: "{{chartType}}",
-      data: {
-        labels: xValues.slice(0,limit),
-        datasets: [{
-          backgroundColor: barColors,
-          data: yValues
-        }]
-      },
-      options: {
-        legend: {display: {{lengendDisplay}}},
-        title: {
-          display: true,
-          text: "{{title}}"
-        }
-    
-      },
-      
+      new Chart("chart{{ id }}", {
+        type: "{{ chartType }}",
+        data: {
+            labels: xValues.slice(0, limit),
+            datasets: [{
+                backgroundColor: barColors,
+                data: yValues
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    suggestedMin: 0
+                },
+               
+            },
+            plugins: {
+                legend: { display: {{ lengendDisplay }} },
+                title: {
+                    display: true,
+                    text: "{{ title }}"
+                }
+            }
+        },
     });
+    
     </script>
+    
 </section>
 
 {% endblock %}

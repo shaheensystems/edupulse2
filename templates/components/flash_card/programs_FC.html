@@ -13,13 +13,13 @@
                 
               <p >Total Students Enrolled : 
                 {% if offering_mode == "offline" %}
-                {{program.calculate_total_no_of_student_for_offline_program }}
+                {{program.calculate_total_no_of_student_for_offline_program |length}}
                 {% endif %}
                 {% if offering_mode == "online" %}
-                {{program.calculate_total_no_of_student_for_online_program }}
+                {{program.calculate_total_no_of_student_for_online_program |length}}
                 {% endif %}
                 {% if offering_mode == "all" %}
-                {{program.calculate_total_no_of_student }}
+                {{program.calculate_total_no_of_student|length }}
                 {% endif %}
               
               </p>

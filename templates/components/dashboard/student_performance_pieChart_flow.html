@@ -6,7 +6,7 @@
        <!-- student perforamnce Pie chart -->
        <div class="bg-gray-200 p-4 mb-4">
         <h2 class="text-xl font-bold mb-2">{{title}}</h2>
-        <div class='flex flex-row flex-wrap py-4'>
+        <div class='flex flex-row justify-center gap-4 flex-wrap py-4'>
           
         <!-- Add three pie charts with dummy data linked with attendance, engagement, and actions -->
           <div class='w-4/12 bg-gray-100 rounded-lg'>
@@ -14,7 +14,7 @@
               {% include 'charts/chart.html' %}
             {% endwith %}
           </div>
-          <div class='w-4/12 bg-gray-100 rounded-lg'>
+          <div class='w-3/12 bg-gray-100 rounded-lg'>
             {% with data=chart2_data title=chart2_title id=chart2_id chartType='pie' lengendDisplay='true' limitData=10 %}
               {% include 'charts/chart.html' %}
             {% endwith %}

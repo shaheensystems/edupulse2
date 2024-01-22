@@ -26,7 +26,7 @@
               <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
                 <p class="mb-2 ">Total Program Offerings: {{program.program_offerings.all|length}} (Blended: {{program.get_list_of_blended_program_offerings_for_selected_program.count}}, Online:{{program.get_list_of_online_program_offerings_for_selected_program.count}})</p> |
                 <p class="mb-2 ">Total Courses: {{program.course.count}} (Blended: {{program.get_list_of_blended_course_for_selected_program.count}}, Online:{{program.get_list_of_online_course_for_selected_program.count}})</p> |
-                <p class="mb-2">Total Students Enrolled: {{program.calculate_total_no_of_student}}</p> |
+                <p class="mb-2">Total Students Enrolled: {{program.calculate_total_no_of_student|length}}</p> |
                 <p class="mb-2">Attendance Percentage: {{program.calculate_attendance_percentage}} %</p> |
                 {% if program.calculate_no_at_risk_student_for_last_week|length  >  0 %}
                 <p class='text-red-500'>Students at Risk: {{program.calculate_no_at_risk_student_for_last_week|length}}</p>

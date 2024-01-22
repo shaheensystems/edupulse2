@@ -10,7 +10,7 @@
                 <br>{{ course.name }} </h1>
              
               {% comment %} <p> No of Courses : {{program.list_course_offerings}}</P> {% endcomment %}
-              <p >Total Students Enrolled (by model): {{course.calculate_total_no_of_student}}</p>
+              <p >Total Students Enrolled (by model): {{course.calculate_total_no_of_student|length}}</p>
               <p> Course Offerings : {{course.course_offering.all|length}}</P>
               <div class='flex flex-row  gap-4 flex-wrap'>
                 {% for course_offering in course.course_offering.all %}

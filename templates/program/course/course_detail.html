@@ -9,7 +9,7 @@
               <h1 class='text-center mt-4 text-xl mb-1'><strong>Course Detail</strong>  </h1>
             
             
-            <div class="bg-gray-200 p-4 mb-4 w-full gap-5 flex flex-row justify-between items-baseline">
+            <section class="bg-gray-200 p-4 mb-4 w-full gap-5 flex flex-row justify-between items-baseline">
              
               <div class='w-1/2'>
                 {% comment %} <h1><strong>Program Detail</strong>  </h1> {% endcomment %}
@@ -25,7 +25,7 @@
             
               <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
                 <p class="mb-2 ">Total Course Offerings: {{course.course_offering.count}}</p> |
-                <p class="mb-2">Total Students Enrolled: {{course.calculate_total_no_of_student}}</p> |
+                <p class="mb-2">Total Students Enrolled: {{course.calculate_total_no_of_student|length}}</p> |
                 <p class="mb-2">Attendnace Percentage: {{course.calculate_attendance_percentage}} %</p> |
                 {% if course.calculate_no_at_risk_student_for_last_week|length  >  0 %}
                 <p class='text-red-500'>Students at Risk: {{course.calculate_no_at_risk_student_for_last_week|length}}</p>
@@ -34,8 +34,8 @@
                 {% endif %}
                 
               </div>
-              <!-- Add more course offering details -->
-            </div>
+             
+            </section>
             
           {% comment %} </a> {% endcomment %}
           <div class='flex flex-row flex-wrap gap-4 hidden'>
@@ -49,17 +49,60 @@
             
           {% endfor %}
           </div>
- 
+          <section class='w-full  bg-gray-100 rounded-lg  mb-3'   >
+            
+            {% if offline_students_attendance|length > 0 %}
+              {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
+              {% include 'components/dashboard/student_performance_pieChart_flow.html' %}
+              {% endwith %}
+            {% else %}
+              <div class='bg-gray-200 p-4'>
+                  <p> No students found for students attendance report </p>
+              </div>
+              
+            {% endif %}
+            
+            </section>
+  <!-- Add more course offering details -->
+  <section>
+    <section class='my-2 w-full'>
+
+      {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
+         <!-- Course_offering_infobar -->
+         <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
+          <h2 class="text-xl font-bold mb-2">Course Offering List</h2>
+          <div class='flex flex-row gap-4 flex-wrap  '>
+            <p class="mb-2 ">total Course Offerings : {{course.course_offering.all|length}}</p> |
+            <p class="mb-2 hidden">Active Program : |</p> 
+            <p class="mb-2 hidden">Inactive Program : |</p> 
+            <p class="mb-2">Total Students Enrolled  : {{course.calculate_total_no_of_student|length}}</p> |
+            {% if course.calculate_no_at_risk_student_for_last_week|length >  0 %}
+                <p class='text-red-500 '>
+                  <a href="{% url 'all-students-at-risk' %}" class='text-red-500'>
+                    Students at Risk: {{ course.calculate_no_at_risk_student_for_last_week|length }}
+                  </a>
+                  </p>
+              {% else  %}
+              <p>Students at Risk: {{course.calculate_no_at_risk_student_for_last_week|length}}</p>
+              {% endif %}
+            
+          </div>
+          <!-- Add more course offering details -->
+        </div>
+        
+      {% comment %} </a> {% endcomment %}
+  </section>
+  
   {% for course_offering in course.course_offering.all %}
         <section class='my-2 w-5/6 bg-gray-50 justify-end  items-start flex flex-col border-2 p-1 '>
 
           {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
             <!-- Course_offering_infobar -->
             <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
-              <h2 class="text-xl font-bold mb-2">{{course_offering.temp_id}}<br>{{course_offering.name}}</h2>
+              <h2 class="text-xl font-bold mb-2">{{course_offering.temp_id}} ({{course_offering.offering_mode |title}})<br>{{course_offering.name}}</h2>
               <div class='flex flex-row gap-4 flex-wrap '>
-                <p class="mb-2 ">Current Course offering: {{course.course_offering.count}}</p> |
-                <p class="mb-2">Total Students Enrolled: {{course.calculate_total_no_of_student}}</p> |
+                
+                <p class="mb-2">Total Students Enrolled: {{course_offering.student.all|length}}</p> |
                 <p>Students at Risk: 10</p> 
               </div>
               <!-- Add more course offering details -->
@@ -67,7 +110,7 @@
             
           {% comment %} </a> {% endcomment %}
       
-       
+         
             <ul class='flex flex-col gap-4 w-3/4'>  
               {% for course_offering in course.course_offering.all %}
                           {% with course_offering=course_offering %}
@@ -79,7 +122,7 @@
  
     </section>
   {% endfor %}
-
+</section>
 </section>
    
 

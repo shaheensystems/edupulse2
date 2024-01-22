@@ -25,16 +25,6 @@ def get_attendance_percentage_by_program(program,total_sessions,present_sessions
     courses = program.course.all().exclude(temp_id__endswith='D')
     # print("Course list offline",courses)
 
-    # if len(program.course.all()) == len(courses):
-    #      print("no change")
-    # else:
-    #      print("changed")
-
-    # if program.temp_id =="NZ2595":
-    #     print(program.temp_id,":",program.name)
-    #     for course in program.course.all().exclude(temp_id__endswith='D'):
-    #         print(course.temp_id)
-    
    
     # Iterate over each course to accumulate session counts
     for course in courses:
@@ -98,3 +88,8 @@ def get_attendance_percentage_by_student(student):
 
         return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
 
+
+
+
+     
+     

@@ -29,7 +29,7 @@ def get_total_no_of_student_by_program(program,offering_mode):
     #     students_in_program = program_offering.student.all()
     #     unique_students.update(students_in_program)
  
-    return len(unique_students)
+    return unique_students
 
 def get_total_no_of_student_by_course(course, offering_mode):
     unique_students = set()
@@ -44,8 +44,26 @@ def get_total_no_of_student_by_course(course, offering_mode):
         students_in_course = course_offering.student.all()
         unique_students.update(students_in_course)
     # print('total _Stunt cousre ',len(unique_students))
-    return len(unique_students)
-    
+    return unique_students
+
+def get_total_no_of_student_by_courses(courses, offering_mode):
+    unique_students = set()
+    for course in courses:
+        if offering_mode=="online":
+            students_in_course=get_total_no_of_student_by_course(course, offering_mode='online')
+        elif offering_mode=="offline":
+            students_in_course=get_total_no_of_student_by_course(course, offering_mode='offline')
+        elif offering_mode=="all":
+            students_in_course=get_total_no_of_student_by_course(course, offering_mode='all')
+
+        unique_students.update(students_in_course)
+
+  
+    return unique_students
+
+
+
+
 def get_total_no_of_student_by_program_offerings(program_offerings):
     # this method has duplicate values dont use 
     student_count=0

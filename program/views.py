@@ -12,6 +12,10 @@ from django.utils import timezone
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offerings,get_no_of_at_risk_students_by_program_offerings
 
 from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,filter_data_based_on_date_range,default_start_and_end_date,get_online_offline_courses,get_online_offline_program_offerings,get_online_offline_course_offerings
+from utils.function.helperGetChartData import get_chart_data_attendance_by_date,get_chart_data_attendance_report
+
+from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_courses
+
 # Create your views here.
 
 class CourseListView(LoginRequiredMixin,ListView):
@@ -74,10 +78,16 @@ class CourseListView(LoginRequiredMixin,ListView):
         context.update(filtered_data_by_date_range)
 
         online_and_offline_courses=get_online_offline_courses(courses_for_current_user=courses_for_current_user)
+        blended_courses_for_current_user=online_and_offline_courses['blended_courses_for_current_user']
+        online_courses_for_current_user=online_and_offline_courses['online_courses_for_current_user']
         context.update(online_and_offline_courses)
 
         total_students,at_risk_students=self.get_all_students_and_at_risk_students(courses_for_current_user)
         context['total_no_of_at_risk_student'] = at_risk_students
+
+        context['total_no_of_student_for_blended_courses']=get_total_no_of_student_by_courses(courses=blended_courses_for_current_user, offering_mode='offline')
+        context['total_no_of_student_for_online_courses']=get_total_no_of_student_by_courses(courses=online_courses_for_current_user, offering_mode='online')
+        context['total_no_of_student_for_all_courses']=get_total_no_of_student_by_courses(courses=blended_courses_for_current_user, offering_mode='all')
         # Add the total_students to the context
         context['total_students'] = total_students
         
@@ -90,6 +100,17 @@ class CourseDetailView(LoginRequiredMixin,DetailView):
     context_object_name='course'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        offline_students=self.object.calculate_total_no_of_student_for_offline_course()
+        offline_students_attendance = Attendance.objects.filter(student__in=offline_students)
+        print(offline_students_attendance)
+
+        context['offline_students_attendance']=offline_students_attendance
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=offline_students_attendance)
+        
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
 
         return context
 
@@ -168,31 +189,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
     template_name='program/program/program_offering_list.html'
     context_object_name='program_offerings'
  
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     # print("user group :",user.groups.all())
-    #     # Check if the user is an admin
-    #     if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
-    #         # print("condition matched admin")
-    #         return ProgramOffering.objects.all()
-
-    #     # Check if the user is a teacher
-    #     elif user.groups.filter(name='Teacher').exists():
-    #         # print("condition matched for teacher")
-    #         # return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
-    #         # Teacher has no access for program 
-    #         # return ProgramOffering.objects.filter(program__course__course_offering__staff=user)
-    #         return ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
-
-    #     elif user.groups.filter(name='Program_Leader').exists():
-    #         # return ProgramOffering.objects.none()
-    #         return ProgramOffering.objects.filter(program_leader__staff=user)  
-        
-    #     elif user.groups.filter(name='Student').exists():
-    #         return ProgramOffering.objects.none()
-    #     # For other user groups (e.g., students), return an empty queryset
-    #     else:
-    #         return ProgramOffering.objects.none()
+   
 
     def get_all_students(self, program_offerings):
         unique_students = set()
@@ -277,18 +274,7 @@ class ProgramOfferingDetailView(LoginRequiredMixin,DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-       
-        # # Assuming 'performance' is a field in the WeeklyReport model
-        # courses = self.object.program.course.all()  # Adjust the related name accordingly
-        # course_offering_count=0
-        # for course in courses:
-            
-        #     for course_offering in course.course_offering.all():
-        #         course_offering_count+=1
-              
 
-        # # context['poor_performance_data'] = poor_performance_data
-        # context['total_course_offering_count']=course_offering_count
    
         return context
 
@@ -296,33 +282,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
     model=CourseOffering
     template_name='program/course/course_offering_list.html'
     context_object_name='course_offerings'
-    
-    # print("initialise Course Offering view :")
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     # print("user group :",user.groups.all())
-    #     # Check if the user is an admin
-    #     if user.groups.filter(name='Admin').exists() or user.groups.filter(name='Head_of_School').exists():
-    #         # print("condition matched admin")
-    #         return CourseOffering.objects.all()
 
-    #     # Check if the user is a teacher
-    #     elif user.groups.filter(name='Teacher').exists():
-    #         # print("condition matched for teacher")
-    #         # Assuming there is a ForeignKey from CourseOffering to Teacher model
-    #         # only course offering where teacher is equal to current user
-    #         return CourseOffering.objects.filter(teacher__staff=user)
-    #     elif user.groups.filter(name='Program_Leader').exists():
-
-    #         return CourseOffering.objects.filter(course__program__program_offerings__program_leader__staff=user)  
-        
-    #     elif user.groups.filter(name='Student').exists():
-    #         return CourseOffering.objects.none()
-    #     # For other user groups (e.g., students), return an empty queryset
-    #     return CourseOffering.objects.none()
-    
-    
- 
     def get_all_students(self, course_offerings):
         unique_students = set()
         for course_offering in course_offerings:
@@ -380,8 +340,11 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
     
     
         
-        # Calculate total number of students across all program offerings
-        # total_students = self.get_all_students(course_offerings_for_current_user)
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
+        
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
         
         total_no_of_at_risk_student=get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings_for_current_user)
 
@@ -404,40 +367,14 @@ class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
         context['view'] = 'table'  # Add the 'view' context value list or detail or table
 
         all_attendance=context['course_offering'].attendance.all()
-        # Create a dictionary to store attendance count date-wise
-        attendance_count = {}
 
-        # Iterate through each attendance record
-        for attendance in all_attendance:
-            # Get the attendance date
-            date = attendance.attendance_date
-            # print("Date :",date)
-
-            # If the date is not in the dictionary, add it
-            if date not in attendance_count:
-                attendance_count[date] = 0
-
-            # Update the attendance count based on the 'is_present' value
-            if attendance.is_present == 'present':
-                attendance_count[date] += 1
-    
-        # Extract the labels and data for the chart
-        labels = list(attendance_count.keys())
-        data = list(attendance_count.values())
-
-        formatted_labels = [date.strftime("%Y-%m-%d") for date in labels]
-        # set initial value 0 and empty to get a good chart view 
-        formatted_labels.insert(0, "")
-        data.insert(0, 0)   
-        # print("labels :",formatted_labels)       
-
-        # Add the labels and data to the context
-        context['chart_data_attendance'] = {
-            'labels': formatted_labels,
-            'data': data,
-            'current_user' : self.request.user,
-        }
-
+        # print("Attendance:",all_attendance)
+        context['chart_data_attendance_by_date']=get_chart_data_attendance_by_date(attendances=all_attendance)
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=all_attendance)
+        
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
         # print("All attendance:",all_attendance)
         return context
    
