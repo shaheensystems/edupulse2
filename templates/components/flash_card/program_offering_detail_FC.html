@@ -10,9 +10,9 @@
         <p class="mb-2 ">Total Course offerings : {{course.course_offering.count}}</p> |
         <p class="mb-2">Total Students Enrolled: 
           {% if course.get_offering_mode_is_online %}
-          {{course.calculate_total_no_of_student_for_online_course}}</p> |
+          {{course.calculate_total_no_of_student_for_online_course|length}}</p> |
           {% else %}
-          {{course.calculate_total_no_of_student_for_offline_course}}</p> |
+          {{course.calculate_total_no_of_student_for_offline_course|length}}</p> |
           {% endif %}
           
         <p>Students at Risk: 10</p> 

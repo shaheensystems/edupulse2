@@ -90,6 +90,12 @@ class CourseListView(LoginRequiredMixin,ListView):
         context['total_no_of_student_for_all_courses']=get_total_no_of_student_by_courses(courses=blended_courses_for_current_user, offering_mode='all')
         # Add the total_students to the context
         context['total_students'] = total_students
+        # Student Performance chart data 
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
+        
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
         
 
         return context
@@ -103,7 +109,7 @@ class CourseDetailView(LoginRequiredMixin,DetailView):
 
         offline_students=self.object.calculate_total_no_of_student_for_offline_course()
         offline_students_attendance = Attendance.objects.filter(student__in=offline_students)
-        print(offline_students_attendance)
+        # print(offline_students)
 
         context['offline_students_attendance']=offline_students_attendance
         chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=offline_students_attendance)
@@ -165,6 +171,13 @@ class ProgramListView(LoginRequiredMixin,ListView):
         # calculated online and offline program after all filter, search and query
         online_and_offline_programs=get_online_offline_program(programs_for_current_user=programs_for_current_user)
         context.update(online_and_offline_programs)
+        # Student Performance chart data 
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
+        
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
+
 
         context['total_no_of_at_risk_student'] = get_no_of_at_risk_students_by_program_offerings(program_offerings_for_current_user)
         # Add the total_students to the context
@@ -181,6 +194,18 @@ class ProgramDetailView(LoginRequiredMixin,DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        offline_students=self.object.calculate_total_no_of_student_for_offline_program()
+        
+        blended_attendances=Attendance.objects.filter(student__in=offline_students)
+        
+
+        
+         # Student Performance chart data 
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=blended_attendances)
+        context['blended_attendances']=blended_attendances
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
 
         return context
 
@@ -264,6 +289,12 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         context['total_no_of_at_risk_student_by_online_program_offering_for_current_user'] = get_no_of_at_risk_students_by_program_offerings(program_offerings=online_program_offerings_for_current_user)
         context['total_no_of_at_risk_student_by_blended_program_offering_for_current_user'] = get_no_of_at_risk_students_by_program_offerings(program_offerings=blended_program_offerings_for_current_user)
 
+         # Student Performance chart data 
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
+        
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
 
         return context
 
@@ -275,6 +306,17 @@ class ProgramOfferingDetailView(LoginRequiredMixin,DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        
+        students=self.object.student.all()
+        attendances=Attendance.objects.filter(student__in=students)
+       
+
+        # Student Performance chart data 
+        chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
+        context['attendances']=attendances
+        context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
+        context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
+        context['chart_data_attendance_report_action']=chart_data_attendance_report_action
    
         return context
 
