@@ -103,6 +103,7 @@ def get_chart_data_program_offerings_student_enrollment(program_offerings):
     return chart_data_program_offerings_student_enrollment
 
 
+
 def get_chart_data_course_offerings_student_enrollment(course_offerings):
     enrollment_data = []
     for course_offering in course_offerings:

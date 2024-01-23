@@ -36,7 +36,7 @@ def filter_database_based_on_current_user(request_user,program_offerings, course
         programs_for_current_user=None
         courses_for_current_user=None
         attendances = attendances.filter(student__in=students)
-        all_programs=programs_for_current_user
+        all_programs=None
     #    ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
     else:
         program_offerings_for_current_user=None
@@ -45,7 +45,7 @@ def filter_database_based_on_current_user(request_user,program_offerings, course
         courses_for_current_user=None
         students=None
         attendances = None
-        all_programs=programs_for_current_user
+        all_programs=None
      # Return the filtered data
     return {
         'program_offerings_for_current_user': program_offerings_for_current_user,
@@ -145,7 +145,10 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
     if start_date and end_date:
 
         if program_offerings_for_current_user is not None :
-            program_offerings_for_current_user=program_offerings_for_current_user.filter(start_date__gte=start_date,end_date__lte=end_date)
+            program_offerings_for_current_user=program_offerings_for_current_user.filter(
+                   start_date__gte=start_date,end_date__lte=end_date)
+        
+      
         if course_offerings_for_current_user is not None :
             course_offerings_for_current_user=course_offerings_for_current_user.filter(start_date__gte=start_date,end_date__lte=end_date)
         
