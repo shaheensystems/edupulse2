@@ -30,6 +30,7 @@ urlpatterns = [
     path('wc_current_programs/',include('program.urls')),
     path('all-attendance/',include('attendance.urls')),
     path('user/',include('customUser.urls')),
+    path("__debug__/", include("debug_toolbar.urls")),
 ]
 
 if settings.DEBUG:
