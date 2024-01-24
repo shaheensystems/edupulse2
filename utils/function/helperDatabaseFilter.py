@@ -4,21 +4,40 @@ from customUser.models import Student
 from django.db.models import Q
 from datetime import datetime, timedelta
 
-def filter_database_based_on_current_user(request_user,program_offerings, course_offerings, programs, courses, students,attendances):
+def filter_database_based_on_current_user(request_user):
     user_groups=request_user.groups.all()
+    # program_offerings=ProgramOffering.objects.all(),
+    # course_offerings=CourseOffering.objects.all(),
+    # programs=Program.objects.all(),
+    # courses=Course.objects.all(),
+    # students=Student.objects.all(),
+    # attendances=Attendance.objects.all()
     
   
 
     if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
+        program_offerings=ProgramOffering.objects.all()
+        course_offerings=CourseOffering.objects.all()
+        programs=Program.objects.all()
+        courses=Course.objects.all()
+        students=Student.objects.all()
+        attendances=Attendance.objects.all()
         program_offerings_for_current_user=program_offerings
         course_offerings_for_current_user=course_offerings
         programs_for_current_user=programs
         courses_for_current_user=courses
         students=students
-        all_programs=programs
+        all_programs=program_offerings_for_current_user
 
         attendances = attendances.filter(student__in=students)
+
+        # print("Query :",program_offerings_for_current_user.query)
     elif user_groups.filter(name="Program_Leader").exists():
+        program_offerings=ProgramOffering.objects.all()
+        course_offerings=CourseOffering.objects.all()
+        students=Student.objects.all()
+        attendances=Attendance.objects.all()
+
         program_offerings_for_current_user=program_offerings.filter(program_leader=request_user.staff_profile)
         course_offerings_for_current_user=course_offerings.filter(course__program__program_offerings__program_leader=request_user.staff_profile)
         students=students.filter(program_offering__program_leader__staff=request_user)
@@ -30,13 +49,17 @@ def filter_database_based_on_current_user(request_user,program_offerings, course
         # print(attendances)
         # print(students)
     elif user_groups.filter(name="Teacher").exists():
+        program_offerings=ProgramOffering.objects.all()
+        course_offerings=CourseOffering.objects.all()
+        students=Student.objects.all()
+        attendances=Attendance.objects.all()
         program_offerings_for_current_user=program_offerings.filter(program__course__course_offering__teacher__staff=request_user)
         course_offerings_for_current_user=course_offerings.filter(teacher__staff=request_user)
         students=students.filter(course_offerings__teacher__staff=request_user)
         programs_for_current_user=None
         courses_for_current_user=None
         attendances = attendances.filter(student__in=students)
-        all_programs=None
+        all_programs=program_offerings_for_current_user
     #    ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
     else:
         program_offerings_for_current_user=None

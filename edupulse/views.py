@@ -28,14 +28,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user_data=filter_database_based_on_current_user(request_user=self.request.user,
-                                                        program_offerings=ProgramOffering.objects.all(),
-                                                        course_offerings=CourseOffering.objects.all(),
-                                                        programs=Program.objects.all(),
-                                                        courses=Course.objects.all(),
-                                                        students=Student.objects.all(),
-                                                        attendances=Attendance.objects.all()
-                                                        )
+        user_data=filter_database_based_on_current_user(request_user=self.request.user)
+
         program_offerings_for_current_user=user_data['program_offerings_for_current_user']
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']
         programs_for_current_user=user_data['programs_for_current_user']
@@ -135,12 +129,16 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['attendances']=attendances
 
 
-        # context['staff_profile'] = self.request.user.staff_profile
+       
         # Check if the user has a staff_profile
-        if hasattr(self.request.user, 'staff_profile'):
-            context['staff_profile'] = self.request.user.staff_profile
-        else:
-            context['staff_profile'] = None
+        # if hasattr(self.request.user, 'staff_profile'):
+        #     context['staff_profile'] = self.request.user.staff_profile
+        # else:
+        #     context['staff_profile'] = None
+
+        
+        context['staff_profile'] = self.request.user.staff_profile if hasattr(self.request.user, 'staff_profile') else None
+
 
         # print("current user:", self.request.user.staff_profile)
         # print("staff profile:", self.request.user.staff_profile)

@@ -8,6 +8,7 @@ from program.models import Course,CourseOffering,Program,ProgramOffering
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import timedelta, datetime
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offerings,get_no_of_at_risk_students_by_program_offerings
 
@@ -39,14 +40,8 @@ class CourseListView(LoginRequiredMixin,ListView):
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
-        user_data=filter_database_based_on_current_user(request_user=self.request.user,
-                                                        program_offerings=ProgramOffering.objects.all(),
-                                                        course_offerings=CourseOffering.objects.all(),
-                                                        programs=Program.objects.all(),
-                                                        courses=Course.objects.all(),
-                                                        students=Student.objects.all(),
-                                                        attendances=Attendance.objects.all()
-                                                        )
+      
+        user_data=filter_database_based_on_current_user(request_user=self.request.user)
         program_offerings_for_current_user=user_data['program_offerings_for_current_user']
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']
         programs_for_current_user=user_data['programs_for_current_user']
@@ -130,14 +125,15 @@ class ProgramListView(LoginRequiredMixin,ListView):
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
-        user_data=filter_database_based_on_current_user(request_user=self.request.user,
-                                                        program_offerings=ProgramOffering.objects.all(),
-                                                        course_offerings=CourseOffering.objects.all(),
-                                                        programs=Program.objects.all(),
-                                                        courses=Course.objects.all(),
-                                                        students=Student.objects.all(),
-                                                        attendances=Attendance.objects.all()
-                                                        )
+        # user_data=filter_database_based_on_current_user(request_user=self.request.user,
+        #                                                 program_offerings=ProgramOffering.objects.all(),
+        #                                                 course_offerings=CourseOffering.objects.all(),
+        #                                                 programs=Program.objects.all(),
+        #                                                 courses=Course.objects.all(),
+        #                                                 students=Student.objects.all(),
+        #                                                 attendances=Attendance.objects.all()
+        #                                                 )
+        user_data=filter_database_based_on_current_user(request_user=self.request.user)
         program_offerings_for_current_user=user_data['program_offerings_for_current_user']
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']
         programs_for_current_user=user_data['programs_for_current_user']
@@ -224,20 +220,25 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         
         return unique_students
     
+    # def get_all_students(self, program_offerings):
+    #     # Use Django's aggregation to count unique students
+    #     return program_offerings.aggregate(total_students=Count('student', distinct=True))['total_students']
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
        
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
-        user_data=filter_database_based_on_current_user(request_user=self.request.user,
-                                                        program_offerings=ProgramOffering.objects.all(),
-                                                        course_offerings=CourseOffering.objects.all(),
-                                                        programs=Program.objects.all(),
-                                                        courses=Course.objects.all(),
-                                                        students=Student.objects.all(),
-                                                        attendances=Attendance.objects.all()
-                                                        )
+        # user_data=filter_database_based_on_current_user(request_user=self.request.user,
+        #                                                 program_offerings=ProgramOffering.objects.all(),
+        #                                                 course_offerings=CourseOffering.objects.all(),
+        #                                                 programs=Program.objects.all(),
+        #                                                 courses=Course.objects.all(),
+        #                                                 students=Student.objects.all(),
+        #                                                 attendances=Attendance.objects.all()
+        #                                                 )
+        user_data=filter_database_based_on_current_user(request_user=self.request.user)
         program_offerings_for_current_user=user_data['program_offerings_for_current_user']
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']
         programs_for_current_user=user_data['programs_for_current_user']
@@ -281,9 +282,9 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         total_students_for_blended_program_offerings_for_current_user = self.get_all_students(program_offerings=blended_program_offerings_for_current_user)
 
         # Add the total_students to the context
-        context['total_students_for_all_program_offerings_for_current_user'] = len(total_students_for_all_program_offerings_for_current_user)   
-        context['total_students_for_online_program_offerings_for_current_user'] = len(total_students_for_online_program_offerings_for_current_user)   
-        context['total_students_for_blended_program_offerings_for_current_user'] = len(total_students_for_blended_program_offerings_for_current_user)   
+        context['total_students_for_all_program_offerings_for_current_user'] = total_students_for_all_program_offerings_for_current_user 
+        context['total_students_for_online_program_offerings_for_current_user'] = total_students_for_online_program_offerings_for_current_user 
+        context['total_students_for_blended_program_offerings_for_current_user'] = total_students_for_blended_program_offerings_for_current_user  
         
         context['total_no_of_at_risk_student_by_all_program_offering_for_current_user'] = get_no_of_at_risk_students_by_program_offerings(program_offerings=program_offerings_for_current_user)
         context['total_no_of_at_risk_student_by_online_program_offering_for_current_user'] = get_no_of_at_risk_students_by_program_offerings(program_offerings=online_program_offerings_for_current_user)
@@ -332,6 +333,10 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
 
         return unique_students
 
+    # def get_all_students(self, course_offerings):
+    #     # Use Django's aggregation to count unique students
+    #     return course_offerings.aggregate(total_students=Count('student', distinct=True))['total_students']
+
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -339,14 +344,8 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
-        user_data=filter_database_based_on_current_user(request_user=self.request.user,
-                                                        program_offerings=ProgramOffering.objects.all(),
-                                                        course_offerings=CourseOffering.objects.all(),
-                                                        programs=Program.objects.all(),
-                                                        courses=Course.objects.all(),
-                                                        students=Student.objects.all(),
-                                                        attendances=Attendance.objects.all()
-                                                        )
+
+        user_data=filter_database_based_on_current_user(request_user=self.request.user)
         program_offerings_for_current_user=user_data['program_offerings_for_current_user']
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']
         programs_for_current_user=user_data['programs_for_current_user']
@@ -399,11 +398,20 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         context['total_no_of_at_risk_student_for_blended_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=blended_course_offerings_for_current_user)
         return context
 
+
+
 class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
     model = CourseOffering
     template_name = 'program/course/course_offering_detail.html'  
     context_object_name = 'course_offering'  
 
+    def get_object(self, queryset=None):
+        """
+        Get the object for this view.
+        """
+        
+        return get_object_or_404(CourseOffering, pk=self.kwargs['pk'])
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['view'] = 'table'  # Add the 'view' context value list or detail or table

@@ -12,7 +12,7 @@
               <h2 class="text-xl font-bold mb-2">Program Offerings Details</h2>
               <div class='flex flex-row gap-4 flex-wrap  '>
                 <p class="mb-2 ">Total Program Offerings : {{ program_offerings_for_current_user|length}} (Blended :{{blended_program_offerings_for_current_user|length}}, Online :{{online_program_offerings_for_current_user |length}})</p> |
-                <p class="mb-2">Total Students Enrolled : {{total_students_for_all_program_offerings_for_current_user}} (Blended :{{total_students_for_blended_program_offerings_for_current_user}}, Online :{{total_students_for_online_program_offerings_for_current_user }})</p> |
+                <p class="mb-2">Total Students Enrolled : {{total_students_for_all_program_offerings_for_current_user|length}} (Blended :{{total_students_for_blended_program_offerings_for_current_user|length}}, Online :{{total_students_for_online_program_offerings_for_current_user|length}})</p> |
                 {% if total_no_of_at_risk_student_by_all_program_offering_for_current_user|length >  0 %}
                     <p class='text-red-500 '>
                       <a href="{% url 'all-students-at-risk' %}" class='text-red-500'>
