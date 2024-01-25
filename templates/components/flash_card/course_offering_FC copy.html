@@ -7,10 +7,10 @@
             <div class=' px-4 py-2  rounded-lg bg-gray-200 w-2/3'>
               <h1>{{ course_offering.temp_id }} ({{course_offering.offering_mode| title}})<br>{{ course_offering.course.name }} </h1>
               <p> From {{ course_offering.start_date }} To {{ course_offering.end_date }}</p>
-              {% comment %} <p> No of Courses : {{program.list_course_offerings}}</P> {% endcomment %}
+              <p> No of Courses : {{program.list_course_offerings}}</P>
     
                 <p >Total Students Enrolled (by model): 
-                  {{course_offering.get_all_students.count}}
+                  {% comment %} {{course_offering.get_all_students.count}} {% endcomment %}
                 </p>
               <p> No of Enrolled Students : {{course_offering.student.count}}</P>
             </div>
@@ -18,11 +18,11 @@
              
                {% if course_offering.calculate_attendance_percentage < 60  %}
               <h1 class="text-red-500">Attendance Status: 
-                {{course_offering.calculate_attendance_percentage }} %
+                {% comment %} {{course_offering.calculate_attendance_percentage }} % {% endcomment %}
                   </h1>
               {% else %}
               <h1 class="text-gray-300}">Attendance Status: 
-                {{course_offering.calculate_attendance_percentage }}%
+                {% comment %} {{course_offering.calculate_attendance_percentage }}% {% endcomment %}
                   
               </h1>
               {% endif %} 

@@ -1,8 +1,9 @@
 from program.models import Program,Course,ProgramOffering,CourseOffering
-from report.models import Attendance
+from report.models import Attendance,WeeklyReport
 from customUser.models import Student
 from django.db.models import Q
 from datetime import datetime, timedelta
+from django.db.models import Count, Prefetch
 
 def filter_database_based_on_current_user(request_user):
     user_groups=request_user.groups.all()
@@ -17,11 +18,20 @@ def filter_database_based_on_current_user(request_user):
 
     if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
         program_offerings=ProgramOffering.objects.all()
-        course_offerings=CourseOffering.objects.all()
+        course_offerings=CourseOffering.objects.select_related('course').prefetch_related(
+            'student',
+            'teacher',
+            Prefetch('attendance', queryset=Attendance.objects.filter(is_present='present'), to_attr='present_attendance'),
+            Prefetch('attendance', queryset=Attendance.objects.exclude(is_present='present'), to_attr='absent_attendance')
+            ).all()
+        weekly_reports=WeeklyReport.objects.select('course_offering','student').all()
+
         programs=Program.objects.all()
         courses=Course.objects.all()
         students=Student.objects.all()
         attendances=Attendance.objects.all()
+        # attendances=Attendance.objects.select_related('student','course_offering').all()
+
         program_offerings_for_current_user=program_offerings
         course_offerings_for_current_user=course_offerings
         programs_for_current_user=programs

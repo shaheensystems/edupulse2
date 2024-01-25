@@ -57,8 +57,15 @@ def get_attendance_percentage_by_course_offering(course_offering, total_sessions
         if course_offering.offering_mode == "online":
             return "Not Applicable"
         else:
-            total_sessions=course_offering.attendance.count()
-            present_sessions = course_offering.attendance.filter(is_present='present').count()
+            
+            # get 100 query each method 
+            # total_sessions=course_offering.attendance.count()
+            # present_sessions = course_offering.attendance.filter(is_present='present').count()
+            
+            total_sessions = len(course_offering.present_attendance) + len(course_offering.absent_attendance)
+            present_sessions = len(course_offering.present_attendance)
+            
+            
             return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
 
 def get_attendance_percentage_by_program_offering(program_offering,total_sessions,present_sessions):

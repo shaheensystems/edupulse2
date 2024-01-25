@@ -372,6 +372,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
         attendances=filtered_data_by_date_range['attendances']
 
+        # 6 query each function 
         online_and_offline_course_offerings_by_current_user = get_online_offline_course_offerings(course_offerings_for_current_user=course_offerings_for_current_user)
         
         context.update(online_and_offline_course_offerings_by_current_user)
@@ -387,15 +388,23 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
         context['chart_data_attendance_report_action']=chart_data_attendance_report_action
         
+         # approx 50 query on below function function 
         total_no_of_at_risk_student=get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings_for_current_user)
 
-        # Add the total_students to the context
+        # # Add the total_students to the context
         context['total_students_for_all_course_offerings_for_current_user'] = self.get_all_students(course_offerings=course_offerings_for_current_user)
+        
+        # 3 query each function 
         context['total_students_for_online_course_offerings_for_current_user'] = self.get_all_students(course_offerings=online_course_offerings_for_current_user)
         context['total_students_for_blended_course_offerings_for_current_user'] = self.get_all_students(course_offerings=blended_course_offerings_for_current_user)
+        
+        # approx 50 query each function 
         context['total_no_of_at_risk_student_for_all_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings_for_current_user)
         context['total_no_of_at_risk_student_for_online_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=online_course_offerings_for_current_user)
         context['total_no_of_at_risk_student_for_blended_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=blended_course_offerings_for_current_user)
+        
+        
+        
         return context
 
 
