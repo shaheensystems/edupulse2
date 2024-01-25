@@ -24,7 +24,7 @@ def filter_database_based_on_current_user(request_user):
             Prefetch('attendance', queryset=Attendance.objects.filter(is_present='present'), to_attr='present_attendance'),
             Prefetch('attendance', queryset=Attendance.objects.exclude(is_present='present'), to_attr='absent_attendance')
             ).all()
-        weekly_reports=WeeklyReport.objects.select('course_offering','student').all()
+        weekly_reports=WeeklyReport.objects.select_related('course_offering','student').all()
 
         programs=Program.objects.all()
         courses=Course.objects.all()
