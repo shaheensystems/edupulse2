@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
-from utils.function.helperAttendance import get_attendance_percentage_by_student
+from utils.function.helperAttendance import get_attendance_percentage_by_student,get_attendance_percentage_by_attendances
 # Create your models here.
 
 class Ethnicity(models.Model):
@@ -96,32 +96,46 @@ class Student(BaseModel):
     visa_number=models.CharField(max_length=255,null=True,blank=True)
     visa_expiry_date=models.DateField(default=None, null=True,blank=True)
     fund_source=models.ForeignKey(StudentFundSource, verbose_name=("Student Fund Source"), on_delete=models.CASCADE, null=True,blank=True)
+    
+    @property
+    def list_of_course_offerings(self):
+        return ", ".join(co.course.name for co in self.course_offerings.all())
 
+        
     def student_is_at_risk_for_last_week_status(self):
-        from report.models import WeeklyReport
+        # from report.models import WeeklyReport
         current_date = datetime.now().date()
 
         # Calculate the start and end dates for the last week
         end_date_last_week = current_date - timedelta(days=current_date.weekday() + 1)
-        start_date_last_week = end_date_last_week - timedelta(days=6)
-        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
-        weekly_reports=self.weekly_reports.all()
-        last_week_weekly_reports=weekly_reports.filter(
-           sessions__attendance_date__range=[start_date_last_week, end_date_last_week] 
-        )
-       
-        # print("last Week reports :",last_week_weekly_reports)
+        # start_date_last_week = end_date_last_week - timedelta(days=6)
+        start_date_last_week = end_date_last_week - timedelta(days=1000)
         
-        for weekly_report in last_week_weekly_reports:
+        
+        # print("weekly Report at risk count dates :,",start_date_last_week," to ",end_date_last_week)
+        # weekly_reports=self.weekly_reports.all()
+        # last_week_weekly_reports=weekly_reports.filter(
+        #    sessions__attendance_date__range=[start_date_last_week, end_date_last_week] 
+        # )
+       
+        # # print("last Week reports :",last_week_weekly_reports)
 
-            if weekly_report.at_risk:
-                # print(True)
-                # print("student Id :",self.temp_id)
-                # print("course name : ",weekly_report.course_offering)
-                return True
+        # for weekly_report in last_week_weekly_reports:
 
+        #     if weekly_report.at_risk:
+        #         # print(True)
+        #         # print("student Id :",self.temp_id)
+        #         # print("course name : ",weekly_report.course_offering)
+        #         return True
+        at_risk_weekly_report_list=self.weekly_reports.filter(sessions__attendance_date__range=[start_date_last_week,end_date_last_week],at_risk=True)
+        
+        return at_risk_weekly_report_list
+       
     def calculate_attendance_percentage(self):
-        return get_attendance_percentage_by_student(student=self)
+        # getting more query compare to get_attendance_percentage_by_attendances
+        # return get_attendance_percentage_by_student(student=self)
+       
+        return get_attendance_percentage_by_attendances(attendances=self.attendances.all())
 
     def __str__(self):
         return f"{self.student.temp_id} "

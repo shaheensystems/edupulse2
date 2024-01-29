@@ -5,7 +5,14 @@
   {% comment %} <a href="{% url 'course_offering_detail' course_offerings.pk %}" > {% endcomment %}
     <!-- Course_offering_infobar -->
     <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
-      <h2 class="text-xl font-bold mb-2">{{course.temp_id}} ({{course.get_offering_mode_is_online}})<br>{{course.name}}</h2>
+      <h2 class="text-xl font-bold mb-2">{{course.temp_id}} (
+      
+        {% if course.get_offering_mode_is_online == True %}
+          Online
+        {% else %}
+          Blended
+        {% endif %}
+        )<br>{{course.name}}</h2>
       <div class='flex flex-row gap-4 flex-wrap '>
         <p class="mb-2 ">Total Course offerings : {{course.course_offering.count}}</p> |
         <p class="mb-2">Total Students Enrolled: 

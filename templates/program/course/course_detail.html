@@ -26,7 +26,11 @@
               <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
                 <p class="mb-2 ">Total Course Offerings: {{course.course_offering.count}}</p> |
                 <p class="mb-2">Total Students Enrolled: {{course.calculate_total_no_of_student|length}}</p> |
-                <p class="mb-2">Attendnace Percentage: {{course.calculate_attendance_percentage}} %</p> |
+                <p class="mb-2">Attendnace Percentage: {{course.calculate_attendance_percentage}} 
+                  {% if course.calculate_attendance_percentage >= 0 %}
+                  %
+                  {% endif %}
+                </p> |
                 {% if course.calculate_no_at_risk_student_for_last_week|length  >  0 %}
                 <p class='text-red-500'>Students at Risk: {{course.calculate_no_at_risk_student_for_last_week|length}}</p>
                 {% else  %}

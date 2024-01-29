@@ -15,7 +15,7 @@ def get_attendance_percentage(present_sessions,total_sessions):
         return round(attendance_percentage, 2)
 
     # If there are no sessions, return 0.0 as the default attendance percentage
-    return 0.0
+    return 00.00
 
 
 def get_attendance_percentage_by_program(program,total_sessions,present_sessions):
@@ -65,7 +65,7 @@ def get_attendance_percentage_by_course_offering(course_offering, total_sessions
             # total_sessions = len(course_offering.present_attendance) + len(course_offering.absent_attendance)
             # present_sessions = len(course_offering.present_attendance)
             # print("present_attendance:",course_offering.attendance.filter(is_present='present'))
-            # present_sessions = len(course_offering.attendance.filter(is_present='present'))
+            present_sessions = len(course_offering.attendance.filter(is_present='present'))
             absent_sessions=len(course_offering.attendance.exclude(is_present='present'))
             total_sessions=present_sessions+absent_sessions
             
@@ -92,13 +92,29 @@ def get_attendance_percentage_by_program_offering(program_offering,total_session
 
 def get_attendance_percentage_by_student(student):
     # Get all the courses associated with the program
-        all_attendances=student.attendances.all()
+        all_attendances=student.attendances.exclude(course_offering__offering_mode='online')
         total_sessions=all_attendances.count()
         present_sessions=all_attendances.filter(is_present='present').count()
     
 
         return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+    
 
+def get_attendance_percentage_by_attendances(attendances):
+    
+    
+    if len(attendances)==0:
+        return 00.00
+    else:
+        offline_attendance=attendances.exclude(course_offering__offering_mode="online")
+        # offline_attendance=attendances
+        total_sessions=len(offline_attendance)
+        # getting query 200 plus 
+        present_sessions=len(offline_attendance.filter(is_present='present'))
+        # total_sessions=0
+        # present_sessions=0
+    
+        return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
 
 
 

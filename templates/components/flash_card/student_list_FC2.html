@@ -49,7 +49,7 @@
                     {% for student in students %}
                        
                         <tr {% if student in at_risk_students %}class="bg-red-300"{% endif %} >
-                            {% comment %} <td class="border px-4 py-2">{{ student.id }}</td> {% endcomment %}
+                          
                             <td class="border px-4 py-2">{{ student.student.temp_id }}</td>
                             <td class="border px-4 py-2 w-auto">{{ student.student.first_name }} {{ student.student.last_name }}</td>
                             <td class="border px-4 py-2">{{ student.student.campus.name }}</td>
@@ -60,18 +60,18 @@
                                 {% endfor %}
                             </td>
                             <td class="border px-4 py-2">
-                                {% for course_offering in student.course_offerings.all %}
+                                {{student.list_of_course_offerings}}
+                                 {% for course_offering in student.course_offerings.all %}
                                     {{ course_offering.course.name }}
-                                    {% if not forloop.last %}, {% endif %}
+                                    {% if not forloop.last %},<br> {% endif %}
                                     <br>
-                                {% endfor %}
+                                {% endfor %}  
                             </td>
                           
                             <td class="border px-4 py-2 text-center align-middle">{{ student.international_student }}</td>
                             <td class="border px-4 py-2 text-center align-middle">{{ student.calculate_attendance_percentage}} %</td>
-                            <td class="border px-4 py-2 text-center align-middle ">{{student.student_is_at_risk_for_last_week_status }}</td>
-                            {% comment %} <td class="border px-4 py-2 {% if student.student_is_at_risk_for_last_week_status is True %} bg-red-300{% endif %} ">{{student.student_is_at_risk_for_last_week_status }}</td> {% endcomment %}
-                        </tr>
+                            <td class="border px-4 py-2 text-center align-middle ">{{student.student_is_at_risk_for_last_week_status |length}}</td>
+                            </tr>
                     {% endfor %}
                 </tbody>
             </table>

@@ -15,8 +15,13 @@
               <p> No of Enrolled Students : {{course_offering.student.count}}</P>
             </div>
             <div class='px-4 py-2 m-2 rounded-lg w-1/3'>
-             
-               {% if course_offering.calculate_attendance_percentage < 60  %}
+
+              {% if course_offering.calculate_attendance_percentage == "Not Applicable" %}
+              <h1 class="text-gray-500">Attendance Status: 
+                {{course_offering.calculate_attendance_percentage }}
+                  </h1>
+              {% else %}
+              {% if course_offering.calculate_attendance_percentage < 60  %}
               <h1 class="text-red-500">Attendance Status: 
                 {{course_offering.calculate_attendance_percentage }} %
                   </h1>
@@ -26,6 +31,10 @@
                   
               </h1>
               {% endif %} 
+
+              {% endif %}
+             
+               
               
             {% if course_offering.calculate_no_at_risk_student_for_last_week|length >  0 %}
             <p class='text-red-500'>Students at Risk : 

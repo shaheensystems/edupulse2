@@ -17,7 +17,18 @@ def filter_database_based_on_current_user(request_user):
   
 
     if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
-        program_offerings=ProgramOffering.objects.all()
+        program_offerings=ProgramOffering.objects.select_related('program').prefetch_related('student',
+                                                                                             'student__attendances',
+                                                                                             'student__attendances__weekly_reports',
+                                                                                             'program__course',
+                                                                                             'program__course__course_offering',
+                                                                                             'program__course__course_offering__student',
+                                                                                             'program__course__course_offering__student__attendances',
+                                                                                             'program__course__course_offering__student__attendances__weekly_reports',
+                                                                                             ).all()
+        
+        
+        
         course_offerings=CourseOffering.objects.select_related('course').prefetch_related(
             'student',
             'teacher',
@@ -26,9 +37,18 @@ def filter_database_based_on_current_user(request_user):
             ).all()
         
 
-        programs=Program.objects.all()
+        # programs=Program.objects.all()
+        programs=Program.objects.prefetch_related('course','program_offerings','course__course_offering','course__course_offering__student','course__course_offering__weekly_reports').all()
         courses=Course.objects.all()
-        students=Student.objects.all()
+        students=Student.objects.select_related('student').prefetch_related('attendances' ,
+                                                                            'attendances__course_offering',
+                                                                            'course_offerings',
+                                                                            'course_offerings__course',
+                                                                            # Prefetch('course_offerings', queryset=CourseOffering.objects.only('name')), 
+                                                                            'program_offering', 
+                                                                            'program_offering__program', 
+                                                                            'weekly_reports'
+                                                                            ).all()
         attendances=Attendance.objects.all()
         # attendances=Attendance.objects.select_related('student','course_offering').all()
 
@@ -40,7 +60,7 @@ def filter_database_based_on_current_user(request_user):
         all_programs=program_offerings_for_current_user
 
         attendances = attendances.filter(student__in=students)
-        weekly_reports=WeeklyReport.objects.select_related('course_offering','student').filter(course_offering__in=course_offerings_for_current_user)
+        weekly_reports=WeeklyReport.objects.select_related('course_offering','student').prefetch_related('student__attendances').filter(course_offering__in=course_offerings_for_current_user)
 
         # print("Query :",program_offerings_for_current_user.query)
     elif user_groups.filter(name="Program_Leader").exists():

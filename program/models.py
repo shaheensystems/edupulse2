@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 from django.db.models import Q
 
-from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering
+from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances
 
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
@@ -135,7 +135,11 @@ class CourseOffering(BaseModel):
     
 
     def calculate_attendance_percentage(self): 
-        return get_attendance_percentage_by_course_offering(course_offering=self,total_sessions=0,present_sessions=0)
+        if self.offering_mode=='online':
+            return "Not Applicable"
+        else:
+            # return get_attendance_percentage_by_course_offering(course_offering=self,total_sessions=0,present_sessions=0)
+            return get_attendance_percentage_by_attendances(self.attendance.all())
      
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_course_offering(course_offering=self)

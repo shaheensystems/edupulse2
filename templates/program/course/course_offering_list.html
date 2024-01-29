@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 <section class='w-full'>
-    <h1> Program Offering List  </h1>
+    
     <section class='my-2 w-full'>
 
-    
          <!-- Course_offering_infobar -->
-         <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
-          <h2 class="text-xl font-bold mb-2">Course Offerings List </h2>
-          <div class='flex flex-row gap-4 flex-wrap '>
+         <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline gap-5">
+          <h2 class="text-xl font-bold mb-2 min-w-fit">Course Offerings List </h2>
+          <div class='flex flex-row gap-4 flex-wrap justify-end'>
             <p class="mb-2 ">Current Course: {{course_offerings_for_current_user.count}} (Blended :{{blended_course_offerings_for_current_user|length}}, Online :{{online_course_offerings_for_current_user|length}})</p> |
             <p class="mb-2">Total Students Enrolled: {{total_students_for_all_course_offerings_for_current_user|length}} (Blended :{{total_students_for_blended_course_offerings_for_current_user|length}}, Online :{{total_students_for_online_course_offerings_for_current_user|length}})</p> |
-                {{total_no_of_at_risk_student_for_blended_course_offerings_for_current_user|length}}
+            <p class="mb-2">Attendance Percentage: {{total_attendance_percentage}} {% if total_attendance_percentage >= 0 %}%{% endif %} </p> |
+                
                 {% if total_no_of_at_risk_student_for_all_course_offerings_for_current_user|length >  0 %}
                   <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student_for_all_course_offerings_for_current_user|length}} (Blended :{{total_no_of_at_risk_student_for_blended_course_offerings_for_current_user|length}}, Online :{{total_no_of_at_risk_student_for_online_course_offerings_for_current_user|length}})</p>
                   {% else  %}

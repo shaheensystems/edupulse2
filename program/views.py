@@ -16,6 +16,7 @@ from utils.function.helperDatabaseFilter import filter_database_based_on_current
 from utils.function.helperGetChartData import get_chart_data_attendance_by_date,get_chart_data_attendance_report
 
 from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_courses
+from utils.function.helperAttendance import get_attendance_percentage_by_attendances
 
 # Create your views here.
 
@@ -127,14 +128,7 @@ class ProgramListView(LoginRequiredMixin,ListView):
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
-        # user_data=filter_database_based_on_current_user(request_user=self.request.user,
-        #                                                 program_offerings=ProgramOffering.objects.all(),
-        #                                                 course_offerings=CourseOffering.objects.all(),
-        #                                                 programs=Program.objects.all(),
-        #                                                 courses=Course.objects.all(),
-        #                                                 students=Student.objects.all(),
-        #                                                 attendances=Attendance.objects.all()
-        #                                                 )
+        
         user_data=filter_database_based_on_current_user(request_user=self.request.user)
         program_offerings_for_current_user=user_data['program_offerings_for_current_user']
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']
@@ -401,7 +395,10 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
         context['chart_data_attendance_report_action']=chart_data_attendance_report_action
         
-         # approx 50 query on below function function 
+        context['total_attendance_percentage']=get_attendance_percentage_by_attendances(attendances)
+        
+        
+        # approx 50 query on below function function 
         total_no_of_at_risk_student=get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings_for_current_user)
 
         # # Add the total_students to the context
@@ -416,6 +413,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         context['total_no_of_at_risk_student_for_online_course_offerings_for_current_user'] = weekly_reports.filter(at_risk=True,course_offering__offering_mode="online")
         context['total_no_of_at_risk_student_for_blended_course_offerings_for_current_user'] = weekly_reports.filter(at_risk=True).exclude(course_offering__offering_mode = "online")
 
+        
         
         # approx 50 query each function 
         
