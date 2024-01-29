@@ -62,8 +62,12 @@ def get_attendance_percentage_by_course_offering(course_offering, total_sessions
             # total_sessions=course_offering.attendance.count()
             # present_sessions = course_offering.attendance.filter(is_present='present').count()
             
-            total_sessions = len(course_offering.present_attendance) + len(course_offering.absent_attendance)
-            present_sessions = len(course_offering.present_attendance)
+            # total_sessions = len(course_offering.present_attendance) + len(course_offering.absent_attendance)
+            # present_sessions = len(course_offering.present_attendance)
+            # print("present_attendance:",course_offering.attendance.filter(is_present='present'))
+            # present_sessions = len(course_offering.attendance.filter(is_present='present'))
+            absent_sessions=len(course_offering.attendance.exclude(is_present='present'))
+            total_sessions=present_sessions+absent_sessions
             
             
             return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)

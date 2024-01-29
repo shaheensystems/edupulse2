@@ -68,33 +68,36 @@
           <div class='flex flex-col'>
             <p class='text-center text-lg font-bold mb-2'> Student Enrollment Status </p>
             
-            <div class='flex flex-row gap-0 flex-wrap justify-center'>
-              <div class='w-4/12 bg-gray-100 rounded-lg'>
-            {% with data=chart_data_campus_enrollment_student text='Students Enrollment By Campus' id='students_enrollment'%}
-              {% include 'charts/barChartHorizontal.html' %}
-            {% endwith %}
+            <div class='flex flex-row gap-2 flex-wrap justify-center '>
+              <div class='w-[32%] bg-gray-100 rounded-lg'>
+              {% comment %} {{chart_data_campus_enrollment_student}}  {% endcomment %}
+              {% comment %} {% with data=chart_data_campus_enrollment_student text='Students Enrollment By Campus' id='students_enrollment_by_campus'%}
+                {% include 'charts/barChartHorizontal.html' %}
+              {% endwith %}  {% endcomment %}
+              {% with data=chart_data_campus_enrollment_student title='Students Enrollment By Campus' id='students_enrollment_by_campus' chartType='pie' lengendDisplay='true' limitData=10 %}
+                {% include 'charts/chart.html' %}
+              {% endwith %}
+              
             </div>
-            <div class='w-4/12 bg-gray-100 rounded-lg'>
+            <div class='w-[33%] bg-gray-100 rounded-lg'>
               {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode' chartType='pie' lengendDisplay='true' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
-            <div class='w-4/12 bg-gray-100 rounded-lg'>
+            <div class='w-[33%] bg-gray-100 rounded-lg'>
               {% with data=chart_data_student_region title='Domestic and International Studnets' id='students_by_country' chartType='bar' lengendDisplay='false' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
-            
-          </div>
-          <div class='flex flex-col'>
-            <p class='text-center text-lg font-bold my-2'> Student Enrollment Status 2</p>
-            
-            <div class='flex flex-row gap-0 flex-wrap justify-center'>
-              <div class='w-4/12 bg-gray-100 rounded-lg'>
+           
+              <div class='w-[33%] bg-gray-100 rounded-lg'>
                 
-                {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program' id='program_students_enrollment'%}
+                {% comment %} {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program' id='program_students_enrollment2'%}
                   {% include 'charts/barChartHorizontal.html' %}
-                {% endwith %}
+                {% endwith %} {% endcomment %}
+                {% with data=chart_data_programs_student_enrollment title='Students Enrollment By Program' id='program_students_enrollment2' chartType='bar' lengendDisplay='false' limitData=10 %}
+                {% include 'charts/chart.html' %}
+              {% endwith %}
               </div>
               {% comment %} <div class='w-4/12 bg-gray-100 rounded-lg'>
                 
@@ -102,18 +105,20 @@
                   {% include 'charts/testchart.html' %}
                 {% endwith %}
               </div> {% endcomment %}
-            <div class='w-4/12 bg-gray-100 rounded-lg hidden'>
-              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode1' chartType='pie' lengendDisplay='true' limitData=10 %}
+            <div class='w-[33%] bg-gray-100 rounded-lg hidden'>
+              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode2' chartType='pie' lengendDisplay='true' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
             <div class='w-4/12 bg-gray-100 rounded-lg hidden'>
+            
               {% with data=chart_data_student_region title='Domestic and International Studnets' id='students_by_country1' chartType='bar' lengendDisplay='false' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
             
           </div>
+         
           
           {% comment %} {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set  %}
               {% include 'components/dashboard/program_offering_info_bar.html' %}

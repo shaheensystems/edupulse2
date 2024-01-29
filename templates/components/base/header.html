@@ -26,7 +26,7 @@
         {% if request.user|user_belongs_to_group:'Head_of_School' %} 
         <a href="{% url 'program_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Programs</a>
        {% endif %}
-        {% if request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Teacher'  %} 
+        {% if request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Program_Leader'  %} 
         <a href="{% url 'program_offering_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Program Offerings</a>
        {% endif %}
        {% if request.user|user_belongs_to_group:'Head_of_School' %} 

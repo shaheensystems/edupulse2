@@ -49,6 +49,7 @@ class CourseListView(LoginRequiredMixin,ListView):
         students=user_data['students']
         attendances=user_data['attendances']
         all_programs=user_data['all_programs']
+        weekly_reports=user_data['weekly_reports']
         
         context.update(user_data)
 
@@ -59,7 +60,8 @@ class CourseListView(LoginRequiredMixin,ListView):
                                         courses_for_current_user=courses_for_current_user,
                                         program_offerings_for_current_user=program_offerings_for_current_user,
                                         course_offerings_for_current_user=course_offerings_for_current_user,
-                                        attendances =attendances)
+                                        attendances =attendances,
+                                        weekly_reports=weekly_reports)
             
         program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
         course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -68,7 +70,7 @@ class CourseListView(LoginRequiredMixin,ListView):
         active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
         inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
         attendances=filtered_data_by_date_range['attendances']
-        
+        weekly_reports=filtered_data_by_date_range['weekly_reports']
        
         context.update(filtered_data_by_date_range)
 
@@ -141,6 +143,7 @@ class ProgramListView(LoginRequiredMixin,ListView):
         students=user_data['students']
         attendances=user_data['attendances']
         all_programs=user_data['all_programs']
+        weekly_reports=user_data['weekly_reports']
         
         context.update(user_data)
 
@@ -151,7 +154,8 @@ class ProgramListView(LoginRequiredMixin,ListView):
                                         courses_for_current_user=courses_for_current_user,
                                         program_offerings_for_current_user=program_offerings_for_current_user,
                                         course_offerings_for_current_user=course_offerings_for_current_user,
-                                        attendances =attendances)
+                                        attendances =attendances,
+                                        weekly_reports=weekly_reports)
             
         program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
         course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -160,6 +164,7 @@ class ProgramListView(LoginRequiredMixin,ListView):
         active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
         inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
         attendances=filtered_data_by_date_range['attendances']
+        weekly_reports=filtered_data_by_date_range['weekly_reports']
         
        
         context.update(filtered_data_by_date_range)
@@ -246,6 +251,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         students=user_data['students']
         attendances=user_data['attendances']
         all_programs=user_data['all_programs']
+        weekly_reports=user_data['weekly_reports']
         
         context.update(user_data)
         filtered_data_by_date_range=filter_data_based_on_date_range(
@@ -255,7 +261,8 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
                                         courses_for_current_user=courses_for_current_user,
                                         program_offerings_for_current_user=program_offerings_for_current_user,
                                         course_offerings_for_current_user=course_offerings_for_current_user,
-                                        attendances =attendances)
+                                        attendances =attendances,
+                                        weekly_reports=weekly_reports)
             
         program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
         course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -264,6 +271,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
         inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
         attendances=filtered_data_by_date_range['attendances']
+        weekly_reports=filtered_data_by_date_range['weekly_reports']
         
         
         online_and_offline_program_offerings_by_current_user = get_online_offline_program_offerings(program_offerings_for_current_user=program_offerings_for_current_user)
@@ -353,6 +361,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         students=user_data['students']
         attendances=user_data['attendances']
         all_programs=user_data['all_programs']
+        weekly_reports=user_data['weekly_reports']
         
         context.update(user_data)
         filtered_data_by_date_range=filter_data_based_on_date_range(
@@ -362,7 +371,8 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
                                         courses_for_current_user=courses_for_current_user,
                                         program_offerings_for_current_user=program_offerings_for_current_user,
                                         course_offerings_for_current_user=course_offerings_for_current_user,
-                                        attendances =attendances)
+                                        attendances =attendances,
+                                        weekly_reports=weekly_reports)
             
         program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
         course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -371,6 +381,9 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
         inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
         attendances=filtered_data_by_date_range['attendances']
+        weekly_reports=filtered_data_by_date_range['weekly_reports']
+        
+        context.update(filtered_data_by_date_range)
 
         # 6 query each function 
         online_and_offline_course_offerings_by_current_user = get_online_offline_course_offerings(course_offerings_for_current_user=course_offerings_for_current_user)
@@ -398,10 +411,17 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         context['total_students_for_online_course_offerings_for_current_user'] = self.get_all_students(course_offerings=online_course_offerings_for_current_user)
         context['total_students_for_blended_course_offerings_for_current_user'] = self.get_all_students(course_offerings=blended_course_offerings_for_current_user)
         
+        # approx 3 query each function 
+        context['total_no_of_at_risk_student_for_all_course_offerings_for_current_user'] = weekly_reports.filter(at_risk=True)
+        context['total_no_of_at_risk_student_for_online_course_offerings_for_current_user'] = weekly_reports.filter(at_risk=True,course_offering__offering_mode="online")
+        context['total_no_of_at_risk_student_for_blended_course_offerings_for_current_user'] = weekly_reports.filter(at_risk=True).exclude(course_offering__offering_mode = "online")
+
+        
         # approx 50 query each function 
-        context['total_no_of_at_risk_student_for_all_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings_for_current_user)
-        context['total_no_of_at_risk_student_for_online_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=online_course_offerings_for_current_user)
-        context['total_no_of_at_risk_student_for_blended_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=blended_course_offerings_for_current_user)
+        
+        # context['total_no_of_at_risk_student_for_all_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=course_offerings_for_current_user)
+        # context['total_no_of_at_risk_student_for_online_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=online_course_offerings_for_current_user)
+        # context['total_no_of_at_risk_student_for_blended_course_offerings_for_current_user'] = get_no_of_at_risk_students_by_course_offerings(course_offerings=blended_course_offerings_for_current_user)
         
         
         

@@ -4,22 +4,24 @@
     <h1> Program Offering List  </h1>
     <section class='my-2 w-full'>
 
-      
+    
          <!-- Course_offering_infobar -->
          <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
           <h2 class="text-xl font-bold mb-2">Course Offerings List </h2>
           <div class='flex flex-row gap-4 flex-wrap '>
             <p class="mb-2 ">Current Course: {{course_offerings_for_current_user.count}} (Blended :{{blended_course_offerings_for_current_user|length}}, Online :{{online_course_offerings_for_current_user|length}})</p> |
             <p class="mb-2">Total Students Enrolled: {{total_students_for_all_course_offerings_for_current_user|length}} (Blended :{{total_students_for_blended_course_offerings_for_current_user|length}}, Online :{{total_students_for_online_course_offerings_for_current_user|length}})</p> |
-                {% if total_no_of_at_risk_student_for_all_course_offerings_for_current_user >  0 %}
+                {{total_no_of_at_risk_student_for_blended_course_offerings_for_current_user|length}}
+                {% if total_no_of_at_risk_student_for_all_course_offerings_for_current_user|length >  0 %}
                   <p class='text-red-500'>Students at Risk: {{total_no_of_at_risk_student_for_all_course_offerings_for_current_user|length}} (Blended :{{total_no_of_at_risk_student_for_blended_course_offerings_for_current_user|length}}, Online :{{total_no_of_at_risk_student_for_online_course_offerings_for_current_user|length}})</p>
                   {% else  %}
                   <p>Students at Risk: {{total_no_of_at_risk_student_for_all_course_offerings_for_current_user |length}}</p>
-                  {% endif %}
+                {% endif %}
           </div> 
           <!-- Add more course offering details -->
+          
         </div>
-        
+        <p>Date Range: {{ start_date}}  - {{ end_date }}</p>
       
   </section>
     <section class='w-full  bg-gray-100 rounded-lg  mb-3'   >
@@ -48,14 +50,14 @@
        
         </ul>
         <div class='flex w-3/4 bg-blue-200 mb-2 mt-2 px-4 py-2'>Online Program 
-          {{online_course_offerings_for_current_user|length}})
+          ({{online_course_offerings_for_current_user|length}})
         </div>
       <ul class='flex flex-col gap-4 w-3/4'>
-       {% comment %} {% for course_offering in online_course_offerings_for_current_user %}
+       {% for course_offering in online_course_offerings_for_current_user %}
              {% with course_offering=course_offering %}
                     {% include 'components/flash_card/course_offering_FC.html' %}
                 {% endwith %}  
-        {% endfor %}  {% endcomment %}
+        {% endfor %}  
        
         </ul>
       

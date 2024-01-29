@@ -37,6 +37,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         students=user_data['students']
         attendances=user_data['attendances']
         all_programs=user_data['all_programs']
+        weekly_reports=user_data['weekly_reports']
         # context.update(user_data)
 
         
@@ -58,7 +59,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                                         courses_for_current_user=courses_for_current_user,
                                         program_offerings_for_current_user=program_offerings_for_current_user,
                                         course_offerings_for_current_user=course_offerings_for_current_user,
-                                        attendances =attendances)
+                                        attendances =attendances,
+                                        weekly_reports=weekly_reports)
             
             program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
             course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -67,6 +69,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             active_programs_for_current_user=filtered_data_by_date_range['active_programs_for_current_user']
             inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
             attendances=filtered_data_by_date_range['attendances']
+            weekly_reports=filtered_data_by_date_range['weekly_reports']
             context.update(filtered_data_by_date_range)
                
         context['date_filter_form']=date_filter_form
