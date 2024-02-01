@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 from django.db.models import Q
 
-from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances
+from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances,get_engagement_percentage_by_course,get_engagement_percentage_by_program
 
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
@@ -54,7 +54,16 @@ class Program(BaseModel):
 
     # attendance percentage is only for blended/offline program, inactive and online program doesn't have attendance
     def calculate_attendance_percentage(self):
-        return get_attendance_percentage_by_program(program=self,total_sessions=0,present_sessions=0)
+        # attendance Percentage is only for offline program 
+        return get_attendance_percentage_by_program(program=self)
+    
+    def calculate_engagement_percentage_for_online_program(self,offering_mode='online'):
+   
+        return get_engagement_percentage_by_program(program=self, offering_mode=offering_mode)
+    
+    def calculate_engagement_percentage_for_blended_program(self,offering_mode='blended'):
+    
+        return get_engagement_percentage_by_program(program=self, offering_mode=offering_mode)
   
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_program(program=self)
@@ -96,7 +105,7 @@ class Course(BaseModel):
         return get_no_of_at_risk_students_by_course(course=self)
     
     def calculate_attendance_percentage(self):
-        return get_attendance_percentage_by_course(course=self,total_sessions=0,present_sessions=0)
+        return get_attendance_percentage_by_course(course=self)
     
     def calculate_total_no_of_student_for_online_course(self,offering_mode="online"):
         return get_total_no_of_student_by_course(course=self,offering_mode=offering_mode)
@@ -106,7 +115,12 @@ class Course(BaseModel):
     
     def calculate_total_no_of_student(self,offering_mode='all'):
         return get_total_no_of_student_by_course(course=self,offering_mode=offering_mode)
-
+    
+    def calculate_engagement_percentage(self):
+        
+        return get_engagement_percentage_by_course(course=self)
+    
+    
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
 

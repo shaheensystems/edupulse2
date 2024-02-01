@@ -134,8 +134,10 @@ class Student(BaseModel):
     def calculate_attendance_percentage(self):
         # getting more query compare to get_attendance_percentage_by_attendances
         # return get_attendance_percentage_by_student(student=self)
-       
         return get_attendance_percentage_by_attendances(attendances=self.attendances.all())
+        
+       
+        
 
     def __str__(self):
         return f"{self.student.temp_id} "

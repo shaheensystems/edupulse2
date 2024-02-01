@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <h1> At Risk Studnets List </h1>
+   
+         
+        {% with students=students  view="table" %}
+             {% include 'components/flash_card/student_list_FC2.html' %}
+         {% endwith %}
+        
+
+    <p></p>
+  
+</section>
+{% endblock content %}

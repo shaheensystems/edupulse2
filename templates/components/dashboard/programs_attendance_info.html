@@ -38,34 +38,58 @@
                             <th class="py-2 px-4 border-b">Program Name</th>
                             <th class="py-2 px-4 border-b">Enrolled Students</th>
                             <th class="py-2 px-4 border-b">Attendance Percentage</th>
+                            <th class="py-2 px-4 border-b">Engagement Percentage</th>
                             <th class="py-2 px-4 border-b">At Risk Students</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for program in offline_programs %}
                             <tr>
-                                <td class="py-2 px-4 border-b">{{ program.temp_id }} (Blended)</td>
-                                <td class="py-2 px-4 border-b">{{ program.name }}</td>
+                                <td class="py-2 px-4 border-b">
+                                    <a href="{% url 'program_detail' program.pk %}">
+                                        {{ program.temp_id }} (Blended)
+                                    </a>       
+                                </td>
+                                <td class="py-2 px-4 border-b">
+                                    <a href="{% url 'program_detail' program.pk %}">
+                                        {{ program.name }}
+                                    </a>       </td>
                                 <td class="py-2 px-4 border-b text-center">{{ program.calculate_total_no_of_student_for_offline_program |length}}</td>
-                                <td class="py-2 px-4 border-b text-center">{{ program.calculate_attendance_percentage }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program.calculate_attendance_percentage }} %</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program.calculate_engagement_percentage_for_blended_program }} %</td>
                                 <td class="py-2 px-4 border-b text-center">{{ program.calculate_no_at_risk_student_for_last_week|length }}</td>
                             </tr>
 
                         {% endfor %}
                         {% for program in online_programs %}
                             <tr>
-                                <td class="py-2 px-4 border-b">{{ program.temp_id }} (Online)</td>
-                                <td class="py-2 px-4 border-b">{{ program.name }}</td>
+                                <td class="py-2 px-4 border-b">
+                                    <a href="{% url 'program_detail' program.pk %}">
+                                        {{ program.temp_id }} (Online)
+                                    </a> 
+                                </td>
+                                <td class="py-2 px-4 border-b">
+                                    <a href="{% url 'program_detail' program.pk %}">
+                                        {{ program.name }}
+                                    </a></td>
                                 <td class="py-2 px-4 border-b text-center">{{ program.calculate_total_no_of_student_for_online_program|length }}</td>
                                 <td class="py-2 px-4 border-b text-center">Not Applicable</td>
+                                <td class="py-2 px-4 border-b text-center">{{ program.calculate_engagement_percentage_for_online_program }} %</td>
                                 <td class="py-2 px-4 border-b text-center">{{ program.calculate_no_at_risk_student_for_last_week|length }}</td>
                             </tr>
 
                         {% endfor %}
                         {% for program in inactive_programs_for_current_user %}
                             <tr>
-                                <td class="py-2 px-4 border-b">{{ program.temp_id }} (inactive) </td>
-                                <td class="py-2 px-4 border-b">{{ program.name }}</td>
+                                <td class="py-2 px-4 border-b">
+                                    <a href="{% url 'program_detail' program.pk %}">
+                                        {{ program.temp_id }} (inactive)
+                                    </a>  </td>
+                                <td class="py-2 px-4 border-b">
+                                    <a href="{% url 'program_detail' program.pk %}">
+                                        {{ program.name }}
+                                    </a> </td>
+                                <td class="py-2 px-4 border-b text-center">No Enrollment</td>
                                 <td class="py-2 px-4 border-b text-center">No Enrollment</td>
                                 <td class="py-2 px-4 border-b text-center">No Enrollment</td>
                                 <td class="py-2 px-4 border-b text-center">No Enrollment</td>
@@ -89,10 +113,15 @@
 
             
                 <div class='flex flex-row gap-4 justify-between text-lg font-bold mt-3'> 
-                    <span class='text-lg font-bold '> {{program.temp_id}}:{{program.name}} (Blended)</span>
-                    <span class='flex flex-col gap-3 font-extralight text-sm text-black-200 px-2'>
+                    <span class='text-lg font-bold '>
+                        <a href="{% url 'program_detail' program.pk %}">
+                            {{program.temp_id}}:{{program.name}} (Blended)
+                        </a>
+                         </span>
+                    <span class='flex flex-col gap-3 font-extralight text-sm text-black-200 px-2 flex-wrap'>
                         <span class=''>Enrolled Student :{{program.calculate_total_no_of_student_for_offline_program|length }},<span>
-                        <span>Attendance percentage :{{program.calculate_attendance_percentage }}%,<span>
+                        <span>Attendance percentage :{{program.calculate_attendance_percentage }} %,<span>
+                        <span>Engagement percentage :{{program.calculate_engagement_percentage_for_blended_program }} %,<span>
                         <span>At Risk Student :{{program.calculate_no_at_risk_student_for_last_week|length }}<span> 
                     </span>
                 </div>
@@ -103,16 +132,27 @@
                             <th class="py-2 px-4 border-b ">Course Name</th>
                             <th class="py-2 px-4 border-b">Enrolled Students</th>
                             <th class="py-2 px-4 border-b">Attendance Percentage</th>
+                            <th class="py-2 px-4 border-b">Engagement Percentage</th>
                             <th class="py-2 px-4 border-b">At-Risk Students</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for course in program.course.all  %}
                             <tr>
-                                <td class="py-2 px-4 border-b pl-10">{{ course.temp_id }} </td>
-                                <td class="py-2 px-4 border-b pl-10">{{ course.name }}</td>
+                                <td class="py-2 px-4 border-b pl-10"> 
+                                    <a href="{% url 'course_detail' course.pk %}">
+                                        {{ course.temp_id }}  
+                                    </a>
+                                  
+                                </td>
+                                <td class="py-2 px-4 border-b pl-10">
+                                    <a href="{% url 'course_detail' course.pk %}">
+                                        {{ course.name }}
+                                    </a>
+                                    </td>
                                 <td class="py-2 px-4 border-b text-center">{{ course.calculate_total_no_of_student_for_offline_course|length }}</td>
                                 <td class="py-2 px-4 border-b text-center pr-10">{{ course.calculate_attendance_percentage }}%</td>
+                                <td class="py-2 px-4 border-b text-center pr-10">{{ course.calculate_engagement_percentage }}%</td>
                                 <td class="py-2 px-4 border-b text-center">{{ course.calculate_no_at_risk_student_for_last_week |length}}</td>
                             </tr>
               
@@ -126,10 +166,15 @@
             
             
                 <div class='flex flex-row gap-4 justify-between text-lg font-bold mt-3'> 
-                    <span class='text-lg font-bold '> {{program.temp_id}}:{{program.name}}(online) </span>
-                    <span class='flex flex-col gap-3 font-extralight text-sm text-black-200 px-2 '>
+                    <span class='text-lg font-bold '>
+                        <a href="{% url 'program_detail' program.pk %}">
+                            {{program.temp_id}}:{{program.name}}(online)
+                        </a>
+                          </span>
+                    <span class='flex flex-col gap-3 font-extralight text-sm text-black-200 px-2 flex-wrap'>
                         <span class=''>Enrolled Student :{{program.calculate_total_no_of_student_for_online_program |length}},<span>
                         <span>Attendance percentage :Not Applicable,<span>
+                        <span>Engagement percentage :{{program.calculate_engagement_percentage_for_online_program }} %,<span>
                         <span>At Risk Student :{{program.calculate_no_at_risk_student_for_last_week|length }}<span> 
                     </span>
                 </div>
@@ -140,6 +185,7 @@
                             <th class="py-2 px-4 border-b ">Course Name</th>
                             <th class="py-2 px-4 border-b">Enrolled Students</th>
                             <th class="py-2 px-4 border-b">Attendance Percentage</th>
+                            <th class="py-2 px-4 border-b">Engagement Percentage</th>
                             <th class="py-2 px-4 border-b">At-Risk Students</th>
                         </tr>
                     </thead>
@@ -147,10 +193,18 @@
                         {% for course in program.course.all  %}
                             {% if course.temp_id|default:""|slice:"-1:" == "D"  %}
                             <tr>
-                                <td class="py-2 px-4 border-b pl-10">{{ course.temp_id }}  </td>
-                                <td class="py-2 px-4 border-b pl-10">{{ course.name }}</td>
+                                <td class="py-2 px-4 border-b pl-10">
+                                    <a href="{% url 'course_detail' course.pk %}">
+                                        {{ course.temp_id }} 
+                                    </a>
+                                     </td>
+                                <td class="py-2 px-4 border-b pl-10">
+                                    <a href="{% url 'course_detail' course.pk %}">
+                                        {{ course.name }}
+                                    </a></td>
                                 <td class="py-2 px-4 border-b text-center">{{ course.calculate_total_no_of_student_for_online_course |length }}</td>
                                 <td class="py-2 px-4 border-b text-center pr-10">{{course.calculate_attendance_percentage}}</td>
+                                <td class="py-2 px-4 border-b text-center pr-10">{{course.calculate_engagement_percentage}}%</td>
                                 <td class="py-2 px-4 border-b text-center">{{ course.calculate_no_at_risk_student_for_last_week |length}}</td>
                             </tr>
                             

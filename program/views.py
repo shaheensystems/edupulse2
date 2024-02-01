@@ -25,6 +25,11 @@ class CourseListView(LoginRequiredMixin,ListView):
     template_name='program/course/course_list.html'
     context_object_name='courses'
 
+    def get_queryset(self):
+        user_data = filter_database_based_on_current_user(request_user=self.request.user)
+        courses_for_current_user = user_data['courses_for_current_user']
+        return courses_for_current_user
+    
     def get_all_students_and_at_risk_students(self, courses):
         unique_students = set()
         no_of_at_risk_students=set()
@@ -102,9 +107,16 @@ class CourseDetailView(LoginRequiredMixin,DetailView):
     model=Course
     template_name='program/course/course_detail.html'
     context_object_name='course'
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # You can customize the queryset here if needed
+        return queryset
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # Now you have access to self.object, which is the Course instance
         offline_students=self.object.calculate_total_no_of_student_for_offline_course()
         offline_students_attendance = Attendance.objects.filter(student__in=offline_students)
         # print(offline_students)
