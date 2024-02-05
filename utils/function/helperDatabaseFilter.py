@@ -61,7 +61,7 @@ def filter_database_based_on_current_user(request_user):
         students=students
         all_programs=program_offerings_for_current_user
 
-        attendances = attendances.filter(student__in=students)
+        attendances = attendances.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').order_by('course_offering').filter(student__in=students)
         weekly_reports=WeeklyReport.objects.select_related('course_offering','student').prefetch_related('student__attendances').filter(course_offering__in=course_offerings_for_current_user)
 
         # print("Query :",program_offerings_for_current_user.query)
@@ -82,7 +82,8 @@ def filter_database_based_on_current_user(request_user):
         
         programs_for_current_user=None
         courses_for_current_user=None
-        attendances = attendances.filter(student__in=students)
+        attendances = attendances.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').order_by('course_offering').filter(student__in=students)
+      
         all_programs=programs_for_current_user
         weekly_reports=WeeklyReport.objects.select_related('course_offering','student').filter(course_offering__in=course_offerings_for_current_user)
 
@@ -103,7 +104,9 @@ def filter_database_based_on_current_user(request_user):
         students=students.filter(course_offerings__teacher__staff=request_user)
         programs_for_current_user=None
         courses_for_current_user=None
-        attendances = attendances.filter(student__in=students)
+        # attendances = attendances.filter(student__in=students)
+        attendances = attendances.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').order_by('course_offering').filter(student__in=students)
+      
         all_programs=program_offerings_for_current_user
         weekly_reports=WeeklyReport.objects.select_related('course_offering','student').filter(course_offering__in=course_offerings_for_current_user)
 
