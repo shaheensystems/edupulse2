@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
-from utils.function.helperAttendance import get_attendance_percentage_by_student,get_attendance_percentage_by_attendances
+from utils.function.helperAttendance import get_attendance_percentage_by_student,get_attendance_percentage_by_attendances,get_engagement_percentage_by_student
 # Create your models here.
 
 class Ethnicity(models.Model):
@@ -53,8 +53,23 @@ class NewUser(AbstractUser):
     address=models.ForeignKey(Address, verbose_name="Address", on_delete=models.PROTECT,null=True,blank=True)
     
     campus=models.ForeignKey(Campus, verbose_name="Campus", on_delete=models.PROTECT,null=True,blank=True, related_name='users')
+    @property
+    def cached_groups(self):
+        if not hasattr(self, '_cached_groups'):
+            self._cached_groups = self.groups.all()
+        return self._cached_groups
+    
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+    def get_group_list(self):
+        group_list=list()
+        
+        for group in self.groups.all():
+            group_list.append(group.name)
+        
+        return group_list
+        
     
     
 
@@ -134,7 +149,14 @@ class Student(BaseModel):
     def calculate_attendance_percentage(self):
         # getting more query compare to get_attendance_percentage_by_attendances
         # return get_attendance_percentage_by_student(student=self)
+        
         return get_attendance_percentage_by_attendances(attendances=self.attendances.all())
+    
+    def calculate_engagement_percentage(self):
+        # getting more query compare to get_attendance_percentage_by_attendances
+        # return get_attendance_percentage_by_student(student=self)
+        
+        return get_engagement_percentage_by_student(student=self)
         
        
         

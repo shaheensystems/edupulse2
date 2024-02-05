@@ -34,6 +34,7 @@
             <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
                 <thead class="bg-gray-200">
                     <tr>
+                        <th class="border px-4 py-2">RID</th>
                         <th class="border px-4 py-2">First Name</th>
                         <th class="border px-4 py-2">Last Name</th>
                         <th class="border px-4 py-2">Email ID</th>
@@ -53,7 +54,13 @@
                     {% for student in students %}
                        
                         <tr {% if student in at_risk_students %}class="bg-red-300"{% endif %} >
+                            <td class="border px-4 py-2">
+                                <a href="{% url 'student-details' student.pk %}" class="underline text-blue-400">
+                                    {{ student.student.temp_id }}
+                                </a>
+                            </td>
                             <td class="border px-4 py-2">{{ student.student.first_name }}</td>
+                            
                             <td class="border px-4 py-2">{{ student.student.last_name }}</td>
                             <td class="border px-4 py-2">{{ student.student.email }}</td>
                             <td class="border px-4 py-2">{{ student.email_id }}</td>

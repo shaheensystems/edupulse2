@@ -1,6 +1,7 @@
 
 from datetime import timedelta, datetime
 from django.utils import timezone
+from django.db.models import Q
 
 
 
@@ -87,6 +88,56 @@ def get_engagement_percentage_by_course(course):
                 present_sessions += course_offering.weekly_reports.exclude(engagement='na').count()
 
             return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+
+def get_engagement_percentage_by_course_offering(course_offering):
+        
+            total_sessions=0
+            present_sessions=0
+            total_sessions+=course_offering.weekly_reports.count()
+            present_sessions += course_offering.weekly_reports.exclude(Q(engagement='na')|Q(engagement='n/a')).count()
+
+            return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+
+def get_engagement_percentage_by_student(student):
+            total_sessions=0
+            present_sessions=0
+            
+            weekly_reports=student.weekly_reports.all()
+            # total_sessions=course_offering.weekly_reports.count()
+            total_sessions=weekly_reports.count()
+            # for wr in weekly_reports:
+            #     print(wr.student)
+            #     print(wr.engagement)
+            
+            
+            # present_sessions += course_offering.weekly_reports.exclude(engagement='na').count()
+            present_sessions = weekly_reports.exclude(Q(engagement='na')|Q(engagement='n/a')).count()
+            
+            # print(total_sessions,":",present_sessions)
+
+            return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+    
+def get_engagement_percentage_by_course_offering_for_student(course_offering,student):
+        
+            total_sessions=0
+            present_sessions=0
+            
+            weekly_reports=course_offering.weekly_reports.filter(student=student)
+            # total_sessions=course_offering.weekly_reports.count()
+            total_sessions=weekly_reports.count()
+            for wr in weekly_reports:
+                print(wr.student)
+                print(wr.engagement)
+            
+            
+            # present_sessions += course_offering.weekly_reports.exclude(engagement='na').count()
+            present_sessions = weekly_reports.exclude(Q(engagement='na')|Q(engagement='n/a')).count()
+            
+            print(course_offering,"-",total_sessions,":",present_sessions)
+
+            return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+        
+
 
 def get_attendance_percentage_by_course_offering(course_offering, total_sessions, present_sessions):
         if course_offering.offering_mode == "online":

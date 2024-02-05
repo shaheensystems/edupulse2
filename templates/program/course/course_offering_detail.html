@@ -12,6 +12,7 @@
           <div class='w-1/2'>
             {% comment %} <h1><strong>Program Detail</strong>  </h1> {% endcomment %}
             <h2 class="text-xl font-bold my-2">{{ course_offering.temp_id }} <br> {{course_offering.course.name}} ({{course_offering.offering_mode| title}})</h2>
+            <p><strong>EFTS:</strong> {{ course_offering.course.course_efts }}</p>
             <p><strong>Description:</strong> {{ course_offering.course.description }}</p>
             <p><strong>Program Link:</strong> {{ course_offering.course.program_link }}</p>
             <p><strong>Duration in week:</strong> {{ course_offering.course.duration_in_week }}</p>
@@ -23,6 +24,7 @@
           <div class='flex flex-row gap-4 flex-wrap items-baseline w-1/2 justify-end align-baseline content-baseline mt-auto'>
             <p class="mb-2">Total Students Enrolled: {{course_offering.student.count}}</p> |
             <p class="mb-2">Attendnace Percentage: {{course_offering.calculate_attendance_percentage}} %</p> |
+            <p class="mb-2">Engagement Percentage: {{course_offering.calculate_engagement_percentage}} %</p> |
             {% if course_offering.calculate_no_at_risk_student_for_last_week|length >  0 %}
             <p class='text-red-500'>Students at Risk : {{course_offering.calculate_no_at_risk_student_for_last_week |length}}</p>
             {% else  %}

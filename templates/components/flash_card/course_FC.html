@@ -8,9 +8,16 @@
               
               <h1>{{ course.temp_id }}
                 <br>{{ course.name }} </h1>
+                <p> 
+                
+                  {% if course.course_efts %}
+                  EFTS : {{course.course_efts}}
+                  {% else %}
+                  EFTS : <span class='text-red-300'> Error !!! Assign Cousre EFTS </span>
+                  {% endif %}</p>
              
               {% comment %} <p> No of Courses : {{program.list_course_offerings}}</P> {% endcomment %}
-              <p >Total Students Enrolled (by model): {{course.calculate_total_no_of_student|length}}</p>
+              <p >Total Students Enrolled : {{course.calculate_total_no_of_student|length}}</p>
               <p> Course Offerings : {{course.course_offering.all|length}}</P>
               <div class='flex flex-row  gap-4 flex-wrap'>
                 {% for course_offering in course.course_offering.all %}

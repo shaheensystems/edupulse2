@@ -27,44 +27,9 @@
 
   <header>
     {% include 'components/base/header.html' %}
-      
-
-    {% comment %} <div class="container mx-auto mt-4 flex flex-row gap-4">
-      <a href={% url 'dashboard' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Dashboard</a>
-      
-
-      {% if request.user|user_belongs_to_group:'Head_of_School' %} 
-      <a href={% url 'upload_file:upload_csv' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Upload Student data </a>
-      <a href="/admin" class='px-4 py-2 bg-blue-300 rounded-lg'>Admin</a>
-      {% endif %}
-
-      {% if request.user|user_belongs_to_group:'Teacher'   %} 
-      <a href={% url 'course_offering_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>Course Offring for teacher</a>
-      {% endif %}
-
-  
-      <a href={% url 'program_offering_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>WC Current Programs </a>
-      <a href={% url 'program_list' %} class='px-4 py-2 bg-blue-300 rounded-lg'>All Programs </a>
-      {% if user.is_authenticated %}
-      
-      <a href="{% url 'user-logout' %}" class='px-4 py-2 bg-red-300 rounded-lg'>Logout</a>
-      <div class='flex  items-center flex-col  h-1 '>
-        <img src="{{ user.user_image.url }}" alt="User Image" class="rounded-full h-10 w-10 ">
-        <p class=" flex text-xs">{{user.first_name}} {{user.last_name}}</p>
-        
-      </div>
-      {% endif %}
-    </div> {% endcomment %}
     
   </hedaer>
-      {% comment %} <h1> username:{{user.username}} <br>
-        GroupStatus :{{request.user|user_belongs_to_group:'Teacher' }} 
-        {% for group in user.groups.all %}
-        {{ group.name }}
-        {% if not forloop.last %}, {% endif %}
-         {% endfor %}
-      </h1>
-   {% endcomment %}
+  
     <section class="container mx-auto mt-4 flex flex-row gap-4">
         {% if messages %}
         <div id="alert-container" class="p-4">

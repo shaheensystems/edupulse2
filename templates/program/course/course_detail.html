@@ -15,6 +15,7 @@
                 {% comment %} <h1><strong>Program Detail</strong>  </h1> {% endcomment %}
                 <h2 class="text-xl font-bold my-2">{{ course.temp_id }} ({% if course.get_offering_mode_is_online == True %} Online {% else %} Blended {% endif %}) 
                   <br> {{ course.name }}</h2>
+                <p><strong>EFTS:</strong> {{ course.course_efts }}</p>
                 <p><strong>Description:</strong> {{ course.description|default:"" }}</p>
                 <p><strong>Program Link:</strong> {{ course.program_link }}</p>
                 <p><strong>Total Credit:</strong> {{ course.course_efts }}</p>

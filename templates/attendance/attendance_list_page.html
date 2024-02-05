@@ -7,16 +7,17 @@
        
         <p>Total Students for attendance: </p>
         <p>Attendance List </p>
-        <p>Attendance List </p>
-        <p>Attendance List </p>
-        <p>Attendance List </p>
-        <p>Attendance List </p>
+       
         {% comment %} {{chart_data_attendance_by_date}} {% endcomment %}
-      <div class='w-12/12 bg-gray-100 rounded-lg my-5 flex justify-center items-center content-center place-items-center'>
+      <div class='w-12/12  bg-gray-100 rounded-lg my-5 flex justify-center items-center content-center place-items-center'>
 
-        {% with data=chart_data_attendance_by_date title='Student Attendace' text='Students Attendace By Date' id='students_attedance'%}
-            {% include 'charts/lineChart.html' %}
-        {% endwith %}
+       
+        <div id='students_attendance_line_chart' class='w-full bg-gray-100 rounded-lg mb-5 ' style="display: block; height: 350px" >
+            {% with data=chart_data_attendance_by_date title='Student Attendace' text='Students Attendace' chartType='line' id='students_attendance_line' lengendDisplay='false' limitData=10 %}
+                {% include 'charts/chart.html' %}
+            {% endwith %}
+        </div> 
+        
       </div>
        {% for course_offering,chart_data in  attendance_data_by_course_offering_for_chart.items %}
        {% comment %} <p>Type: {{ course_offering | default:"" }}</p> 

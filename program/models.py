@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 from django.db.models import Q
 
-from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances,get_engagement_percentage_by_course,get_engagement_percentage_by_program
+from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances,get_engagement_percentage_by_course,get_engagement_percentage_by_program,get_engagement_percentage_by_course_offering,get_engagement_percentage_by_course_offering_for_student
 
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
@@ -51,6 +51,14 @@ class Program(BaseModel):
         )
         return list_of_blended_program_offerings_for_selected_program
 
+    def calculate_program_efts(self):
+        total_credit=0
+        for c in self.course.all():
+            if c.course_efts is not None :
+              
+                total_credit+=c.course_efts
+        return round(total_credit, 6)
+            
 
     # attendance percentage is only for blended/offline program, inactive and online program doesn't have attendance
     def calculate_attendance_percentage(self):
@@ -125,6 +133,8 @@ class Course(BaseModel):
         return f'{self.temp_id}-{self.name}'
 
 
+
+
 class CourseOffering(BaseModel):
     
     OFFERING_CHOICES1 = [
@@ -147,14 +157,50 @@ class CourseOffering(BaseModel):
     offering_mode = models.CharField(max_length=10,choices=OFFERING_CHOICES1,default='online',blank=True, null=True,help_text='Select the mode of course offering: Online, Offline, or Blended'
     )
     
-
+    def calculate_duration_in_week(self):
+        start_date=self.start_date
+        end_date=self.end_date
+        days_difference =(end_date-start_date).days
+        
+        no_of_weeks=days_difference//7
+        
+        if days_difference%7!=0:
+            no_of_weeks+=1
+        
+        
+        starting_week_number=start_date.isocalendar()[1]
+        ending_week_number=end_date.isocalendar()[1]
+        # print(start_date,":",end_date)
+        # print(starting_week_number,":",ending_week_number)
+        
+        return {"no_of_weeks":no_of_weeks,"starting_week_number":starting_week_number,"ending_week_number":ending_week_number}
+        
+        
     def calculate_attendance_percentage(self): 
         if self.offering_mode=='online':
             return "Not Applicable"
         else:
             # return get_attendance_percentage_by_course_offering(course_offering=self,total_sessions=0,present_sessions=0)
             return get_attendance_percentage_by_attendances(self.attendance.all())
+    
+    def calculate_engagement_percentage(self):
+        
+        return get_engagement_percentage_by_course_offering(course_offering=self)
+    
+    def calculate_attendance_percentage_for_student(self, student):
+        if self.offering_mode == 'online':
+            return "Not Applicable"
+        else:
+            student_attendance_records = self.attendance.filter(student=student)
+            return get_attendance_percentage_by_attendances(student_attendance_records)
+    
+    def calculate_engagement_percentage_for_student(self,student):
+        
+        return get_engagement_percentage_by_course_offering_for_student(course_offering=self,student=student)  
+       
      
+   
+    
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_course_offering(course_offering=self)
 
@@ -169,7 +215,17 @@ class CourseOffering(BaseModel):
     
     def __str__(self):
         return f'{self.temp_id}-{self.course.name}'
-
+    
+    
+# class StudentEnrollment(BaseModel):
+#     student=models.ForeignKey(Student, verbose_name=_(""), on_delete=models.CASCADE)
+#     course_offering=models.ForeignKey(CourseOffering, verbose_name=_(""), on_delete=models.CASCADE)
+#     enrollment_status=models.BooleanField(_(""))
+#     result=models.CharField(_(""), max_length=50)
+    
+    
+    
+    
 class ProgramOffering(BaseModel):
     program=models.ForeignKey(Program, verbose_name=("program"), on_delete=models.CASCADE,null=True,blank=True,related_name="program_offerings")
     start_date=models.DateField( auto_now=False, auto_now_add=False)

@@ -13,18 +13,18 @@
     {% elif view == "detail" %} 
         {% for student in students  %}
         <div class='bg-blue-200 m-4 p-4 rounded-lg {% if student in at_risk_students %} bg-red-300{% endif %}'>
-            <p>Student first Name :{{student.student.first_name}} </p>
-            <p>Student Last Name :{{student.student.last_name}} </p>
-            <p>Student email ID:{{student.student.email}} </p>
-            <p>Student personal Email :{{student.email_id}} </p>
-            <p>Student date of brth :{{student.student.dob}} </p>
-            <p>Student gender :{{student.student.gender}} </p>
-            <p>Student campus :{{student.student.campus.name}} </p>
-            <p>Student Joining date  :{{student.joining_date}} </p>
-            <p>International Studnet Status  :{{student.international_student}} </p>
-            <p>Student passport Number  :{{student.passport_number}} </p>
-            <p>Student Visa Number :{{student.visa_number}} </p>
-            <p>Student Visa Expirty date :{{student.visa_expiry_date}} </p>
+            <span>Student first Name :{{student.student.first_name}} </span>
+            <span>Student Last Name :{{student.student.last_name}} </span>
+            <span>Student email ID:{{student.student.email}} </span>
+            <span>Student personal Email :{{student.email_id}} </span>
+            <span>Student date of brth :{{student.student.dob}} </span>
+            <span>Student gender :{{student.student.gender}} </span>
+            <span>Student campus :{{student.student.campus.name}} </span>
+            <span>Student Joining date  :{{student.joining_date}} </span>
+            <span>International Studnet Status  :{{student.international_student}} </span>
+            <span>Student passport Number  :{{student.passport_number}} </span>
+            <span>Student Visa Number :{{student.visa_number}} </span>
+            <span>Student Visa Expirty date :{{student.visa_expiry_date}} </span>
             <br>
         </div>
         {% endfor %}
@@ -42,6 +42,7 @@
                         <th class="border px-4 py-2">Course Offering</th>
                         <th class="border px-4 py-2">International Student</th>
                         <th class="border px-4 py-2">Attendance Percentage</th>
+                        <th class="border px-4 py-2">Engagement Percentage</th>
                         <th class="border px-4 py-2">At Risk</th>
                     </tr>
                 </thead>
@@ -50,7 +51,12 @@
                        
                         <tr {% if student in at_risk_students %}class="bg-red-300"{% endif %} >
                           
-                            <td class="border px-4 py-2">{{ student.student.temp_id }}</td>
+                            <td class="border px-4 py-2 ">
+                                <a href="{% url 'student-details' student.pk %}" class="underline text-blue-400">
+                                    {{ student.student.temp_id }}
+                                </a>
+                                
+                            </td>
                             <td class="border px-4 py-2 w-auto">{{ student.student.first_name }} {{ student.student.last_name }}</td>
                             <td class="border px-4 py-2">{{ student.student.campus.name }}</td>
                             <td class="border px-4 py-2">
@@ -70,13 +76,14 @@
                           
                             <td class="border px-4 py-2 text-center align-middle">{{ student.international_student }}</td>
                             <td class="border px-4 py-2 text-center align-middle">{{ student.calculate_attendance_percentage}} %</td>
+                            <td class="border px-4 py-2 text-center align-middle">{{ student.calculate_engagement_percentage}} %</td>
                             <td class="border px-4 py-2 text-center align-middle ">{{student.student_is_at_risk_for_last_week_status |length}}</td>
                             </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% else %}
-            <p>No students available.</p>
+            <span>No students available.</p>
         {% endif %}
    
     {% endif %}

@@ -39,17 +39,19 @@ def filter_database_based_on_current_user(request_user):
 
         # programs=Program.objects.all()
         programs=Program.objects.prefetch_related('course','program_offerings','course__course_offering','course__course_offering__student','course__course_offering__weekly_reports').all()
-        courses=Course.objects.all()
+        courses=Course.objects.prefetch_related('course_offering','program').all()
         students=Student.objects.select_related('student').prefetch_related('attendances' ,
                                                                             'attendances__course_offering',
                                                                             'course_offerings',
                                                                             'course_offerings__course',
-                                                                            # Prefetch('course_offerings', queryset=CourseOffering.objects.only('name')), 
                                                                             'program_offering', 
                                                                             'program_offering__program', 
-                                                                            'weekly_reports'
+                                                                            'student__campus',
+                                                                            'weekly_reports',
+                                                                            'weekly_reports__sessions'
                                                                             ).all()
-        attendances=Attendance.objects.all()
+        # attendances=Attendance.objects.all()
+        attendances=Attendance.objects.select_related('course_offering','program_offering','student').all()
         # attendances=Attendance.objects.select_related('student','course_offering').all()
 
         program_offerings_for_current_user=program_offerings

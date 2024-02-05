@@ -3,5 +3,5 @@ from attendance.views import AttendanceListView
 
 
 urlpatterns = [
-    path('',AttendanceListView.as_view(),name="all-attendance"),
+    path('',AttendanceListView.as_view(),name="attendance-list"),
 ]

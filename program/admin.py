@@ -23,7 +23,7 @@ class ProgramAdmin(admin.ModelAdmin):
     calculate_no_at_risk_student_for_last_week.short_description = 'No. of At-Risk Students (Last Week)'
 
     def calculate_total_no_of_student(self,obj):
-        return obj.calculate_total_no_of_student()
+        return len( obj.calculate_total_no_of_student())
     
     calculate_total_no_of_student.short_description = 'No. of  Students'
 
@@ -31,7 +31,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display=['temp_id','name','calculate_total_no_of_student','description','course_efts']
     
     def calculate_total_no_of_student(self,obj):
-        return obj.calculate_total_no_of_student()
+        return len(obj.calculate_total_no_of_student())
     
     calculate_total_no_of_student.short_description = 'No. of  Students'
 

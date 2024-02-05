@@ -173,7 +173,36 @@ class AllStudentsView(LoginRequiredMixin,ListView):
 
         return context
 
+class StudentDetailView(LoginRequiredMixin,DetailView):
+    model=Student
+    template_name='students/student_details.html'
+    context_object_name='student'
+    def get_queryset(self):
+        # Use select_related() to fetch related fields in a single query
+        return super().get_queryset().select_related('student','fund_source')\
+            .prefetch_related('student__campus','student__groups','student__user_permissions',
+                              'program_offering','program_offering__program','program_offering__program__course',
+                              'weekly_reports','course_offerings','course_offerings__course','course_offerings__teacher')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = self.object
+
+        # Calculate and set attendance percentage for each course offering
+        for course_offering in student.course_offerings.all():
+            if course_offering.offering_mode == 'online':
+                course_offering.attendance_percentage = "Not Applicable"
+            else:
+                student_attendance_records = course_offering.attendance.filter(student=student)
+                attendance_percentage = course_offering.calculate_attendance_percentage_for_student(student=student)
+                engagement_percentage=course_offering.calculate_engagement_percentage_for_student(student=student)
+                course_offering.attendance_percentage_by_student = attendance_percentage
+                course_offering.engagement_percentage_by_student = engagement_percentage
+                
+
+        context['course_offerings'] = student.course_offerings.all()
+        return context
+    
 
 class AllStudentsAtRiskView(LoginRequiredMixin, ListView):
     model = Student

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% block content %}
+<section>
+   
+   <div>
+    <p>
+      {% if student.active_status is True %}
+         <span class="flex items-center">
+            <span class="h-3 w-3 bg-green-400 rounded-full mr-1"></span>
+            Active {{student.international_student}}
+         </span>
+      {% else %}
+         <span class="flex items-center">
+            <span class="h-3 w-3 bg-red-400 rounded-full mr-1"></span>
+            Not Active
+         </span>
+      {% endif %}
+    </p>
+      {% with current_user=student.student  %}
+         {% include 'components/dashboard/user_profile_FC.html' %}
+      {% endwith %}
+   </div>
+   <div>
+
+      <div>
+         {% comment %} <p> Overall Attendnace Percentage :{{student.calculate_attendance_percentage}}%</p>
+         <p> Overall Engagement Percentage :{{student.calculate_engagement_percentage}}%</p>
+        {% endcomment %}
+
+      </div>
+      
+      <span class='font-semibold'>Enrolled Program:  </span>
+      {% for po in student.program_offering.all %}
+          <div class="flex gap-3  items-baseline ml-5 flex-col">
+            <span class="font-semibold">{{ po }}
+            <button class="mr-2 text-blue-500 text-xs focus:outline-none  ">More Detail</button>
+            </span>
+          
+          <div class="course-list hidden ml-5">
+              <p class='font-medium'>List of all courses:</p>
+              <ul>
+                  {% for c in po.program.course.all %}
+                      <li class="pl-3">{{ c }}</li>
+                  {% endfor %}
+              </ul>
+          </div>
+         </div>
+      {% endfor %}
+  </div>
+  <div class='my-5 '>
+   <span class='font-semibold'>List of Enrolled Courses : </span>
+   <div class='ml-10'>
+      {% for co in course_offerings %}
+         <div class=' my-3 flex flex-row flex-wrap w-4/5 rounded-lg border-gray-200 border-2'>
+            <!-- cousre Info -->
+            <div class='bg-gray-200 w-3/4 p-4 rounded-lg'>
+               <p>{{co.temp_id}}:{{co.course.name|title}} ({{co.offering_mode|title}}) 
+                  <a href="{% url 'course_offering_detail' co.pk%}"  class='mr-2 text-blue-500 text-xs focus:outline-none'> click for course detail  </a>
+               </p>
+            
+               
+               {% comment %} <p> Duration (in week) :{{co.calculate_duration_in_week}}</p> {% endcomment %}
+               {% with duration_details=co.calculate_duration_in_week %}
+               <p>Start From {{co.start_date}} (week {{duration_details.starting_week_number}}) To {{co.end_date}} (week {{duration_details.ending_week_number}})</p>
+               <p>Duration (in weeks): {{ duration_details.no_of_weeks }}</p>
+               
+               {% endwith %}
+               <p>EFTS :{{co.course.course_efts}}</p>
+               
+               <p> Faculty :
+                  {% if co.teacher.exists %}
+                     {{ co.teacher.all|join:', ' }}
+                  {% else %}
+                     Not Assign
+                  {% endif %}
+               </p>
+               <p>Course Remark :{{co.remark}}</p>
+               <p> Description :{{co.course.description}}</p>
+               <p> Key Comopents : {{co.course.key_components}}</p>
+            </div>
+            <!-- details and reports -->
+            <div class='w-1/4 p-4 rounded-lg'>
+               <p> Attendnace Percentage :{{co.attendance_percentage_by_student}} % </p>
+               <p> Engagement Percentage :{{co.engagement_percentage_by_student}} % </p>
+               {% comment %} <p> Engagement Percentage course:{{co.calculate_engagement_percentage}}</p> {% endcomment %}
+               <p> At Risk Status :</p>
+               <p>Result Status {{co.result_status}},Result Status code : {{co.result_status_code}}</p>
+               
+              
+               
+               
+               <p></p>
+            </div>
+               
+               
+               
+              
+             
+ 
+            
+         </div>
+      {% endfor %}
+   </div>
+  </div>
+   
+
+
+
+
+  <script>
+   // JavaScript to toggle the visibility of course list
+   document.querySelectorAll('.course-list').forEach(function(element) {
+       element.previousElementSibling.addEventListener('click', function() {
+           element.classList.toggle('hidden');
+       });
+   });
+</script>
+</section>
+{% endblock content %}

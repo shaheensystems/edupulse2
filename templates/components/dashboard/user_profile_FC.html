@@ -6,9 +6,13 @@
     {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
        <!-- User Profile Section -->
        <div class="bg-gray-200 p-4 mb-4 flex flex-col">
-        <h2 class="text-xl font-bold mb-2 flex  justify-leftitems-center">User Profile</h2>
+       
+
+        
+
+        <h2 class="text-xl font-bold mb-2 flex  justify-left items-center">User Profile</h2>
         <div class="flex flex-row gap-4">
-          <div class='flex justify-center flex-col items-center'>
+          <div class='flex justify-center flex-col items-center text-center'>
      
             {% if current_user.user_image and current_user.user_image.url %}
                 <img src="{{ current_user.user_image.url }}" alt="User Image" class="rounded-full h-16 w-16 mb-2">
@@ -16,10 +20,12 @@
                 <img src="{% static '/default/default_user_image.jpeg' %}" alt="User Image" class="rounded-full h-16 w-16 mb-2">            
             {% endif %} 
             
-            <p class="mb-2">{{current_user.first_name}} {{current_user.last_name}}</p>
+            <p class="mb-2  ">{{current_user.first_name|title}} {{current_user.last_name|title}}</p>
             
           </div>
-          <div class='flex flex-col ml-5'>
+          
+            {% if "Head_of_School" in current_user.get_group_list or "admin" in current_user.get_group_list or "Campus_Manager" in current_user.get_group_list or "Lab_Assistant" in current_user.get_group_list or "Pastrol_Care" in current_user.get_group_list or  "Program_Leader" in current_user.get_group_list or "Teacher" in current_user.get_group_list %}
+            <div class='flex flex-col ml-5'>
             <p class="mb-2">Username: {{current_user.username}}</p>
             <p class="mb-2">Campus: {{current_user.campus}}</p>
             <p>
@@ -31,14 +37,52 @@
             </p>
             <p>
             Group :
-              {% for group in current_user.groups.all %}
-                  {{ group.name }}
-                  {% if not forloop.last %}, {% endif %}
-              {% endfor %}
-              ({{current_user|user_belongs_to_group:'Teacher' }})
+           
+            {% if current_user.get_group_list %} {{current_user.get_group_list}}{% else %} student{% endif %}
+             
             </p>
-          
           </div>
+        {% else %}
+        <div class='flex flex-row flex-wrap mx-5  w-full justify-between'>
+          <div class='flex flex-col  '>
+              <p class="mb-2">ID: {{current_user.username}}</p>
+              <p class="mb-2">Email : {{current_user.email}}</p>
+              <p class="mb-2">International Student: {{current_user.student_profile.international_student}}</p>
+              <p class="mb-2">Enrolled Program: 
+                {% for po in current_user.student_profile.program_offering.all %}
+                    {{ po.program.name }}
+                {% endfor %}
+              </p>
+              <p class="mb-2">Campus: {{current_user.campus}}</p>
+              <p>
+                {% if current_user.staff_profile %}
+                    Joining Date: {{ current_user.staff_profile.joining_date}}
+                {% elif current_user.student_profile %}
+                Joining Date: {{ current_user.student_profile.joining_date}}
+                {% endif %}
+              </p>
+              <p>
+              Group :
+              {% if current_user.get_group_list %} {{current_user.get_group_list}}{% else %} student{% endif %}
+                
+              </p>
+            </div>
+              <div class='flex flex-col ml-5'>
+                <p> Overall Attendnace Percentage :{{current_user.student_profile.calculate_attendance_percentage}}%</p>
+                <p> Overall Engagement Percentage :{{current_user.student_profile.calculate_engagement_percentage}}%</p>
+              
+              </div>
+
+
+      </div>
+      
+        {% endif %}
+
+
+       
+            
+          
+          
         </div>
         <!-- Add more user profile details -->
       </div>

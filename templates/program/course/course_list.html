@@ -69,6 +69,7 @@
       </section>
           <div class='flex gap-4 flex-col'>
           {% for course in blended_courses_for_current_user %}
+          
               {% with course=course %}
                   {% include 'components/flash_card/course_FC.html' %}
               {% endwith %} 
@@ -82,7 +83,7 @@
           <div class="bg-gray-200 p-4 mb-4 w-full flex flex-row justify-between items-baseline">
            <h2 class="text-xl font-bold mb-2">Online Course List</h2>
            <div class='flex flex-row gap-4 flex-wrap  '>
-             <p class="mb-2 ">Total Bonline Course : {{online_courses_for_current_user|length}}</p> |
+             <p class="mb-2 ">Total online Course : {{online_courses_for_current_user|length}}</p> |
              <p class="mb-2 hidden">Active Program : |</p> 
              <p class="mb-2 hidden">Inactive Program : |</p> 
              <p class="mb-2">Total Students Enrolled  : {{total_no_of_student_for_online_courses|length}}</p> |
