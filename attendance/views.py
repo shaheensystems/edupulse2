@@ -104,6 +104,15 @@ class AttendanceListView(LoginRequiredMixin,ListView):
 
         context['attendance_data_by_course_offering_for_chart'] = chart_data_by_course_offering
         context['grouped_attendances_by_course_offering'] = grouped_attendances_by_course_offering
+        
+        # print(chart_data_by_course_offering)
+        for course_offering, chart_data in chart_data_by_course_offering.items():
+            print("Course Offering:", course_offering)
+            print("Chart Data:", chart_data)
+            if course_offering == "Course Offering: IT5017_Q4_2023-Web Concepts":
+                print("Course Offering:", course_offering)
+                print("Chart Data:", chart_data)
+                
         context['chart_data_attendance_by_date']=get_chart_data_attendance_by_date(attendances=attendances)
 
         
