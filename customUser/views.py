@@ -191,12 +191,12 @@ class StudentDetailView(LoginRequiredMixin,DetailView):
         # Calculate and set attendance percentage for each course offering
         for course_offering in student.course_offerings.all():
             if course_offering.offering_mode == 'online':
-                course_offering.attendance_percentage = "Not Applicable"
+                course_offering.attendances_percentage = "Not Applicable"
             else:
-                student_attendance_records = course_offering.attendance.filter(student=student)
+                student_attendance_records = course_offering.attendances.filter(student=student)
                 attendance_percentage = course_offering.calculate_attendance_percentage_for_student(student=student)
                 engagement_percentage=course_offering.calculate_engagement_percentage_for_student(student=student)
-                course_offering.attendance_percentage_by_student = attendance_percentage
+                course_offering.attendances_percentage_by_student = attendance_percentage
                 course_offering.engagement_percentage_by_student = engagement_percentage
                 
 

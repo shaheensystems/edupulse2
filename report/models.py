@@ -15,7 +15,7 @@ class Attendance(BaseModel):
     # this table can be access by teacher for each course and each student to mark attendance
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True,related_name='attendances')
     program_offering = models.ForeignKey(ProgramOffering, on_delete=models.CASCADE, null=True, blank=True,related_name='attendances')
-    course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, null=True, blank=True ,related_name="attendance")  
+    course_offering = models.ForeignKey(CourseOffering, on_delete=models.CASCADE, null=True, blank=True ,related_name="attendances")  
     is_present = models.CharField(max_length=255,choices=ATTENDANCE_CHOICE,default="present", null=True, blank=True)  
     attendance_date = models.DateField(default=timezone.now, null=True, blank=True)
     remark=models.TextField(null=True,blank=True,max_length=255)
