@@ -80,12 +80,12 @@
               
             </div>
             <div class='w-[33%] bg-gray-100 rounded-lg'>
-              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode' chartType='pie' lengendDisplay='true' limitData=10 %}
+              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode' chartType='polarArea' lengendDisplay='true' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
             <div class='w-[33%] bg-gray-100 rounded-lg'>
-              {% with data=chart_data_student_region title='Domestic and International Studnets' id='students_by_country' chartType='bar' lengendDisplay='false' limitData=10 %}
+              {% with data=chart_data_student_region title='Domestic and International Studnets' id='students_by_country' chartType='doughnut' lengendDisplay='true' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
@@ -95,7 +95,7 @@
                 {% comment %} {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program' id='program_students_enrollment2'%}
                   {% include 'charts/barChartHorizontal.html' %}
                 {% endwith %} {% endcomment %}
-                {% with data=chart_data_programs_student_enrollment title='Students Enrollment By Program' id='program_students_enrollment2' chartType='bar' lengendDisplay='false' limitData=10 %}
+                {% with data=chart_data_programs_student_enrollment title='Students Enrollment By Program' id='program_students_enrollment2' chartType='bar' orientation='horizontal' lengendDisplay='false' limitData=10 %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
               </div>

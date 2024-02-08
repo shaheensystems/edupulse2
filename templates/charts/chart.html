@@ -12,12 +12,35 @@
       var yValues = {{ data.data|safe }};
       var limit = {{ limitData }};
       var barColors = [
-        "#b91d47",
-        "#00aba9",
-        "#2b5797",
-        "#e8c3b9",
-        "#1e7145"
+      {% if chartType == 'polarArea' or chartType == 'doughnut' or chartType == 'pie'  %}
+      'rgb(255, 99, 132)',
+      'rgb(75, 192, 192)',
+      'rgb(255, 205, 86)',
+      'rgb(201, 203, 207)',
+      'rgb(54, 162, 235)'
+      {% else %}
+
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(255, 205, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(201, 203, 207, 0.2)'
+
+      {% endif %}
+      
       ];
+      var borderColor= [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(255, 205, 86)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+      'rgb(201, 203, 207)'
+    ],
+    borderW
     
       new Chart("chart{{ id }}", {
         type: "{{ chartType }}",
@@ -25,23 +48,72 @@
             labels: xValues.slice(0, limit),
             datasets: [{
                 backgroundColor: barColors,
+                borderColor:borderColor,
+                borderWidth: 1,
                 data: yValues
             }]
         },
         options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    suggestedMin: 0
-                },
+                {% if orientation == 'horizontal' %}
+
+                indexAxis: 'y',
+
+                {% endif %}
+                {% if chartType == 'pie' or chartType == 'doughnut' or chartType == 'polarArea' %}
+                    scales: { 
+                        
+                    },
+                    {% elif chartType == 'line' %}
+                    scales:{
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            suggestedMin: 0,
+                        },
+                        x:{
+                            grid:{
+                                offset:true,
+                            },
+                            stacked: true,
+                            beginAtZero:true,
+                            suggestedMin: 0,
+                        },
+
+                    },
+                    {% else %}
+
+                    scales:{
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            suggestedMin: 0,
+                        },
+                        x:{
+                            grid:{
+                                offset:true,
+                            },
+                            stacked: true,
+                            beginAtZero:true,
+                            suggestedMin: 0,
+                        },
+
+                    },
+                {% endif %}
                
-            },
+            
             plugins: {
-                legend: { display: {{ lengendDisplay }} },
+                legend: { 
+                    display: {{ lengendDisplay }} 
+                },
                 title: {
                     display: true,
                     text: "{{ title }}"
-                }
+                },
+                datalabels: {
+                    color: 'black', // Set the color of the labels to black
+                    align: 'start', // Set the alignment of the labels
+                    anchor: 'end' // Set the anchor point of the labels
+                },
             }
         },
     });
