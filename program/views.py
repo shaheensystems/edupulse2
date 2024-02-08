@@ -455,7 +455,7 @@ class CourseOfferingDetailView(LoginRequiredMixin,DetailView):
         context = super().get_context_data(**kwargs)
         context['view'] = 'table'  # Add the 'view' context value list or detail or table
 
-        all_attendance=context['course_offering'].attendance.all()
+        all_attendance=context['course_offering'].attendances.all()
 
         # print("Attendance:",all_attendance)
         context['chart_data_attendance_by_date']=get_chart_data_attendance_by_date(attendances=all_attendance)

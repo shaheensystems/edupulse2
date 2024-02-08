@@ -30,11 +30,11 @@ class Program(BaseModel):
     
     def get_list_of_online_course_for_selected_program(self):
         # return self.course.filter(offering_mode_is_online=True)
-        list_of_online_course_for_selected_program=self.course.all().filter(temp_id__endswith = "D")
+        list_of_online_course_for_selected_program=self.courses.all().filter(temp_id__endswith = "D")
         return list_of_online_course_for_selected_program
 
     def get_list_of_blended_course_for_selected_program(self):
-        list_of_offline_course_for_selected_program=self.course.all().exclude(temp_id__endswith = "D")
+        list_of_offline_course_for_selected_program=self.courses.all().exclude(temp_id__endswith = "D")
         return list_of_offline_course_for_selected_program
    
     
@@ -50,7 +50,7 @@ class Program(BaseModel):
 
     def calculate_program_efts(self):
         total_credit=0
-        for c in self.course.all():
+        for c in self.courses.all():
             if c.course_efts is not None :
               
                 total_credit+=c.course_efts
@@ -178,7 +178,7 @@ class CourseOffering(BaseModel):
             return "Not Applicable"
         else:
             # return get_attendance_percentage_by_course_offering(course_offering=self,total_sessions=0,present_sessions=0)
-            return get_attendance_percentage_by_attendances(self.attendance.all())
+            return get_attendance_percentage_by_attendances(self.attendances.all())
     
     def calculate_engagement_percentage(self):
         

@@ -36,7 +36,7 @@ class AttendanceListView(LoginRequiredMixin,DetailView):
         context = super().get_context_data(**kwargs)
 
         # Get attendance data for the course offering in ascending order 
-        attendance_list = self.object.attendance.values('attendance_date').annotate(
+        attendance_list = self.object.attendances.values('attendance_date').annotate(
         
             total_present=Count(Case(When(is_present='present', then=1))),
             total_students=Count('student')
