@@ -34,8 +34,8 @@ class CourseListView(LoginRequiredMixin,ListView):
         unique_students = set()
         no_of_at_risk_students=set()
         for course in courses:
-            no_of_at_risk_students.update(get_no_of_at_risk_students_by_course_offerings(course.course_offering.all()))
-            for course_offering in course.course_offering.all():
+            no_of_at_risk_students.update(get_no_of_at_risk_students_by_course_offerings(course.course_offerings.all()))
+            for course_offering in course.course_offerings.all():
                 unique_students.update(course_offering.student.all())
 
         return unique_students,no_of_at_risk_students

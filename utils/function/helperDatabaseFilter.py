@@ -20,11 +20,11 @@ def filter_database_based_on_current_user(request_user):
         program_offerings=ProgramOffering.objects.select_related('program').prefetch_related('student',
                                                                                              'student__attendances',
                                                                                              'student__attendances__weekly_reports',
-                                                                                             'program__course',
-                                                                                             'program__course__course_offering',
-                                                                                             'program__course__course_offering__student',
-                                                                                             'program__course__course_offering__student__attendances',
-                                                                                             'program__course__course_offering__student__attendances__weekly_reports',
+                                                                                             'program__courses',
+                                                                                             'program__courses__course_offerings',
+                                                                                             'program__courses__course_offerings__student',
+                                                                                             'program__courses__course_offerings__student__attendances',
+                                                                                             'program__courses__course_offerings__student__attendances__weekly_reports',
                                                                                              ).all()
         
         
@@ -38,8 +38,8 @@ def filter_database_based_on_current_user(request_user):
         
 
         # programs=Program.objects.all()
-        programs=Program.objects.prefetch_related('course','program_offerings','course__course_offering','course__course_offering__student','course__course_offering__weekly_reports').all()
-        courses=Course.objects.prefetch_related('course_offering','program').all()
+        programs=Program.objects.prefetch_related('courses','program_offerings','courses__course_offerings','courses__course_offerings__student','courses__course_offerings__weekly_reports').all()
+        courses=Course.objects.prefetch_related('course_offerings','program').all()
         students=Student.objects.select_related('student').prefetch_related('attendances' ,
                                                                             'attendances__course_offering',
                                                                             'course_offerings',
@@ -99,7 +99,7 @@ def filter_database_based_on_current_user(request_user):
             ).all()
         students=Student.objects.all()
         attendances=Attendance.objects.all()
-        program_offerings_for_current_user=program_offerings.filter(program__course__course_offering__teacher__staff=request_user)
+        program_offerings_for_current_user=program_offerings.filter(program__courses__course_offerings__teacher__staff=request_user)
         course_offerings_for_current_user=course_offerings.filter(teacher__staff=request_user)
         students=students.filter(course_offerings__teacher__staff=request_user)
         programs_for_current_user=None
@@ -250,8 +250,8 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
 
         if courses_for_current_user is not None:
             courses_for_current_user = courses_for_current_user.filter(
-                                                            Q(course_offering__start_date__gte=start_date) 
-                                                            & Q(course_offering__end_date__lte=end_date)
+                                                            Q(course_offerings__start_date__gte=start_date) 
+                                                            & Q(course_offerings__end_date__lte=end_date)
                                                         ).distinct()
         
         

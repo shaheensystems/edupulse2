@@ -60,11 +60,11 @@ class Address(BaseModel):
 
 class Campus(BaseModel):
     name=models.CharField(max_length=255,null=True,blank=True)
-    address=models.ForeignKey(Address,on_delete=models.PROTECT,null=True,blank=True)
+    address=models.ForeignKey(Address,on_delete=models.PROTECT,null=True,blank=True,related_name='campuses')
 
     class Meta:
         verbose_name = "Campus"  # Set the verbose name for the singular form
-        verbose_name_plural = "Campus"
+        verbose_name_plural = "Campuses"
     
     def __str__(self):
         return f'{self.name}'

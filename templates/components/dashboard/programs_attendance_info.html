@@ -137,7 +137,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for course in program.course.all  %}
+                        {% for course in program.courses.all  %}
                             <tr>
                                 <td class="py-2 px-4 border-b pl-10"> 
                                     <a href="{% url 'course_detail' course.pk %}">
@@ -190,7 +190,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for course in program.course.all  %}
+                        {% for course in program.courses.all  %}
                             {% if course.temp_id|default:""|slice:"-1:" == "D"  %}
                             <tr>
                                 <td class="py-2 px-4 border-b pl-10">

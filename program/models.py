@@ -6,10 +6,7 @@ from django.utils import timezone
 from django.db.models import Q
 
 from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances,get_engagement_percentage_by_course,get_engagement_percentage_by_program,get_engagement_percentage_by_course_offering,get_engagement_percentage_by_course_offering_for_student
-
-
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
-
 from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program,get_total_no_of_student_by_course
 from utils.function.helperProgram import OFFERING_CHOICES
 
@@ -100,7 +97,7 @@ class Course(BaseModel):
     program_link = models.URLField(max_length=255, null=True, blank=True)
     total_credit=models.PositiveIntegerField(null=True,blank=True)
     duration_in_week=models.PositiveIntegerField(null=True,blank=True)
-    program = models.ManyToManyField(Program, blank=True, related_name='course')
+    program = models.ManyToManyField(Program, blank=True, related_name='courses')
     course_efts=models.FloatField(null=True,blank=True)
 
     def get_offering_mode_is_online(self):
@@ -143,7 +140,7 @@ class CourseOffering(BaseModel):
         ('blended', 'BLENDED'),
     ]
 
-    course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True,related_name='course_offering')
+    course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True,related_name='course_offerings')
     start_date=models.DateField( auto_now=False, auto_now_add=False)
     end_date=models.DateField( auto_now=False, auto_now_add=False)
     remark=models.TextField(max_length=255,blank=True,null=True)
@@ -243,7 +240,7 @@ class ProgramOffering(BaseModel):
         
 
     def list_course_offerings(self):
-        courses = self.program.course.all()
+        courses = self.program.courses.all()
         course_offerings_list = []
         # Iterate over each course to collect course offerings
         for course in courses:
@@ -258,12 +255,12 @@ class ProgramOffering(BaseModel):
     # this method is incorrect , it will calculate all student based on course Offering no on program offring 
     def calculate_total_no_of_student(self):
          # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
-        courses = self.program.course.all()
+        courses = self.program.courses.all()
 
         # Use a set to store unique students
         unique_students = set()
         for course in courses:
-            for course_offering in course.course_offering.all():
+            for course_offering in course.course_offerings.all():
                 students_in_course = course_offering.student.all()
                 unique_students.update(students_in_course)
         return len(unique_students)

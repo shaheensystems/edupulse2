@@ -9,11 +9,11 @@
             <p> Program Link :{{ program.program_link }} </p>
             <p> Total Credit :{{ program.total_credit }} </p>
             <p> Duration in Week :{{ program.duration_in_week }} </p>
-            <p> Total Course : {{program.course.count}} </p>
+            <p> Total Course : {{program.courses.count}} </p>
             
             <div class='bg-green-200 px-4 py-2 ml-10 rounded-lg flex flex-row  flex-wrap gap-3'>
                 
-                {% for course in program.course.all%}
+                {% for course in program.courses.all%}
                 <a href="{% url 'course_detail' course.pk %}">
                     <div class='flex flex-col'>
                         <p> Course Name :{{ course.name }} </p>

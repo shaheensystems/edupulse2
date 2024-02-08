@@ -6,7 +6,7 @@ from report.models import WeeklyReport
 from report.models import Attendance
 
 class CourseInline(admin.StackedInline):  # You can use TabularInline if you prefer a more compact display.
-    model = Program.course.through
+    model = Program.courses.through
     extra = 1  # Number of empty forms to display
 
 class ProgramAdmin(admin.ModelAdmin):

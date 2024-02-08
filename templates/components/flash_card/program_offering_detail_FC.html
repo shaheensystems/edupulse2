@@ -14,7 +14,7 @@
         {% endif %}
         )<br>{{course.name}}</h2>
       <div class='flex flex-row gap-4 flex-wrap '>
-        <p class="mb-2 ">Total Course offerings : {{course.course_offering.count}}</p> |
+        <p class="mb-2 ">Total Course offerings : {{course.course_offerings.count}}</p> |
         <p class="mb-2">Total Students Enrolled: 
           {% if course.get_offering_mode_is_online %}
           {{course.calculate_total_no_of_student_for_online_course|length}}</p> |
@@ -31,7 +31,7 @@
 
 
     <ul class='flex flex-col gap-4 w-3/4'>  
-      {% for course_offering in course.course_offering.all %}
+      {% for course_offering in course.course_offerings.all %}
       {% if  course_offering.offering_mode == "online" %}
         {% if not course.get_offering_mode_is_online  %}
         <div class='text-red-300'>Correct course or Course offering, offering mode is incorrect</div>

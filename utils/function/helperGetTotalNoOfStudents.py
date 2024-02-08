@@ -7,21 +7,21 @@ def get_total_no_of_student_by_program(program,offering_mode):
     unique_students = set()
     if offering_mode=="online":
         # program_offerings = program.program_offerings.all().filter(offering_mode = "online")
-        for course in program.course.all():
-            for course_offering in course.course_offering.all().filter(offering_mode = 'online'):
+        for course in program.courses.all():
+            for course_offering in course.course_offerings.all().filter(offering_mode = 'online'):
                     students_in_course = course_offering.student.all()
                     unique_students.update(students_in_course)  
     elif offering_mode=="offline":
         
         # program_offerings = program.program_offerings.all().exclude(offering_mode = "online")
-        for course in program.course.all():
-            for course_offering in course.course_offering.all().exclude(offering_mode = 'online'):
+        for course in program.courses.all():
+            for course_offering in course.course_offerings.all().exclude(offering_mode = 'online'):
                     students_in_course = course_offering.student.all()
                     unique_students.update(students_in_course)  
     elif offering_mode=="all":
         # program_offerings=program.program_offerings.all()
-        for course in program.course.all():
-            for course_offering in course.course_offering.all():
+        for course in program.courses.all():
+            for course_offering in course.course_offerings.all():
                     students_in_course = course_offering.student.all()
                     unique_students.update(students_in_course)
 
@@ -34,11 +34,11 @@ def get_total_no_of_student_by_program(program,offering_mode):
 def get_total_no_of_student_by_course(course, offering_mode):
     unique_students = set()
     if offering_mode=="online":
-        course_offerings=course.course_offering.all().filter(offering_mode = 'online')
+        course_offerings=course.course_offerings.all().filter(offering_mode = 'online')
     elif offering_mode=="offline":
-        course_offerings=course.course_offering.all().exclude(offering_mode = 'online')
+        course_offerings=course.course_offerings.all().exclude(offering_mode = 'online')
     elif offering_mode=="all":
-        course_offerings=course.course_offering.all()
+        course_offerings=course.course_offerings.all()
 
     for course_offering in course_offerings:
         students_in_course = course_offering.student.all()

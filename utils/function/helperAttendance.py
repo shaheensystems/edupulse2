@@ -23,13 +23,13 @@ def get_attendance_percentage_by_program(program):
     total_sessions=0
     present_sessions=0
     # print("Course list all",program.course.all())
-    courses = program.course.all().exclude(temp_id__endswith='D')
+    courses = program.courses.all().exclude(temp_id__endswith='D')
     # print("Course list offline",courses)
 
    
     # Iterate over each course to accumulate session counts
     for course in courses:
-        course_offerings=course.course_offering.all()
+        course_offerings=course.course_offerings.all()
         if course_offerings:
             for course_offering in course_offerings:
                 if course_offering.offering_mode=="online":
@@ -45,9 +45,9 @@ def get_engagement_percentage_by_program(program,offering_mode):
     present_sessions=0
     # print("Course list all",program.course.all())
     if offering_mode=='online':
-        courses = program.course.all().filter(temp_id__endswith='D')
+        courses = program.courses.all().filter(temp_id__endswith='D')
     elif offering_mode=='blended':
-        courses = program.course.all().exclude(temp_id__endswith='D')
+        courses = program.courses.all().exclude(temp_id__endswith='D')
     else:
         print('offering Mode is not selected properly')
         return "Error in Offering Mode "
@@ -56,7 +56,7 @@ def get_engagement_percentage_by_program(program,offering_mode):
    
     # Iterate over each course to accumulate session counts
     for course in courses:
-        course_offerings=course.course_offering.all()
+        course_offerings=course.course_offerings.all()
         if course_offerings:
             for course_offering in course_offerings:
                     total_sessions+=course_offering.weekly_reports.count()
@@ -71,7 +71,7 @@ def get_attendance_percentage_by_course(course):
         else:
             total_sessions=0
             present_sessions=0
-            course_offerings=course.course_offering.all()
+            course_offerings=course.course_offerings.all()
             for course_offering in course_offerings:
                 total_sessions+=course_offering.attendance.count()
                 present_sessions += course_offering.attendance.filter(is_present='present').count()
@@ -82,7 +82,7 @@ def get_engagement_percentage_by_course(course):
         
             total_sessions=0
             present_sessions=0
-            course_offerings=course.course_offering.all()
+            course_offerings=course.course_offerings.all()
             for course_offering in course_offerings:
                 total_sessions+=course_offering.weekly_reports.count()
                 present_sessions += course_offering.weekly_reports.exclude(engagement='na').count()
@@ -165,10 +165,10 @@ def get_attendance_percentage_by_program_offering(program_offering,total_session
         else:
             total_sessions=total_sessions
             present_sessions=present_sessions
-            courses = program_offering.program.course.all()
+            courses = program_offering.program.courses.all()
 
             for course in courses:
-                course_offerings=course.course_offering.all()           
+                course_offerings=course.course_offerings.all()           
                 if course_offerings:                
                     for course_offering in course_offerings:
                         total_sessions += course_offering.attendance.count()

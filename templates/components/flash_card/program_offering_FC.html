@@ -42,11 +42,11 @@
           <div class='flex flex-row hidden'>
             <p>Matching detail block </p>
             <p> Program name :{{program_offering.program.name}}</P>
-            <p> All Cousres :{{program_offering.program.course.all}}</P>
-              {% for course in  program_offering.program.course.all %}
+            <p> All Cousres :{{program_offering.program.courses.all}}</P>
+              {% for course in  program_offering.program.courses.all %}
                   <p>Cousre name :{{course.name}}</P>
-                  <p> All Course Offering :{{course.course_offering.all}}</P>
-                    {% for course_offering in course.course_offering.all %}
+                  <p> All Course Offering :{{course.course_offerings.all}}</P>
+                    {% for course_offering in course.course_offerings.all %}
                         <p>course offering Name :{{course_offering.temp_id}}:{{course_offering.course.name}}</p>
                         <p>no of student :{{course_offering.student.count}}</p>
                     {% endfor %}

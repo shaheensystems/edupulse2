@@ -41,7 +41,7 @@ class WeeklyReport(BaseModel):
         ('na','N/A'),
         ('follow up email and call','Follow Up Email and Call'),
         ('pastoral care','Pastoral Care'),
-        ('personalised study plan/Extra session','Personlaised Study Plan /Extra Session'),
+        ('personalized study plan/Extra session','Personalized Study Plan /Extra Session'),
         ('emergency contact','Emergency Contact'),
         ('other','Other'),
     ]

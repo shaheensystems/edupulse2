@@ -97,7 +97,7 @@ class AllStudentsView(LoginRequiredMixin,ListView):
                 ).order_by('-at_risk_status_count')
         elif sort_by=='calculate_attendance_percentage':
             # students = students.order_by('-calculate_attendance_percentage') 
-            # high nuber of query with wrong sort result , resolve later 
+            # high number of query with wrong sort result , resolve later 
             # students = sorted(students, key=lambda x: x.calculate_attendance_percentage() or 0 ,reverse=True)
             students_list = list(students)  # Fetch the queryset into Python memory
             students_list.sort(key=lambda x: x.calculate_attendance_percentage() or 0, reverse=True)  # Sort the list using the method
@@ -181,7 +181,7 @@ class StudentDetailView(LoginRequiredMixin,DetailView):
         # Use select_related() to fetch related fields in a single query
         return super().get_queryset().select_related('student','fund_source')\
             .prefetch_related('student__campus','student__groups','student__user_permissions',
-                              'program_offering','program_offering__program','program_offering__program__course',
+                              'program_offering','program_offering__program','program_offering__program__courses',
                               'weekly_reports','course_offerings','course_offerings__course','course_offerings__teacher')
 
     def get_context_data(self, **kwargs):
@@ -252,7 +252,7 @@ class AllStudentsAtRiskView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # students = self.object_list
-        # send filtred data according to user group 
+        # send filtered data according to user group 
         # print(students)
         
         # print(weekly_reports)

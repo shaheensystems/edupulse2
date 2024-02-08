@@ -97,7 +97,7 @@ def get_all_at_risk_student_last_week(students):
 def get_no_of_at_risk_students_by_program(program):
 
     # Get all courses associated with the program
-    courses = program.course.all()
+    courses = program.courses.all()
 
     # Initialize variable to track the count of at-risk students
     at_risk_students = set()
@@ -114,7 +114,7 @@ def get_no_of_at_risk_students_by_program(program):
 def get_no_of_at_risk_students_by_program_offering(program_offering):
         at_risk_students = set()
         # Get all courses associated with the program
-        courses = program_offering.program.course.all()
+        courses = program_offering.program.courses.all()
 
         # Iterate over each course to accumulate session counts
         for course in courses:
@@ -129,7 +129,7 @@ def get_no_of_at_risk_students_by_program_offerings(program_offerings):
         at_risk_students = set()
         # Get all courses associated with the program
         for program_offering in program_offerings:
-            courses = program_offering.program.course.all()
+            courses = program_offering.program.courses.all()
 
             # Iterate over each course to accumulate session counts
             for course in courses:
@@ -140,7 +140,7 @@ def get_no_of_at_risk_students_by_program_offerings(program_offerings):
 
 def get_no_of_at_risk_students_by_course(course):
     at_risk_students = set()
-    course_offerings = course.course_offering.all()
+    course_offerings = course.course_offerings.all()
 
     for course_offering in course_offerings:
             at_risk_students_new=get_no_of_at_risk_students_by_course_offering(course_offering=course_offering)

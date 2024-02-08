@@ -47,9 +47,9 @@
                   {% endfor %}
                 </div>
               <br>
-              <p> Courses assign to Programs : {{program.course.all|length}}</P>
+              <p> Courses assign to Programs : {{program.courses.all|length}}</P>
               <div class='flex flex-row  gap-4 flex-wrap'>
-                {% for course in program.course.all %}
+                {% for course in program.courses.all %}
 
                 {% if offering_mode == "all"   %}
                   <p class='bg-blue-300 px-4 py-2 rounded-lg'>{{course.temp_id}} </p>
@@ -91,11 +91,11 @@
           <div class='flex flex-row hidden'>
             <p>Matching detail block </p>
             <p> Program name :{{program.name}}</P>
-            <p> All Cousres :{{program.course.all}}</P>
-              {% for course in  program.course.all %}
+            <p> All Cousres :{{program.courses.all}}</P>
+              {% for course in  program.courses.all %}
                   <p>Cousre name :{{course.name}}</P>
-                  <p> All Course Offering :{{course.course_offering.all}}</P>
-                    {% for course_offering in course.course_offering.all %}
+                  <p> All Course Offering :{{course.course_offerings.all}}</P>
+                    {% for course_offering in course.course_offerings.all %}
                         <p>course offering Name :{{course_offering.temp_id}}:{{course_offering.course.name}}</p>
                         <p>no of student :{{course_offering.student.count}}</p>
                     {% endfor %}
