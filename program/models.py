@@ -188,7 +188,7 @@ class CourseOffering(BaseModel):
         if self.offering_mode == 'online':
             return "Not Applicable"
         else:
-            student_attendance_records = self.attendance.filter(student=student)
+            student_attendance_records = self.attendances.filter(student=student)
             return get_attendance_percentage_by_attendances(student_attendance_records)
     
     def calculate_engagement_percentage_for_student(self,student):

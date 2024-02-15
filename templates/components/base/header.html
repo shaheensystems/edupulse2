@@ -1,109 +1,77 @@
 {% load custom_tags %}
 {% load static %}
 {% block content %}
-<nav class="bg-gray-100 ">
-  <div class="container mx-auto flex items-center justify-between p-4  flex-row gap-4">
-      <!-- Logo and site name -->
-      <a href="{% url 'dashboard' %}" class="flex items-center flex-col">
-          <img src="{% static '/logo/logo.jpeg' %}" alt="Logo" class="w-10 h-08 mr-2">
-          <span class="text-md font-semibold">EduPulse</span>
-      </a>
+<header class="fixed top-0 left-0 right-0 bg-gray-100 text-white py-4 px-6 flex flex-row items-center z-50 border-2 border-b-white">
+  <!-- Left section with logo and burger menu -->
+  <div class="flex items-center w-64  h-full ">
+    <button id="sidebarToggle" class="text-gray-400 mr-4 ">
+        <i class="fas fa-bars"></i>
+    </button>
+    <img src="{% static '/logo/logo.jpeg' %}" alt="Logo" class="w-10 h-08 mr-2">
+    <span class="text-lg font-semibold text-gray-400">EduPulse</span>
+  </div>
+  <!-- Right section with user info and logout -->
+  <div class='flex flex-row justify-between items-center w-full bg-gray-100 px-4'>
+    <div class="flex items-left">
 
-      <!-- Navbar links -->
-      <div id="navLinks"  class=" hidden flex-col justify-center lg:items-center items-end lg:flex-row lg:flex space-x-4  md:flex-wrap">
-
-        <a href="{% url 'dashboard' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Dashboard</a>
-
-        {% if request.user|user_belongs_to_group:'Admin' or request.user|user_belongs_to_group:'Head_of_School'    %} 
-          <a href="{% url 'admin:index' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Admin</a>
-        {% endif %}
+        {% if user.is_authenticated %}
+        <span class="mr-4 text-gray-400"> Hi {{ user.first_name }} {{ user.last_name }} !</span>
         
-         
+        {% endif %} 
 
-        {% if request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Program_Leader'   %} 
-          <a href="{% url 'upload_file:upload_csv' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Upload Data</a>
-        {% endif %}
-        {% if request.user|user_belongs_to_group:'Head_of_School' %} 
-        <a href="{% url 'program_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Programs</a>
-       {% endif %}
-        {% if request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Program_Leader'  %} 
-        <a href="{% url 'program_offering_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Program Offerings</a>
-       {% endif %}
-       {% if request.user|user_belongs_to_group:'Head_of_School' %} 
-        <a href="{% url 'course_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Course</a>
-       {% endif %}
-        {% if request.user|user_belongs_to_group:'Teacher' or request.user|user_belongs_to_group:'Head_of_School'  or request.user|user_belongs_to_group:'Program_Leader'    %} 
-          <a href="{% url 'course_offering_list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Course Offerings</a>
-        {% endif %}
-       
-        {% if request.user|user_belongs_to_group:'Teacher'  or request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School'    %} 
-          <a href="{% url 'attendance-list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Attendance</a>
-        {% endif %}
-        {% if request.user|user_belongs_to_group:'Teacher' or request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School'    %} 
-          <a href="{% url 'dashboard' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Reports</a>
-        {% endif %}
-        {% if request.user|user_belongs_to_group:'Teacher' or request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Teacher'    %} 
-         <a href="{% url 'students-list' %}" class="text-blue-500 bg-gray-200 px-4 py-2 rounded-lg">Students</a>
-        {% endif %}
-       
-        
+    </div>
+    <div class="flex items-left gap-6 ">
 
-      </div>
-
-      <!-- User profile or login/logout button -->
-      <div class="flex items-center space-x-2 flex-row gap-3">
-          {% if user.is_authenticated %}
-              <!-- User profile pic and name -->
-              <div class='flex flex-col justify-center items-center'>
-                {% comment %} <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="w-12 h-10 rounded-full"> {% endcomment %}
-                {% if current_user.user_image and current_user.user_image.url %}
-                <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="w-12 h-10 rounded-full">
+        {% if user.is_authenticated %}
+        <!-- User profile pic and name -->
+        <div class='flex flex-row justify-center items-center gap-4 '>
+          {% comment %} <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="w-12 h-10 rounded-full"> {% endcomment %}
+          {% if current_user.user_image and current_user.user_image.url %}
+          <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="w-12 h-10 rounded-full">
+          {% else %}
+            <img src="{% static '/default/default_user_image.jpeg' %}" class="w-12 h-10 rounded-full">
+            
+          {% endif %} 
+            <span class="hidden lg:inline  text-center  text-xs font-semibold text-gray-400">{{ user.first_name }} {{ user.last_name }}</span>
+            </div>
+            
+            {% comment %} <a href="{% url 'user-logout' %}" class="text-red-500 md:mr-5 bg-gray-200 px-4 py-2 rounded-lg">Logout</a> {% endcomment %}
+            <div class="relative">
+              <button id="dropdownToggle" class="md:mr-5 px-4 py-2 rounded-lg flex items-center">
+                <i id="arrowIcon" class="fa fa-caret-down text-gray-500 text-2xl"></i>
+            </button>
+              <div id="dropdownMenu" class="absolute right-0 mt-2 bg-white text-gray-800 text-sm rounded-lg shadow-md hidden">
+                <a href="{% url 'dashboard' %}" class="inline-block px-4 py-2 hover:bg-gray-100 whitespace-nowrap w-full">User Profile</a>
+                <a href="{% url 'user-logout' %}" class="inline-block px-4 py-2 hover:bg-gray-100 whitespace-nowrap w-full">Log Out</a>
+            </div>
+          </div>
+          
             {% else %}
-              <img src="{% static '/default/default_user_image.jpeg' %}" class="w-12 h-10 rounded-full">
-               
-            {% endif %} 
-              <span class="hidden lg:inline  text-center  text-xs font-semibold text-gray-400">{{ user.first_name }} {{ user.last_name }}</span>
-              </div>
-              <form method='post' action='{% url 'user-logout' %}' class="text-red-500 md:mr-5 bg-gray-300 px-4 py-2 rounded-lg">
-                {% csrf_token %}
-                <button type='submit'> Logout</button>
-              </form>
-              {% comment %} <a href="{% url 'user-logout' %}" class="text-red-500 md:mr-5 bg-gray-200 px-4 py-2 rounded-lg">Logout</a> {% endcomment %}
-              {% else %}
-              <a href="{% url 'user-login' %}" class="text-blue-500 md:mr-5 bg-gray-200 px-4 py-2 rounded-lg">Login</a>
-          {% endif %}
-      </div>
+            <a href="{% url 'user-login' %}" class="text-blue-500 md:mr-5 bg-gray-200 px-4 py-2 rounded-lg">Login</a>
+      {% endif %}
 
-      <!-- Responsive navigation toggle button -->
-      <button id="navToggle" class="lg:hidden focus:outline-none">
-        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
-      </button>
+
+
+      <div class="flex items-center">
+        <a href="#" class="text-gray-400 relative">
+            <i class="fas fa-bell"></i>
+            <span class="bg-red-500 text-white text-xs rounded-full w-2 h-4 flex items-center justify-center absolute top-0 right-0 -mt-1 -mr-1">2</span>
+        </a>
+    </div>
+    </div>
+    
   </div>
 
-      <script>
-      // Get references to the elements
-      const navLinks = document.getElementById('navLinks');
-      const navToggle = document.getElementById('navToggle');
+  <script>
+    const dropdownToggle = document.getElementById('dropdownToggle');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const arrowIcon = document.getElementById('arrowIcon');
 
-      // Add a click event listener to the toggle button
-      navToggle.addEventListener('click', function () {
-        // Toggle the visibility of the navigation links
-        navLinks.classList.toggle('hidden');
-      });
-
-      // Add a click event listener to each navigation link to hide the dropdown when a link is clicked
-      const navLinksArray = Array.from(navLinks.children);
-      navLinksArray.forEach(link => {
-        link.addEventListener('click', function () {
-          navLinks.classList.add('hidden');
-        });
-      });
-    </script>
-</nav>
-
-
-  {% endblock content %}
+    dropdownToggle.addEventListener('click', () => {
+        dropdownMenu.classList.toggle('hidden');
+        arrowIcon.classList.toggle('fa-caret-down');
+        arrowIcon.classList.toggle('fa-caret-up');
+    });
+</script>
+</header>
+{% endblock content %}

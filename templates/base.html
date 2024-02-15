@@ -14,40 +14,74 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
   <script src="https://www.gstatic.com/charts/loader.js"> </script>
 
-    
   <title>EduPulse</title>
   <link rel="stylesheet" href="{% static 'src/styles.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 </head>
 
-<body class="bg-yellow-50 flex flex-col gap-3">
-
-  <header>
-    {% include 'components/base/header.html' %}
-    
-  </hedaer>
+<body class="bg-yellow-50 flex flex-row">
+  <!--Sidebar -->
   
-    <section class="container mx-auto mt-4 flex flex-row gap-4">
-        {% if messages %}
-        <div id="alert-container" class="p-4">
-          {% for message in messages %}
-              <div class="{% if message.tags == 'success' %}bg-blue-500{% elif message.tags == 'error' %}bg-red-500{% elif message.tags == 'warning' %}bg-yellow-500{% elif message.tags == 'info' %}bg-green-500{% endif %} text-white mb-2 p-2 rounded">
-                  <p>{{ message }}</p>
-              </div>
-          {% endfor %}
+  <section class="bg-yellow-50 flex flex-row">
+    <div>
+    {% include 'components/base/header.html' %}
+    </div>
+    <section>
+      {% include 'components/base/sidebar.html' %}
+    </section> 
+    <div id="mainContent" class="ml-16 p-8 transition ease-in-out duration-300"> <!-- Adjust ml-16 to match the width of the sidebar when expanded -->
+      <!--Header -->
+      
+      <!-- main content-->
+          <section class="container mx-auto mt-4 flex flex-row gap-4">
+              {% if messages %}
+              <div id="alert-container" class="p-4">
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'success' %}bg-blue-500{% elif message.tags == 'error' %}bg-red-500{% elif message.tags == 'warning' %}bg-yellow-500{% elif message.tags == 'info' %}bg-green-500{% endif %} text-white mb-2 p-2 rounded">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+              {% endif %}  
+          </section>
+        <section class=" container mx-auto mt-4 flex flex-row gap-4">
+        
+          {% block content %}
+          {% endblock content %}
+        </section>
       </div>
-        {% endif %}  
-    </section>
-  <section class="container mx-auto mt-4 flex flex-row gap-4">
-   
-    {% block content %}
-    {% endblock content %}
+    
+    
   </section>
- 
+
+
   <script>
+         // JavaScript for handling sidebar expand/collapse
+         const sidebarToggle = document.getElementById('sidebarToggle');
+          const sidebarCollapse = document.getElementById('sidebarCollapse');
+          const sidebar = document.getElementById('sidebar');
+          const mainContent = document.getElementById('mainContent');
+          const links = document.querySelectorAll('#sidebar a');
+
+
+          sidebarToggle.addEventListener('click', () => {
+            if (sidebar.style.width !== '4rem') {
+              sidebar.style.width = '4rem';
+              mainContent.style.marginLeft = '4rem'; // Adjust main content margin
+          } else {
+              sidebar.style.width = 'auto';
+          }
+          links.forEach(link => {
+              const span = link.querySelector('span');
+              span.classList.toggle('md:hidden');
+              span.classList.toggle('md:flex');
+          });
+
+          });
+
+         
     // Automatically hide the alert after 2000 milliseconds (2 seconds)
     setTimeout(function () {
         var alertContainer = document.getElementById('alert-container');

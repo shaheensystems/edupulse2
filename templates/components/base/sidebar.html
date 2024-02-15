@@ -1,0 +1,35 @@
+{% load sidebar_tags %}
+{% load static %}
+{% block content %}
+
+<div id="sidebar" class="fixed top-10 bottom-0 bg-[#D1D3E2] text-white py-4 px-6 flex flex-col items-start  transition ease-in-out duration-300">
+    
+    <!-- Sidebar links -->
+    
+    <div class="flex flex-col mt-10 ">
+
+        {% sidebar_link 'Dashboard' 'fas fa-tachometer-alt' 'dashboard' %}
+        {% sidebar_link 'Program' 'fas fa-cogs' 'program_list' %}
+        {% sidebar_link 'Report' 'fas fa-chart-line' 'dashboard' %}
+        {% sidebar_link 'FAQ' 'fas fa-question-circle' 'dashboard' %}
+
+        {% comment %} {% with link_name='Dashboard' icon_name='fas fa-tachometer-alt' url_name='dashboard' %}
+            {% include 'components/dashboard/sidebar/link_and_icon.html' %}
+        {% endwith %}
+
+        {% with link_name='Program' icon_name='fas fa-cogs' url_name='dashboard' %}
+            {% include 'components/dashboard/sidebar/link_and_icon.html' %}
+        {% endwith %}
+
+        {% with link_name='Report' icon_name='fas fa-chart-line' url_name='dashboard' %}
+            {% include 'components/dashboard/sidebar/link_and_icon.html' %}
+        {% endwith %}
+        {% with link_name='FAQ' icon_name='fas fa-question-circle' url_name='dashboard' %}
+            {% include 'components/dashboard/sidebar/link_and_icon.html' %}
+        {% endwith %} {% endcomment %}
+       
+    </div>
+</div>
+
+
+{% endblock %}
