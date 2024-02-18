@@ -2,9 +2,16 @@
 {% load static %}
 {% block content %}
 
-<div id="sidebar" class="fixed top-10 bottom-0 bg-[#D1D3E2] text-white py-4 px-6 flex flex-col items-start  transition ease-in-out duration-300">
-    
+{% comment %} <div id="sidebar" class="fixed top-10 bottom-0 bg-[#D1D3E2] text-white py-4 px-6 flex flex-col items-start  transition ease-in-out duration-300"> {% endcomment %}
+<div id ='sidebar' class=" bg-gray-800 text-white w-64 h-screen p-4">    
     <!-- Sidebar links -->
+    <div class="flex items-center  ">
+        <button id="toggleSidebar" class="text-gray-400  ">
+            <i class="fas fa-bars"></i>
+        </button>
+        <img src="{% static '/logo/logo.jpeg' %}" alt="Logo" class="w-10 h-08 ml-4 mr-2" id='sidebar_company_logo'>
+        <span class="text-lg font-semibold text-gray-400" id='sidebar_company_name'>EduPulse</span>
+      </div>
     
     <div class="flex flex-col mt-10 ">
 
@@ -13,22 +20,29 @@
         {% sidebar_link 'Report' 'fas fa-chart-line' 'dashboard' %}
         {% sidebar_link 'FAQ' 'fas fa-question-circle' 'dashboard' %}
 
-        {% comment %} {% with link_name='Dashboard' icon_name='fas fa-tachometer-alt' url_name='dashboard' %}
-            {% include 'components/dashboard/sidebar/link_and_icon.html' %}
-        {% endwith %}
-
-        {% with link_name='Program' icon_name='fas fa-cogs' url_name='dashboard' %}
-            {% include 'components/dashboard/sidebar/link_and_icon.html' %}
-        {% endwith %}
-
-        {% with link_name='Report' icon_name='fas fa-chart-line' url_name='dashboard' %}
-            {% include 'components/dashboard/sidebar/link_and_icon.html' %}
-        {% endwith %}
-        {% with link_name='FAQ' icon_name='fas fa-question-circle' url_name='dashboard' %}
-            {% include 'components/dashboard/sidebar/link_and_icon.html' %}
-        {% endwith %} {% endcomment %}
+      
        
     </div>
+    <script>
+        // JavaScript for toggling sidebar
+        const links = document.querySelectorAll('#sidebar a');
+        const logo=document.querySelectorAll
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('w-64');
+            document.getElementById('sidebar').classList.toggle('w-16');
+            
+            links.forEach(link => {
+                const span = link.querySelector('span');
+                span.classList.toggle('md:hidden');
+                span.classList.toggle('md:flex');
+                
+            });
+            document.getElementById('sidebar_company_logo').classList.toggle('hidden');
+            document.getElementById('sidebar_company_logo').classList.toggle('flex');
+            document.getElementById('sidebar_company_name').classList.toggle('hidden');
+            document.getElementById('sidebar_company_name').classList.toggle('flex');
+        });
+    </script>
 </div>
 
 
