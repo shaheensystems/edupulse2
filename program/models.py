@@ -9,6 +9,8 @@ from utils.function.helperAttendance import get_attendance_percentage,get_attend
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
 from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program,get_total_no_of_student_by_course
 from utils.function.helperProgram import OFFERING_CHOICES
+from utils.function.helperGetChartData import get_chart_data_attendance_report
+
 
 class ProgramAndCourseType(models.Model):
     name=models.CharField(max_length=50, unique=True)
@@ -153,6 +155,46 @@ class CourseOffering(BaseModel):
     teacher = models.ManyToManyField(Staff,blank=True ,related_name='course_offerings')
     offering_mode = models.CharField(max_length=10,choices=OFFERING_CHOICES1,default='online',blank=True, null=True,help_text='Select the mode of course offering: Online, Offline, or Blended'
     )
+    
+    def get_week_numbers(self):
+        start_date=self.start_date
+        end_date=self.end_date
+        
+        num_weeks=(end_date-start_date).days//7
+        week_numbers = [(str(week), str(week)) for week in range(1, num_weeks + 1)]
+        
+        return [('', '---')] + week_numbers  # Add an empty choice and return
+        
+        
+    def calculate_student_attendance_percentage(self):
+        attendances=self.attendances.all()
+        
+        present=attendances.filter(is_present='present').count()
+        informed_absent=attendances.filter(is_present='informed absent').count()
+        absent=attendances.filter(Q(is_present='absent')|Q(is_present='tardy')).count()
+        total_attendances=attendances.count()
+        if total_attendances>0 and total_attendances == present+informed_absent+absent:
+            present_percentage=f'{(present / total_attendances) * 100:.2f}%'
+            informed_absent_percentage=f'{(informed_absent / total_attendances) * 100:.2f}%'
+            absent_percentage=f'{(absent / total_attendances) * 100:.2f}%'
+        else:
+            present_percentage=0
+            informed_absent_percentage=0
+            absent_percentage=0
+            
+        return{
+            'present_percentage':present_percentage ,
+            'informed_absent_percentage':informed_absent_percentage ,
+            'absent_percentage':absent_percentage ,
+        }
+    
+    def calculate_student_attendance_chart_data(self):
+        if self.attendances.all():
+            chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=self.attendances.all())
+        else:
+            chart_data_attendance_report_attendance=None
+        return chart_data_attendance_report_attendance
+        
     
     def calculate_duration_in_week(self):
         start_date=self.start_date

@@ -20,15 +20,16 @@ from django.urls import path,include
 from django.conf.urls.static import static
 
 
-from .views import DashboardView
+from .views import DashboardView,ManageAttendance
 
 urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path('admin/', admin.site.urls),
     path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
     path('',DashboardView.as_view(), name='dashboard'),
+    path('manage-attendance', ManageAttendance.as_view(),name='manage-attendance'),
     path('wc_current_programs/',include('program.urls')),
-    path('all-attendance/',include('attendance.urls')),
+    path('attendance/',include('attendance.urls')),
     path('user/',include('customUser.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
 ]

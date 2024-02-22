@@ -1,15 +1,21 @@
+from typing import Any
 from django.shortcuts import render, redirect
 from customUser.models import Student,Staff
 from report.models import Attendance
 from base.models import Campus
 from django.views.generic import DetailView,ListView,TemplateView
+from django.views.generic.edit import FormView
 from program.models import ProgramOffering,CourseOffering,Program,Course
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from datetime import datetime
-from .forms import DateFilterForm
+from .forms import DateFilterForm, ManageAttendanceFilterForm
 from django.db.models import Q,F,Count
 from datetime import datetime, timedelta
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_program_offerings,get_no_of_at_risk_students_by_course_offerings
@@ -149,3 +155,62 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         # Add other necessary context data
 
         return context
+    
+class ManageAttendance(LoginRequiredMixin,FormView):
+    template_name='report/manage_attendance.html'
+    form_class = ManageAttendanceFilterForm
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user  # Pass the request.user to the form
+        return kwargs
+    
+    def form_valid(self, form):
+        course_offering = form.cleaned_data['course_offering']
+        week_number = form.cleaned_data['week_number']
+        student = form.cleaned_data['student']
+        start_date=course_offering.start_date + timedelta(weeks=int(week_number) - 1)
+        weekly_reports=course_offering.weekly_reports.all()
+        print("weekly_reports:",weekly_reports)
+        weekly_report=None
+        for weekly_report in weekly_reports:
+                print(weekly_report.get_week_number())
+                if weekly_report.get_week_number()==int(week_number):
+                    print(f" week number {weekly_report.get_week_number() } and {week_number}")
+                    weekly_report=weekly_report
+                    print("weekly_report:",weekly_report)
+        
+        #  # Instantiate the form
+        # form = self.get_form()
+        
+        # # Call the set_student_choices method to set student choices based on the selected course offering
+        # form.set_student_choices(course_offering_id=self.request.POST.get('course_offering'))
+        
+        
+        if student:
+            attendance_data = Attendance.objects.filter(course_offering=course_offering, attendance_date__gte=start_date, student=student)
+            # weekly_report=weekly_report.filter(student=student)
+        else:
+            attendance_data = Attendance.objects.filter(course_offering=course_offering, attendance_date__gte=start_date)
+        
+            print("final weekly_report:",weekly_report)
+        return self.render_to_response(self.get_context_data(form=form, attendance_data=attendance_data,weekly_report=weekly_report))
+
+    @method_decorator(csrf_exempt)  # Apply csrf_exempt decorator to the dispatch method
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        # Handle GET request to render the form initially
+        form = self.get_form()
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def post(self, request, *args, **kwargs):
+        # Handle POST request to update student choices based on the selected course offering
+        if request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+            course_offering_id = request.POST.get('course_offering_id')
+            students = Student.objects.filter(course_offerings__id=course_offering_id)
+            serialized_students = [{'id': student.id, 'first_name': student.first_name, 'last_name': student.last_name} for student in students]
+            return JsonResponse(serialized_students, safe=False)
+        else:
+            return super().post(request, *args, **kwargs)

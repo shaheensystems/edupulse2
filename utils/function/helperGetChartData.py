@@ -1,5 +1,5 @@
 from collections import Counter
-from report.models import WeeklyReport
+
 from datetime import datetime,timedelta
 from django.db.models import Q
 def get_chart_data_offering_type_student_enrollment(course_offerings):
@@ -177,6 +177,7 @@ def get_chart_data_attendance_report(attendances):
     chart_data_attendance_report_action={}
     # print(attendances)
     if attendances:
+        from report.models import WeeklyReport
         absent_attendances_only=attendances.exclude(is_present='present')
         weekly_reports_absent_students=WeeklyReport.objects.filter(sessions__in=absent_attendances_only)
         weekly_reports_absent_students_not_engaged=weekly_reports_absent_students.filter(Q(engagement='not engaged'))

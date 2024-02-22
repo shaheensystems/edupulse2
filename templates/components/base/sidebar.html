@@ -2,48 +2,86 @@
 {% load static %}
 {% block content %}
 
-{% comment %} <div id="sidebar" class="fixed top-10 bottom-0 bg-[#D1D3E2] text-white py-4 px-6 flex flex-col items-start  transition ease-in-out duration-300"> {% endcomment %}
-<div id ='sidebar' class=" bg-gray-800 text-white w-64 h-screen p-4">    
+<section id='sidebar' class="bg-gray-200 text-white w-64 h-screen">
     <!-- Sidebar links -->
-    <div class="flex items-center  ">
-        <button id="toggleSidebar" class="text-gray-400  ">
-            <i class="fas fa-bars"></i>
-        </button>
-        <img src="{% static '/logo/logo.jpeg' %}" alt="Logo" class="w-10 h-08 ml-4 mr-2" id='sidebar_company_logo'>
-        <span class="text-lg font-semibold text-gray-400" id='sidebar_company_name'>EduPulse</span>
-      </div>
-    
-    <div class="flex flex-col mt-10 ">
-
+    <div class="flex flex-col fixed p-4 w-64 mt-5">
+         <!-- Dashboard -->
+        
         {% sidebar_link 'Dashboard' 'fas fa-tachometer-alt' 'dashboard' %}
-        {% sidebar_link 'Program' 'fas fa-cogs' 'program_list' %}
-        {% sidebar_link 'Report' 'fas fa-chart-line' 'dashboard' %}
-        {% sidebar_link 'FAQ' 'fas fa-question-circle' 'dashboard' %}
+       
+       
+        <!-- Group: Programs -->
+        <div class="mb-4">
+            <div class="dropdown mb-2">
+                <button class=" dropdown-toggle text-sm text-gray-400 uppercase mb-2 " >Programs</button>
+                <div class="dropdown-menu">
+                    {% sidebar_link 'Program' 'fas fa-cogs' 'program_list' %}
+                    {% sidebar_link 'Program Offerings' 'fas fa-layer-group' 'program_offering_list' %}
+                </div>
+            </div>
+        </div>
 
-      
+        <!-- Group: Courses -->
+        <div class="mb-4">
+            <div class="dropdown mb-2">
+                <button class="dropdown-toggle text-sm text-gray-400 uppercase mb-2 ">Courses</button>
+                <div class="dropdown-menu">
+                    {% sidebar_link 'Course' 'fas fa-book' 'course_list' %}
+                    {% sidebar_link 'Course Offerings' 'fas fa-book-open' 'course_offering_list' %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Group: Management -->
+        <div class="mb-4">
+            <div class="dropdown mb-2">
+                <button class="dropdown-toggle text-sm text-gray-400 uppercase mb-2">Management</button>
+                <div class="dropdown-menu">
+                    {% sidebar_link 'Manage Attendance' 'fas fa-calendar-check' 'manage-attendance' %}
+                    {% sidebar_link 'Manage Students' 'fas fa-user-graduate' 'students-list' %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Group: Other -->
+        <div class="mb-4">
+            <h2 class="dropdown-toggle text-sm text-gray-400 uppercase mb-2">Other</h2>
+            <div class="dropdown-menu">
+                {% sidebar_link 'Admin' 'fas fa-user-cog' 'admin:index' %}
+                {% sidebar_link 'Import Data' 'fas fa-file-import' 'upload_file:upload_csv' %}
+                {% sidebar_link 'Report' 'fas fa-chart-line' 'dashboard' %}
+                {% sidebar_link 'FAQ' 'fas fa-question-circle' 'dashboard' %}
+            </div>
+           
+        </div>
        
     </div>
     <script>
-        // JavaScript for toggling sidebar
-        const links = document.querySelectorAll('#sidebar a');
-        const logo=document.querySelectorAll
-        document.getElementById('toggleSidebar').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('w-64');
-            document.getElementById('sidebar').classList.toggle('w-16');
-            
-            links.forEach(link => {
-                const span = link.querySelector('span');
-                span.classList.toggle('md:hidden');
-                span.classList.toggle('md:flex');
-                
+        // JavaScript for dropdown menu
+        document.querySelectorAll('.dropdown-toggle').forEach(function(element) {
+            element.addEventListener('click', function() {
+                var dropdownMenu = this.nextElementSibling;
+                dropdownMenu.classList.toggle('hidden');
             });
-            document.getElementById('sidebar_company_logo').classList.toggle('hidden');
-            document.getElementById('sidebar_company_logo').classList.toggle('flex');
-            document.getElementById('sidebar_company_name').classList.toggle('hidden');
-            document.getElementById('sidebar_company_name').classList.toggle('flex');
+        });
+
+        // JavaScript to highlight active link
+        document.addEventListener('DOMContentLoaded', function() {
+            var currentUrl = window.location.pathname;
+            var sidebarLinks = document.querySelectorAll('#sidebar a');
+
+            sidebarLinks.forEach(function(link) {
+                if (link.getAttribute('href') === currentUrl) {
+                   
+                    link.querySelector('i').classList.add("text-blue-400");
+                    link.querySelector('span').classList.add("text-blue-400");
+                   
+                }
+            });
         });
     </script>
-</div>
+   
+</section>
 
 
 {% endblock %}

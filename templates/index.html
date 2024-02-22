@@ -5,17 +5,32 @@
 
 
         <!-- User Profile Section -->
-        {% with current_user=current_user  %}
+        {% comment %} {% with current_user=current_user  %}
            {% include 'components/dashboard/user_profile_FC.html' %}
-        {% endwith %}
+        {% endwith %} {% endcomment %}
       
 
         {% if request.user|user_belongs_to_group:'Teacher' %}
         {% comment %} {{total_students_at_risk_query_set}} {% endcomment %}
             <!-- Course Offering Details Section -->
+            <div class='hidden'>
             {% with course_offerings=course_offerings_for_current_user students=total_students_in_course_offerings_for_current_user total_no_of_at_risk_student=total_students_at_risk_query_set %}
               {% include 'components/dashboard/course_offering_info_bar.html' %}
             {% endwith %}
+          </div>
+
+            <div class='flex flex-row gap-4 mt-4'> 
+              <span class='flex flex-wrap text-gray-400 text-sm  items-end px-2'>Jump to : </span>
+              {% for co in course_offerings_for_current_user %}
+                <a href="{% url 'course_offering_detail' co.pk %}" class='text-blue-400 underline underline-offset-4'> {{co.temp_id}}</a>
+              {% endfor %}
+            </div>
+            
+            {% for co in course_offerings_for_current_user %}
+              {% with co=co %}
+                {% include "components/dashboard/course_offering_report.html" %}
+              {% endwith %}
+            {% endfor %}
         {% endif %}
        
         <!-- date Filter -->

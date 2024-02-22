@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="m-4">
+    <!-- Weekly Attendance Report is the manage attendance with filter -->
+    <h1>Manage Attendance</h1>
+
+    <form method="POST" class="row g-3 flex justify-between flex-row gap-4 w-3/4">
+        <!-- CSRF token is automatically included in the form -->
+        {% csrf_token %}
+        <div class="col-md-3 flex flex-row gap-2">
+            <label for="id_course_offering">Course Offering</label>
+            {{ form.course_offering }}
+        </div>
+        <div class="col-md-3 flex flex-row gap-2">
+            <label for="id_week_number">Week Number</label>
+            <div class='w-10 bg-red-200'>  <!-- Adjust the width as needed -->
+                {{ form.week_number }}
+            </div>
+        </div>
+        <div class="col-md-3 flex flex-row gap-2">
+            <label for="id_student">Student Name</label>
+            {{ form.student }}
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+
+    <section class="m-4">
+        {{attendance_data}}<br>
+        {{weekly_report}}
+        Week Number : {{weekly_report.get_week_number}}
+        <!-- Data display section -->
+        {% if weekly_report %}
+        {% comment %} <h2>Attendance Data</h2> {% endcomment %}
+        <table class="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="border px-4 py-2">Student ID</th>
+                    <th class="border px-4 py-2">Name</th>
+                    {% for session_date in week.list.0.sessions.all|dictsort:"attendance_date" %}
+                        <th class="border px-4 py-2">Session {{ forloop.counter }} <br>{{ session_date.attendance_date }}</th>
+                    {% endfor %}
+                    
+                    <th class="border px-4 py-2">Engagement</th>
+                    <th class="border px-4 py-2">Action</th>
+                    <th class="border px-4 py-2">Follow Up</th>
+                    <th class="border px-4 py-2">Last Login Status</th>
+                    <th class="border px-4 py-2">No of Page View in canvas</th>
+                    <th class="border px-4 py-2">Assessment Status</th>
+                    <th class="border px-4 py-2">At Risk</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr>
+                        <td class="border px-4 py-2">{{ weekly_report.student.temp_id }}</td>
+                        <td class="border px-4 py-2">{{ weekly_report.student.student.first_name }} {{ weekly_report.student.student.last_name }}</td>
+                        {% for session in weekly_report.sessions.all|dictsort:"attendance_date" %}
+                            <td class="border px-4 py-2">{{ session.is_present }}</td>
+                            
+                        {% endfor %}
+                        <td class="border px-4 py-2">{{ weekly_report.engagement }}</td>
+                        <td class="border px-4 py-2">{{ weekly_report.action }}</td>
+                        <td class="border px-4 py-2">{{ weekly_report.follow_up }}</td>
+                        <td class="border px-4 py-2">{{ weekly_report.login_in_on_canvas }}</td>
+                        <td class="border px-4 py-2">{{ weekly_report.no_of_pages_viewed_on_canvas }}</td>
+                        <td class="border px-4 py-2">{{ weekly_report.assessment_status }}</td>
+                        <td class="border px-4 py-2">{{ weekly_report.at_risk }}</td>
+                    </tr>
+                    
+             
+                
+            </tbody>
+        </table>
+        {% else %}
+        <p>No attendance data available.</p>
+        {% endif %}
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const courseOfferingSelect = document.querySelector('#id_course_offering');
+            const studentSelect = document.querySelector('#id_student');
+            
+            // Event listener for course offering change
+            courseOfferingSelect.addEventListener('change', function () {
+                const selectedCourseOfferingId = courseOfferingSelect.value;
+                
+                // Make AJAX request to fetch students associated with the selected course offering
+                fetch(`/manage-attendance/?course_offering_id=${selectedCourseOfferingId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Clear existing options
+                        studentSelect.innerHTML = '<option value="">---------</option>';
+                        
+                        // Add fetched students as options
+                        data.forEach(student => {
+                            const option = document.createElement('option');
+                            option.value = student.id;
+                            option.textContent = `${student.first_name} ${student.last_name}`;
+                            studentSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching students:', error);
+                    });
+            });
+        });
+    </script>
+</section>
+{% endblock %}

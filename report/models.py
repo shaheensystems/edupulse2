@@ -1,9 +1,10 @@
 from django.db import models
 from base.models import BaseModel
 from customUser.models import Student  # Import the Student model
-from program.models import ProgramOffering, CourseOffering,Course
+from program.models import ProgramOffering, CourseOffering
 from django.utils import timezone
 from django.db import models
+from datetime import date
 
 class Attendance(BaseModel):
     ATTENDANCE_CHOICE=[
@@ -79,6 +80,22 @@ class WeeklyReport(BaseModel):
     # at_risk Status
     assessment_status=models.CharField( choices=ASSESSMENT_CHOICE, max_length=255,null=True,blank=True,default="n/a")
     at_risk=models.BooleanField(default=None,null=True,blank=True)
+    
+    def get_week_number(self):
+        start_date=self.course_offering.start_date
+        end_date=self.course_offering.end_date
+        
+        attendance_dates = [session.attendance_date for session in self.sessions.all()]
+
+        # Find the minimum attendance date
+        min_attendance_date = min(attendance_dates) if attendance_dates else date.today()  # Use today's date if there are no attendance dates
+        # Calculate the number of weeks between start_date and min_attendance_date
+        num_weeks = (min_attendance_date - start_date).days // 7 + 1
+        
+        return num_weeks
+        
+        
+
 
 
 

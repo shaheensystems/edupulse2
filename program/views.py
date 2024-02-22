@@ -33,12 +33,15 @@ class CourseListView(LoginRequiredMixin,ListView):
     def get_all_students_and_at_risk_students(self, courses):
         unique_students = set()
         no_of_at_risk_students=set()
-        for course in courses:
-            no_of_at_risk_students.update(get_no_of_at_risk_students_by_course_offerings(course.course_offerings.all()))
-            for course_offering in course.course_offerings.all():
-                unique_students.update(course_offering.student.all())
+        if courses:
+            for course in courses:
+                no_of_at_risk_students.update(get_no_of_at_risk_students_by_course_offerings(course.course_offerings.all()))
+                for course_offering in course.course_offerings.all():
+                    unique_students.update(course_offering.student.all())
 
-        return unique_students,no_of_at_risk_students
+            return unique_students,no_of_at_risk_students
+        else:
+            return unique_students,no_of_at_risk_students
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -86,6 +89,7 @@ class CourseListView(LoginRequiredMixin,ListView):
         context.update(online_and_offline_courses)
 
         total_students,at_risk_students=self.get_all_students_and_at_risk_students(courses_for_current_user)
+        
         context['total_no_of_at_risk_student'] = at_risk_students
 
         context['total_no_of_student_for_blended_courses']=get_total_no_of_student_by_courses(courses=blended_courses_for_current_user, offering_mode='offline')
