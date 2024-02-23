@@ -163,7 +163,7 @@ class CourseOffering(BaseModel):
         num_weeks=(end_date-start_date).days//7
         week_numbers = [(str(week), str(week)) for week in range(1, num_weeks + 1)]
         
-        return [('', '---')] + week_numbers  # Add an empty choice and return
+        return  week_numbers  # Add an empty choice and return
         
         
     def calculate_student_attendance_percentage(self):

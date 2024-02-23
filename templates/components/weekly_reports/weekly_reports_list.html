@@ -1,0 +1,66 @@
+
+<form id="week-form" class="my-4">
+
+    {% csrf_token %}
+    <table class="min-w-full bg-white border border-gray-300 border-1 rounded-lg overflow-hidden">
+        <thead class="bg-[#F4F2FF] text-sm">
+            <tr>
+                <th class="border px-4 py-2">Student</th>
+                <th class="border px-4 py-2">Status</th>
+                {% comment %} Create dynamic headers for each session {% endcomment %}
+                {% for weekly_report in weekly_reports %}
+                    {% for session in weekly_report.sessions.all %}
+                        <th class="border px-4 py-2">
+                            Session <br>
+                            <p class='truncate'>{{ session.attendance_date }}</p>
+                        </th>
+                    {% endfor %}
+                {% endfor %}
+                <th class="border px-4 py-2">Engagement</th>
+                <th class="border px-4 py-2">Action</th>
+                <th class="border px-4 py-2">Follow Up</th>
+                <th class="border px-4 py-2">Last Login Status</th>
+                <th class="border px-4 py-2">No of Page View in canvas</th>
+                <th class="border px-4 py-2">Assessment Status</th>
+                <th class="border px-4 py-2">At Risk</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for weekly_report in weekly_reports %}
+                <tr class='border-b-2 border-gray-300'>
+                    <td class="border px-4 py-2">
+                        <span class='text-sm text-gray-800'>{{ weekly_report.student.student.first_name }} {{ weekly_report.student.student.last_name }}</span>
+                        <span class='text-xs text-gray-300 mt-2'>  {{ weekly_report.student.email_id }} </span>
+                    </td>
+                    <td class="border px-4 py-2">
+                        <span class="text-sm rounded-lg px-4 py-1 {% if weekly_report.at_risk %} bg-red-300 text-red-500 {% else %} bg-blue-200 text-blue-500 {% endif %} max-w-xs truncate">
+                            {% if weekly_report.at_risk == True %}
+                                <span class='truncate text-xs'> At Risk</span>
+                            {% else %}
+                                <span class="truncate text-xs inline-flex items-center">
+                                    <span class="h-2 w-2 bg-blue-800 rounded-full mr-2"></span>
+                                    <span>On Track</span>
+                                </span>
+                            {% endif %}
+                        </span>    
+                    </td>
+                    <td class="border px-4 py-2">{{ weekly_report.student.student.first_name }} {{ weekly_report.student.student.last_name }}</td>
+                    {% for session in weekly_report.sessions.all %}
+                        <td class="border px-4 py-2">
+                            {{ session.is_present }}
+                        </td>
+                    {% endfor %}
+                    <td class="border px-4 py-2">{{ weekly_report.engagement }}</td>
+                    <td class="border px-4 py-2">{{ weekly_report.action }}</td>
+                    <td class="border px-4 py-2">{{ weekly_report.follow_up }}</td>
+                    <td class="border px-4 py-2">{{ weekly_report.login_in_on_canvas }}</td>
+                    <td class="border px-4 py-2">{{ weekly_report.no_of_pages_viewed_on_canvas }}</td>
+                    <td class="border px-4 py-2">{{ weekly_report.assessment_status }}</td>
+                    
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  
+</form>
+

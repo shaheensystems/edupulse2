@@ -16,7 +16,13 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-
+from django.db.models import Prefetch
+from report.models import WeeklyReport
+from django.utils.translation import gettext_lazy as _
+from django.core.serializers import serialize
+from django.core import serializers
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_program_offerings,get_no_of_at_risk_students_by_course_offerings
 
@@ -214,3 +220,96 @@ class ManageAttendance(LoginRequiredMixin,FormView):
             return JsonResponse(serialized_students, safe=False)
         else:
             return super().post(request, *args, **kwargs)
+
+class ManageAttendanceView(LoginRequiredMixin, TemplateView):
+    template_name = 'report/manage_attendance.html'
+    context_object_name = 'course_offerings'
+    
+    
+    def get_queryset(self):
+        # Assuming you want to filter course offerings based on the user
+        user = self.request.user
+        course_offerings= CourseOffering.objects.prefetch_related(
+            'teacher',
+            'student',
+            'teacher__staff',
+            'attendances',
+            Prefetch('weekly_reports', queryset=WeeklyReport.objects.prefetch_related('sessions'))
+        ).filter(teacher__staff=user)
+        
+        # course_offerings=CourseOffering.objects.all()
+        
+        return course_offerings
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['course_offerings'] = self.get_queryset()
+        print(context['course_offerings'])
+        return context
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # AJAX request
+            course_offering_id = request.GET.get('course_offering_id')
+            if course_offering_id:
+                course_offering = get_object_or_404(CourseOffering, temp_id=course_offering_id)
+                students = course_offering.student.all()
+                # week_numbers = course_offering.get_week_numbers()
+                week_numbers = [str(week_number[1]) for week_number in course_offering.get_week_numbers()]
+                serialized_students = [{'id': student.temp_id, 'first_name': student.student.first_name, 'last_name': student.student.last_name} for student in students]
+                
+                print("W N",week_numbers)
+                print("S",serialized_students)
+                response_data = {
+                    'students': serialized_students,
+                    'week_numbers': week_numbers,
+                }
+                return JsonResponse(response_data, status=200)
+            else:
+                return JsonResponse({'error': 'Course offering ID is required'}, status=400)
+        else:
+            # Non-AJAX request
+            context = self.get_context_data()
+            # Add default values for form fields
+            default_course_offering_id = context['course_offerings'].first().temp_id if context['course_offerings'] else None
+            default_week_number = '1'  # Set your default week number here
+            default_student_id = context['course_offerings'].first().student.first().temp_id if context['course_offerings'] and context['course_offerings'].first().student.first() else None
+            context['default_course_offering_id'] = default_course_offering_id
+            context['default_week_number'] = default_week_number
+            context['default_student_id'] = default_student_id
+            return render(request, self.template_name, context)
+    
+    def post(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            course_offering_id = request.POST.get('course_offering')
+            week_number = request.POST.get('week_number')
+            student_id = request.POST.get('student')
+            print("Post :",course_offering_id,student_id,week_number)
+            if course_offering_id and week_number and student_id:
+                course_offering = get_object_or_404(CourseOffering, temp_id=course_offering_id)
+                student = get_object_or_404(Student, temp_id=student_id)
+                start_date = course_offering.start_date + timedelta(weeks=int(week_number) - 1)
+                end_date=start_date+timedelta(days=7)
+                # Retrieve weekly report data based on course offering, week number, and student
+                # Replace this with your actual logic to fetch weekly report data
+                weekly_report_data = course_offering.weekly_reports.all()  # Implement your logic here
+                
+                weekly_report_data=weekly_report_data.filter(Q(sessions__attendance_date__gte=start_date) & Q(sessions__attendance_date__lte=end_date))
+
+                # serialized_weekly_reports = serializers.serialize('json', weekly_report_data)
+                
+                # return JsonResponse(serialized_weekly_reports,safe=False, status=200)
+            
+                # Render HTML using a Django template
+                html_content = render_to_string('components/weekly_reports/weekly_reports_list.html', {'weekly_reports': weekly_report_data})
+
+                return JsonResponse({'html_content': html_content}, status=200)
+            else:
+                return JsonResponse({'error': 'Course offering ID, week number, and student ID are required'}, status=400)
+        else:
+            return JsonResponse({'error': 'This endpoint accepts only AJAX requests'}, status=400)   
+    
