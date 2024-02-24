@@ -5,7 +5,7 @@ from .forms import CSVModelForm,AttendanceUploadForm, CanvasStatsUploadForm
 # from .forms import CSVUploadForm
 # from .models import UploadFile
 from .models import Csv,CanvasStatsUpload
-from report.models import Attendance,WeeklyReport
+from report.models import Attendance,WeeklyReport, StudentEnrollment
 from customUser.models import Student
 from program.models import Program,Course,ProgramOffering,CourseOffering
 from customUser.models import NewUser,Student,Campus, Ethnicity, StudentFundSource
@@ -16,6 +16,8 @@ from django.urls import reverse
 
 from report.views import get_week_number
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 def handle_ethnicity(user, ethnicity_name):
     print("Ethnicity name ",ethnicity_name)
@@ -353,6 +355,37 @@ def update_or_create_program_offering(data):
     else:
         print(f"Ignoring program offering with code '{data['student_program_offer_code']}' due to spaces in the code, not valid ")
 
+def update_or_create_student_enrollment(data):
+    print("Start student enrollment process for:", data['student_program_offer_code'])
+
+    try:
+        linked_student = Student.objects.get(temp_id=data['student_id'])
+        linked_course_offering = CourseOffering.objects.get(temp_id=data['student_course_offer_code'])
+        linked_program_offering = ProgramOffering.objects.get(temp_id=data['student_program_offer_code'])
+    except ObjectDoesNotExist as e:
+        print("Error for Student Enrollment process:", e)
+        return
+
+    if linked_student and linked_course_offering and linked_program_offering:
+        # Proceed with the enrollment process
+        try:
+            student_enrollment_object, created = StudentEnrollment.objects.get_or_create(
+                student=linked_student,
+                course_offering=linked_course_offering,
+                program_offering=linked_program_offering
+            )
+
+            if not created:
+                # Update additional fields if needed
+                student_enrollment_object.save()
+            print("Student Enrollment created or update successfully")
+
+        except IntegrityError as e:
+            print("Error creating or updating StudentEnrollment:", e)
+    
+    
+    
+
 def Upload_file_view(request):
     form = CSVModelForm(request.POST or None, request.FILES or None)
 
@@ -443,9 +476,7 @@ def Upload_file_view(request):
                 # add course and program offering after creating student 
                 update_or_create_course_offering(data)
                 update_or_create_program_offering(data)
-
-
-               
+                update_or_create_student_enrollment(data)
 
         obj.activated = True
         obj.save()

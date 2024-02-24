@@ -124,8 +124,8 @@ class StudentEnrollment(BaseModel):
         ('fail','Fail'),
         ('dropped','Dropped'),
     ]
-    student=models.ForeignKey(Student, verbose_name='student', on_delete=models.CASCADE)
-    course_offering=models.ForeignKey(CourseOffering, verbose_name='course_offering', on_delete=models.CASCADE)
-    program_offering=models.ForeignKey(ProgramOffering, verbose_name='program_offering', on_delete=models.CASCADE)
-    status=models.BooleanField()
+    student=models.ForeignKey(Student, verbose_name='student', on_delete=models.CASCADE,related_name='student_enrollments')
+    course_offering=models.ForeignKey(CourseOffering, verbose_name='course_offering', on_delete=models.CASCADE,related_name='student_enrollments')
+    program_offering=models.ForeignKey(ProgramOffering, verbose_name='program_offering', on_delete=models.CASCADE,related_name='student_enrollments')
+    status=models.BooleanField(default=True)
     result=models.CharField(choices=RESULT_CHOICE,null=True,blank=True, max_length=255,default='awaited')

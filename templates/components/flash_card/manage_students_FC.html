@@ -36,7 +36,18 @@
                             </td>
                             
                             <td class="px-6 py-2 text-left"> 
-                                {% if program.name is not None %}{{ program.name }} {% else %} Not Found{% endif %}
+                                {% comment %} {% for enrollment in student.student_enrollments.all %}
+                                    {{ enrollment.program_offering.program.name }}<br>
+                                {% endfor %} {% endcomment %}
+                            
+                                {% if program is not None %}
+                               
+                                    {% for p in program  %}
+                                        {{p}}<br>
+                                    {% endfor %}
+                                {% else %} 
+                                Not Found
+                                {% endif %}
                             </td>
                           
                          

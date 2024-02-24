@@ -1,5 +1,5 @@
 from django.contrib import admin
-from report.models import Attendance, CourseResult, WeeklyReport
+from report.models import Attendance, CourseResult, WeeklyReport,StudentEnrollment
 
 class AttendanceAdmin(admin.ModelAdmin):
     list_display = ('student', 'program_offering', 'course_offering', 'is_present', 'attendance_date')
@@ -43,3 +43,8 @@ class WeeklyReportAdmin(admin.ModelAdmin):
     get_attendance_date.short_description="Attendance Date"
 
 admin.site.register(WeeklyReport, WeeklyReportAdmin)
+
+class StudentEnrollmentAdmin(admin.ModelAdmin):
+    list_display=('student','course_offering','program_offering','status','result')
+
+admin.site.register(StudentEnrollment,StudentEnrollmentAdmin)

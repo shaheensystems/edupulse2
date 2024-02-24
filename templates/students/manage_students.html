@@ -26,7 +26,7 @@
             </form>
         </div>
         <div>
-            <button class="flex items-center bg-green-400 font-light text-lg px-4 py-2 rounded-lg font-semibold text-gray-600">
+            <button class="flex items-center bg-green-400  text-lg px-4 py-2 rounded-lg font-semibold text-gray-600">
                 <i class="fa fa-edit mr-2 fa-2x text-gray-500 font-thin"></i>
                 Edit
             </button>
@@ -35,7 +35,8 @@
     {% comment %} <p>{{students|length}}</p> {% endcomment %}
   
     <section class='mt-5 w-full'>
-        {% with students=students program=program %}
+        
+    {% with students=students program=program %}
         {% include 'components/flash_card/manage_students_FC.html' %}
     {% endwith %} 
     </section>

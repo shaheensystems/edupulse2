@@ -15,6 +15,7 @@ from utils.function.helperDatabaseFilter import filter_database_based_on_current
 from utils.function.helperGetAtRiskStudent import get_all_at_risk_student_last_week
 from program.models import CourseOffering
 from customUser.models import NewUser
+from report.models import StudentEnrollment
 
 # Create your views here.
 class UserLoginView(LoginView):
@@ -49,12 +50,21 @@ class ManageStudentsView(LoginRequiredMixin,ListView):
         program=""
         if selected_course_offering_id=='all_courses':
             students=students.filter(course_offerings__in=course_offerings_for_current_user)
+            program_queryset=set(StudentEnrollment.objects.filter(course_offering__in=course_offerings_for_current_user))
+            program_names_set = {enrollment.program_offering.program.name for enrollment in program_queryset}
+            print("Program:",program_names_set)
+            program=list(program_names_set)
+            
         else:
             students=students.filter(course_offerings__in=[selected_course_offering_id])
             course_offering=course_offerings_for_current_user.get(id=selected_course_offering_id)
-            program=course_offering.course.program
+            print("CO -N",course_offering.student_enrollments.all)
+            program_queryset=set(StudentEnrollment.objects.filter(course_offering=course_offering))
+            program_names_set = {enrollment.program_offering.program.name for enrollment in program_queryset}
+            print("Program:",program_names_set)
+            program=list(program_names_set)
             
-        
+            
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
