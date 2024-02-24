@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-4">Teacher Profile</h1>
+    <div class="bg-white shadow-md rounded px-8 py-6">
+        <p class="text-lg"><span class="font-bold">Name:</span> {{ staff_profile.staff.first_name }} {{ staff_profile.staff.last_name }}</p>
+        <p class="text-lg"><span class="font-bold">Email:</span> {{ staff_profile.email_id }}</p>
+        <p class="text-lg"><span class="font-bold">Joining Date:</span> {{ staff_profile.joining_date }}</p>
+        <p class="text-lg"><span class="font-bold">Designation:</span> {{ staff_profile.designation }}</p>
+        <p class="text-lg"><span class="font-bold">User Name:</span> {{ staff_profile.staff.username }}</p>
+        <p class="text-lg"><span class="font-bold">Role:</span> {{ staff_profile.role }}</p>
+        <p class="text-lg"><span class="font-bold">Remark:</span> {{ staff_profile.remark }}</p>
+    </div>
+</div>
+{% endblock %}

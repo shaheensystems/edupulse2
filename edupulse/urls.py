@@ -20,14 +20,14 @@ from django.urls import path,include
 from django.conf.urls.static import static
 
 
-from .views import DashboardView,ManageAttendance, ManageAttendanceView,SaveWeeklyReportsView
+from .views import DashboardView, ManageAttendanceView,SaveWeeklyReportsView
 
 urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path('admin/', admin.site.urls),
     path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
     path('',DashboardView.as_view(), name='dashboard'),
-    path('manage-attendance1', ManageAttendance.as_view(),name='manage-attendance1'),
+  
     path('manage-attendance/', ManageAttendanceView.as_view(),name='manage-attendance'),
     path('save-weekly-reports/', SaveWeeklyReportsView.as_view(), name='save_weekly_reports'),
     path('wc_current_programs/',include('program.urls')),

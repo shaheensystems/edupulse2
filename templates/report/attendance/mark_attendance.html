@@ -1,55 +1,70 @@
 {% extends "base.html" %}
 {% block content %}
-<section>
+<section class='flex m-4'>
     <!-- mark_attendance.html -->
-    <form method="post">
+    <form method="post" id="attendanceForm" >
         {% csrf_token %}
-        <h2>Mark Attendance for {{ course_offering.course.name }} ({{ course_offering.start_date }} - {{ course_offering.end_date }})</h2>
+        <h2 class='text-md font-semibold my-4'>
+            Mark Attendance <br>
+            {{ course_offering.course.name }} ({{ course_offering.start_date }} - {{ course_offering.end_date }})
+        </h2>
 
-        <label for="attendanceDate">Select Date:</label>
-        <input type="date" id="attendanceDate" name="attendanceDate" value="{{ today_date }}" required>
-
-        <table>
+        <div class='flex flex-row gap-4 justify-start items-center border-2  bg-gray-200 pl-4 py-0 w-fit'>
+            <label for="attendanceDate" class=''>Select Date:</label>
+            <input type="date" id="attendanceDate" name="attendanceDate" value="{{ today_date }}" required class='border-2 border-gray-300 text-sm '>
+        </div>
+        
+        <table class="border-collapse w-full my-4  border-gray-200">
             <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Is Present</th>
-                    <th>Remark</th>
+                <tr class="bg-gray-200 text-gray-600">
+                    <th class="px-4 py-2">Student</th>
+                    <th class="px-4 py-2">Is Present</th>
+                    <th class="px-4 py-2">Remark</th>
                 </tr>
             </thead>
             <tbody>
                 {% for student in students %}
-                    <tr>
-                        <td>{{ student.student.first_name }} {{ student.student.last_name }}</td>
-                        <td>
-                            <select name="is_present_{{ student.id }}">
-                                <option value="present">Present</option>
+                    <tr class="border-b border-gray-200 text-md">
+                        <td class="px-4 py-2">{{ student.student.first_name }} {{ student.student.last_name }}</td>
+                        <td class="px-4 py-2">
+                            <select name="is_present_{{ student.id }}" class='edited-field px-4'>
+                                <option value="present" >Present</option>
                                 <option value="absent">Absent</option>
                                 <option value="informed absent">Informed Absent</option>
                                 <option value="tardy">Tardy</option>
-                            
                             </select>
                         </td>
-                        <td>
+                        <td class="px-4 py-2 ">
                             <input type="text" name="remark_{{ student.id }}">
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+        
         <button type="submit"><p class='bg-green-300 px-4 py-2  rounded-lg flex'>Save Attendance</p></button>
     </form>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const attendanceDateInput = document.getElementById("attendanceDate");
+    
+            // Get the current date in the format "YYYY-MM-DD"
+            const currentDate = new Date().toISOString().split("T")[0];
+    
+            // Set the input field's value to the current date
+            attendanceDateInput.value = currentDate;
+    
+            var form = document.getElementById('attendanceForm');
+            form.addEventListener('change', function (event) {
+                if (event.target.classList.contains('edited-field')) {
+                    event.target.style.backgroundColor = 'yellow'; // Highlight the edited field
+                }
+            });
+        });
+    
+       
+    </script>
+    
 </section>
 
 {% endblock content %}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const attendanceDateInput = document.getElementById("attendanceDate");
-
-        // Get the current date in the format "YYYY-MM-DD"
-        const currentDate = new Date().toISOString().split("T")[0];
-
-        // Set the input field's value to the current date
-        attendanceDateInput.value = currentDate;
-    });
-</script>

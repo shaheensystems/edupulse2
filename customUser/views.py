@@ -14,6 +14,7 @@ from django.db.models import Q,Count,F, ExpressionWrapper, FloatField, When, Cas
 from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,filter_data_based_on_date_range,default_start_and_end_date
 from utils.function.helperGetAtRiskStudent import get_all_at_risk_student_last_week
 from program.models import CourseOffering
+from customUser.models import NewUser
 
 # Create your views here.
 class UserLoginView(LoginView):
@@ -298,4 +299,14 @@ class AllStudentsAtRiskView(LoginRequiredMixin, ListView):
         
         # print(weekly_reports)
 
+        return context
+    
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'components/profile/user_profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        staff_profile = Staff.objects.get(staff=user)
+        context['staff_profile'] = staff_profile
         return context

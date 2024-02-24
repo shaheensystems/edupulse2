@@ -54,7 +54,7 @@
                     {% endwith %}
                     <td class="border px-4 py-2">
                         {% comment %} {{ weekly_report.engagement }} {% endcomment %}
-                        <select name="engagement_{{ weekly_report.id }}" class=" border border-gray-300 px-2 py-1 rounded-md text-xs">
+                        <select name="engagement_{{ weekly_report.id }}" class="edited-field border border-gray-300 px-2 py-1 rounded-md text-xs">
                             <option value="na" {% if weekly_report.engagement == 'na' %}selected{% endif %}>N/A</option>
                             <option value="on track canvas" {% if weekly_report.engagement == 'on track canvas' %}selected{% endif %}>On Track - CANVAS</option>
                             <option value="on track assessment" {% if weekly_report.engagement == 'on track assessment' %}selected{% endif %}>On Track - Assessment</option>
@@ -66,7 +66,7 @@
                     </td>
                     <td class="border px-4 py-2">
                         {% comment %} {{ weekly_report.action }} {% endcomment %}
-                        <select name="action_{{ weekly_report.id }}" class=" border border-gray-300 px-2 py-1 rounded-md text-xs">
+                        <select name="action_{{ weekly_report.id }}" class="edited-field border border-gray-300 px-2 py-1 rounded-md text-xs">
                             <option value="na" {% if weekly_report.action == 'na' %}selected{% endif %}>N/A</option>
                             <option value="follow up email and call" {% if weekly_report.action == 'follow up email and call' %}selected{% endif %}>Follow Up Email and Call</option>
                             <option value="pastoral care" {% if weekly_report.action == 'pastoral care' %}selected{% endif %}>Pastoral Care</option>
@@ -77,7 +77,7 @@
                     </td>
                     <td class="border px-4 py-2">
                         {% comment %} {{ weekly_report.follow_up }} {% endcomment %}
-                        <select name="follow_up_{{ weekly_report.id }}" class=" border border-gray-300 px-2 py-1 rounded-md text-xs">
+                        <select name="follow_up_{{ weekly_report.id }}" class="edited-field border border-gray-300 px-2 py-1 rounded-md text-xs">
                             <option value="na" {% if weekly_report.follow_up == 'na' %}selected{% endif %} >N/A</option>
                             <option value="warning letter 1" {% if weekly_report.follow_up == 'warning letter 1' %}selected{% endif %}>Warning Letter 1</option>
                             <option value="warning letter 2" {% if weekly_report.follow_up == 'warning letter 2' %}selected{% endif %}>Warning Letter 2</option>
@@ -93,7 +93,7 @@
                     <td class="border px-4 py-2">{{ weekly_report.no_of_pages_viewed_on_canvas }}</td>
                     <td class="border px-4 py-2">
                         {% comment %} {{ weekly_report.performance}} {% endcomment %}
-                        <select name="assessment_status_{{ weekly_report.id }}" class=" border border-gray-300 px-2 py-1 rounded-md text-xs">
+                        <select name="assessment_status_{{ weekly_report.id }}" class="edited-field border border-gray-300 px-2 py-1 rounded-md text-xs">
                             <option value="na" {% if weekly_report.assessment_status == 'na' %}selected{% endif %} >N/A</option>
                             <option value="making progress" {% if weekly_report.assessment_status == 'making progress' %}selected{% endif %} >MAKING PROGRESS</option>
                             <option value="no progress" {% if weekly_report.assessment_status == 'no progress' %}selected{% endif %}>NO PROGRESS</option>
@@ -107,7 +107,7 @@
                     </td>
                     <td class="border px-4 py-2">
                         {% comment %} {{ weekly_report.follow_up }} {% endcomment %}
-                        <select name="at_risk_{{ weekly_report.id }}" class=" border border-gray-300 px-2 py-1 rounded-md text-xs">
+                        <select name="at_risk_{{ weekly_report.id }}" class="edited-field border border-gray-300 px-2 py-1 rounded-md text-xs">
                             <option value="true" {% if weekly_report.at_risk %}selected{% endif %} >TRUE</option>
                             <option value="false" {% if not weekly_report.at_risk %}selected{% endif %}>FALSE</option>
                         </select> 

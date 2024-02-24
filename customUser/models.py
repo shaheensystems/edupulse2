@@ -85,6 +85,7 @@ class Staff(BaseModel):
 
     ]
     staff = models.OneToOneField(NewUser, on_delete=models.CASCADE, null=True, blank=True, related_name='staff_profile')
+    
     email_id=models.EmailField(null=True,blank=True)
     joining_date=models.DateField(null=True,blank=True)
     designation=models.CharField(max_length=255,choices=Designation_Choice,null=True,blank=True)

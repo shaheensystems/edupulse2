@@ -47,7 +47,7 @@
               <i id="arrowIcon" class="fa fa-caret-down text-gray-500 text-2xl"></i>
             </button>
             <div id="dropdownMenu" class="absolute right-0 mt-2 bg-white text-gray-800 text-sm rounded-lg shadow-md hidden">
-              <a href="{% url 'dashboard' %}" class="inline-block px-4 py-2 hover:bg-gray-100 whitespace-nowrap w-full">User Profile</a>
+              <a href="{% url 'user-profile' pk=user.pk  %}" class="inline-block px-4 py-2 hover:bg-gray-100 whitespace-nowrap w-full">User Profile</a>
               <form method='post' action='{% url 'user-logout' %}' class="inline-block px-4 py-2 hover:bg-gray-100 whitespace-nowrap w-full">
                 {% csrf_token %}
                 <button type='submit'> Logout</button>

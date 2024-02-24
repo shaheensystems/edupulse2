@@ -165,64 +165,6 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
         return context
     
-class ManageAttendance(LoginRequiredMixin,FormView):
-    template_name='report/manage_attendance.html'
-    form_class = ManageAttendanceFilterForm
-    
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user  # Pass the request.user to the form
-        return kwargs
-    
-    def form_valid(self, form):
-        course_offering = form.cleaned_data['course_offering']
-        week_number = form.cleaned_data['week_number']
-        student = form.cleaned_data['student']
-        start_date=course_offering.start_date + timedelta(weeks=int(week_number) - 1)
-        weekly_reports=course_offering.weekly_reports.all()
-        print("weekly_reports:",weekly_reports)
-        weekly_report=None
-        for weekly_report in weekly_reports:
-                print(weekly_report.get_week_number())
-                if weekly_report.get_week_number()==int(week_number):
-                    print(f" week number {weekly_report.get_week_number() } and {week_number}")
-                    weekly_report=weekly_report
-                    print("weekly_report:",weekly_report)
-        
-        #  # Instantiate the form
-        # form = self.get_form()
-        
-        # # Call the set_student_choices method to set student choices based on the selected course offering
-        # form.set_student_choices(course_offering_id=self.request.POST.get('course_offering'))
-        
-        
-        if student:
-            attendance_data = Attendance.objects.filter(course_offering=course_offering, attendance_date__gte=start_date, student=student)
-            # weekly_report=weekly_report.filter(student=student)
-        else:
-            attendance_data = Attendance.objects.filter(course_offering=course_offering, attendance_date__gte=start_date)
-        
-            print("final weekly_report:",weekly_report)
-        return self.render_to_response(self.get_context_data(form=form, attendance_data=attendance_data,weekly_report=weekly_report))
-
-    @method_decorator(csrf_exempt)  # Apply csrf_exempt decorator to the dispatch method
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        # Handle GET request to render the form initially
-        form = self.get_form()
-        return self.render_to_response(self.get_context_data(form=form))
-
-    def post(self, request, *args, **kwargs):
-        # Handle POST request to update student choices based on the selected course offering
-        if request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-            course_offering_id = request.POST.get('course_offering_id')
-            students = Student.objects.filter(course_offerings__id=course_offering_id)
-            serialized_students = [{'id': student.id, 'first_name': student.first_name, 'last_name': student.last_name} for student in students]
-            return JsonResponse(serialized_students, safe=False)
-        else:
-            return super().post(request, *args, **kwargs)
 
 class ManageAttendanceView(LoginRequiredMixin, TemplateView):
     template_name = 'report/manage_attendance.html'
@@ -263,6 +205,7 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
                 students = course_offering.student.all()
                 # week_numbers = course_offering.get_week_numbers()
                 week_numbers = [str(week_number[1]) for week_number in course_offering.get_week_numbers()]
+                print("course_offering",course_offering,"-","week Number:",week_numbers)
                 serialized_students = [{'id': student.temp_id, 'first_name': student.student.first_name, 'last_name': student.student.last_name} for student in students]
                 
                 print("W N",week_numbers)
