@@ -115,3 +115,17 @@ class CourseResult(models.Model):
 
     class Meta:
         unique_together = ('student', 'program_offering', 'course_offering')
+
+
+class StudentEnrollment(BaseModel):
+    RESULT_CHOICE=[
+        ('awaited','Awaited'),
+        ('pass','Pass'),
+        ('fail','Fail'),
+        ('dropped','Dropped'),
+    ]
+    student=models.ForeignKey(Student, verbose_name='student', on_delete=models.CASCADE)
+    course_offering=models.ForeignKey(CourseOffering, verbose_name='course_offering', on_delete=models.CASCADE)
+    program_offering=models.ForeignKey(ProgramOffering, verbose_name='program_offering', on_delete=models.CASCADE)
+    status=models.BooleanField()
+    result=models.CharField(choices=RESULT_CHOICE,null=True,blank=True, max_length=255,default='awaited')
