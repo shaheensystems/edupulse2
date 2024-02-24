@@ -245,14 +245,6 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
-        # user_data=filter_database_based_on_current_user(request_user=self.request.user,
-        #                                                 program_offerings=ProgramOffering.objects.all(),
-        #                                                 course_offerings=CourseOffering.objects.all(),
-        #                                                 programs=Program.objects.all(),
-        #                                                 courses=Course.objects.all(),
-        #                                                 students=Student.objects.all(),
-        #                                                 attendances=Attendance.objects.all()
-        #                                                 )
         user_data=filter_database_based_on_current_user(request_user=self.request.user)
         program_offerings_for_current_user=user_data['program_offerings_for_current_user']
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']

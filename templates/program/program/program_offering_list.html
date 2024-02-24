@@ -50,6 +50,7 @@
           <div class='flex w-3/4 bg-green-200 mb-2 px-4 py-2'>Blended Program ({{blended_program_offerings_for_current_user|length}})</div>
           <ul class='flex flex-col gap-4 w-3/4'>
             {% for program_offering in blended_program_offerings_for_current_user %}      
+           
                           {% with program_offering=program_offering %}
                               {% include 'components/flash_card/program_offering_FC.html' %}
                           {% endwith %} 

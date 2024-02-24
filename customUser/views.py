@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.contrib.auth.views import LoginView,LogoutView
 from django.urls import reverse_lazy, reverse
@@ -12,6 +13,7 @@ from utils.function.helperGetAtRiskStudent import get_all_at_risk_student_last_w
 from django.db.models import Q,Count,F, ExpressionWrapper, FloatField, When, Case,Value,Func
 from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,filter_data_based_on_date_range,default_start_and_end_date
 from utils.function.helperGetAtRiskStudent import get_all_at_risk_student_last_week
+from program.models import CourseOffering
 
 # Create your views here.
 class UserLoginView(LoginView):
@@ -30,7 +32,46 @@ class UserLogOutView(LogoutView):
     success_url=reverse_lazy('dashboard')
     template_name='auth/logout.html'
 
-
+class ManageStudentsView(LoginRequiredMixin,ListView):
+    model=CourseOffering
+    template_name='students/manage_students.html'
+    context_object_name='course_offerings_for_current_user'
+    
+    def get_queryset(self):
+        user=self.request.user
+        user_data=filter_database_based_on_current_user(request_user=self.request.user)
+        # course_offerings_for_current_user=user_data['course_offerings_for_current_user']
+        course_offerings_for_current_user=user_data['course_offerings_for_current_user']
+        students=user_data['students']
+        selected_course_offering_id=self.request.GET.get('sort_by','all_courses') # Default to sorting by id
+        
+        program=""
+        if selected_course_offering_id=='all_courses':
+            students=students.filter(course_offerings__in=course_offerings_for_current_user)
+        else:
+            students=students.filter(course_offerings__in=[selected_course_offering_id])
+            course_offering=course_offerings_for_current_user.get(id=selected_course_offering_id)
+            program=course_offering.course.program
+            
+        
+        default_start_date ,default_end_date=default_start_and_end_date()
+        start_date = default_start_date
+        end_date=default_end_date
+        
+        return students ,course_offerings_for_current_user,program
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        students ,course_offerings_for_current_user,program=self.get_queryset()
+       
+        context['course_offerings_for_current_user']=course_offerings_for_current_user
+        context['students']=students
+        context['program']=program
+        
+        
+        return context
+    
 class AllStudentsView(LoginRequiredMixin,ListView):
     model=Student
     template_name='students/students_list.html'

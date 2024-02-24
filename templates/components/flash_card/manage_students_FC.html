@@ -1,0 +1,63 @@
+{% block content %}
+<section class='rounded-lg  '>
+   
+   
+        {% if students %}
+            <table class="min-w-full bg-white text-gray-500  border-gray-300 rounded-lg overflow-hidden">
+                <thead class="">
+                    <tr>
+                        <th class="border-b px-6 py-2 text-left">Students</th>
+                        <th class="border-b px-6 py-2 text-left">Campus</th>
+                        <th class="border-b px-6 py-2 text-left">Phone Number</th>
+                        <th class="border-b px-6 py-2 text-left">Status</th>
+                        <th class="border-b px-6 py-2 text-left">Programme</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                       
+                        <tr class='text-md text-gray-500 border-b-2 border-gray-300' >
+                            <td class=" px-6 py-2 flex flex-col text-left">
+                                <span> {{ student.student.first_name }} {{ student.student.last_name }}</span>
+                                <span class='text-xs mt-1'>{{ student.student.email }}</span>
+                                <span><a href="{% url 'student-details' student.pk %}" class="text-xs underline text-blue-400">
+                                    {{ student.student.temp_id }}
+                                </a></span>
+                               
+                                
+                            </td>
+                            <td class=" px-6 py-2 text-left">{{ student.student.campus.name }}</td>
+                            <td class=" px-6 py-2 text-left">
+                                {% if student.student.phone is not None%}{{ student.student.phone}}{% endif %}
+                            </td>
+                            <td class=" px-6 py-2 text-left">
+                                {% if student.international_student == True %}International{% else %}Domestic{% endif %}
+                            </td>
+                            
+                            <td class="px-6 py-2 text-left"> 
+                                {% if program.name is not None %}{{ program.name }} {% else %} Not Found{% endif %}
+                            </td>
+                          
+                         
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No students available.</p>
+        {% endif %}
+   
+  
+  
+    {% comment %} <a href="{% url 'student_detail.html' student.pk %}" > {% endcomment %}
+        
+      
+        
+          
+       
+       
+    {% comment %} </a> {% endcomment %}
+</section>
+
+{% endblock content %}

@@ -55,11 +55,11 @@ def get_at_risk_student_list_by_filter(start_date,end_date,students,course_offer
     # student__in=students
     # )
     
-    weekly_reports_list = course_offering.weekly_reports.filter(
+    weekly_reports_list = course_offering.weekly_reports.select_related('student', 'course_offering').prefetch_related('sessions').filter(
         sessions__attendance_date__range=[start_date, end_date],
         at_risk=True,
         student__in=students
-    ).select_related('student', 'course_offering').prefetch_related('sessions')
+    )
 
 
     # this alone function is querying from 26 to 85 
@@ -143,6 +143,7 @@ def get_no_of_at_risk_students_by_course(course):
     course_offerings = course.course_offerings.all()
 
     for course_offering in course_offerings:
+        
             at_risk_students_new=get_no_of_at_risk_students_by_course_offering(course_offering=course_offering)
             at_risk_students.update(at_risk_students_new)
 

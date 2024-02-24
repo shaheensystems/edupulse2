@@ -1,8 +1,10 @@
 from typing import Any
+import json
 from django.shortcuts import render, redirect
 from customUser.models import Student,Staff
 from report.models import Attendance
 from base.models import Campus
+from django.views import View
 from django.views.generic import DetailView,ListView,TemplateView
 from django.views.generic.edit import FormView
 from program.models import ProgramOffering,CourseOffering,Program,Course
@@ -23,6 +25,7 @@ from django.core.serializers import serialize
 from django.core import serializers
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
+from django.http import JsonResponse
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_program_offerings,get_no_of_at_risk_students_by_course_offerings
 
@@ -274,10 +277,22 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
         else:
             # Non-AJAX request
             context = self.get_context_data()
+            # # Load values from localStorage
+            # course_offering_filter = request.GET.get('course_offering_filter')
+            # week_number_filter = request.GET.get('week_number_filter')
+            # student_filter = request.GET.get('student_filter')
             # Add default values for form fields
             default_course_offering_id = context['course_offerings'].first().temp_id if context['course_offerings'] else None
             default_week_number = '1'  # Set your default week number here
             default_student_id = context['course_offerings'].first().student.first().temp_id if context['course_offerings'] and context['course_offerings'].first().student.first() else None
+            # # Set default values from localStorage if available
+            # if course_offering_filter:
+            #     default_course_offering_id = course_offering_filter
+            # if week_number_filter:
+            #     default_week_number = week_number_filter
+            # if student_filter:
+            #     default_student_id = student_filter
+                
             context['default_course_offering_id'] = default_course_offering_id
             context['default_week_number'] = default_week_number
             context['default_student_id'] = default_student_id
@@ -289,9 +304,9 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
             week_number = request.POST.get('week_number')
             student_id = request.POST.get('student')
             print("Post :",course_offering_id,student_id,week_number)
-            if course_offering_id and week_number and student_id:
+            if course_offering_id and week_number :
                 course_offering = get_object_or_404(CourseOffering, temp_id=course_offering_id)
-                student = get_object_or_404(Student, temp_id=student_id)
+                
                 start_date = course_offering.start_date + timedelta(weeks=int(week_number) - 1)
                 end_date=start_date+timedelta(days=7)
                 # Retrieve weekly report data based on course offering, week number, and student
@@ -303,13 +318,46 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
                 # serialized_weekly_reports = serializers.serialize('json', weekly_report_data)
                 
                 # return JsonResponse(serialized_weekly_reports,safe=False, status=200)
-            
+                if student_id:
+
+                    student = get_object_or_404(Student, temp_id=student_id)
+                    weekly_report_data=weekly_report_data.filter(student=student)
+                    
                 # Render HTML using a Django template
-                html_content = render_to_string('components/weekly_reports/weekly_reports_list.html', {'weekly_reports': weekly_report_data})
+                html_content = render_to_string('components/weekly_reports/weekly_reports_list.html', {
+                    'weekly_reports': weekly_report_data,
+                    'course_offering':course_offering,
+                    'week_number':week_number,
+                    })
 
                 return JsonResponse({'html_content': html_content}, status=200)
             else:
                 return JsonResponse({'error': 'Course offering ID, week number, and student ID are required'}, status=400)
         else:
             return JsonResponse({'error': 'This endpoint accepts only AJAX requests'}, status=400)   
-    
+
+
+class SaveWeeklyReportsView(View):
+    def post(self, request):
+        print("save weekly report request received ")
+        # Process the POST request data here
+        # For example, you can retrieve the data from the request and save it to the database
+        # Make sure to handle any errors that might occur during saving
+        
+        # For demonstration purposes, let's assume we receive JSON data with weekly report details
+        data = request.POST.get('data')  # Assuming the data is sent as JSON in the request
+        # Process the data and save it to the WeeklyReport model
+        # For example:
+        try:
+            # Parse the JSON data
+            weekly_reports_data = json.loads(data)
+            for report_data in weekly_reports_data:
+                weekly_report = WeeklyReport.objects.get(pk=report_data['id'])
+                weekly_report.engagement = report_data['engagement']
+                weekly_report.action = report_data['action']
+                # Set other fields accordingly
+                weekly_report.save()
+                
+            return JsonResponse({'success': True, 'message': 'Weekly reports saved successfully'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)

@@ -31,7 +31,7 @@
               {% endif %} 
              
              
-            {% if program_offering.calculate_no_at_risk_student_for_last_week|length >  0 %}
+              {% if program_offering.calculate_no_at_risk_student_for_last_week|length >  0 %}
               <p class='text-red-500'> Studnets at risk : {{program_offering.calculate_no_at_risk_student_for_last_week |length}}</p>
             {% else  %}
             <p > No of Studnets at risk : {{program_offering.calculate_no_at_risk_student_for_last_week |length}}</p>

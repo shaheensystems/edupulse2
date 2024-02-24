@@ -48,15 +48,16 @@ def get_total_no_of_student_by_course(course, offering_mode):
 
 def get_total_no_of_student_by_courses(courses, offering_mode):
     unique_students = set()
-    for course in courses:
-        if offering_mode=="online":
-            students_in_course=get_total_no_of_student_by_course(course, offering_mode='online')
-        elif offering_mode=="offline":
-            students_in_course=get_total_no_of_student_by_course(course, offering_mode='offline')
-        elif offering_mode=="all":
-            students_in_course=get_total_no_of_student_by_course(course, offering_mode='all')
+    if courses:
+        for course in courses:
+            if offering_mode=="online":
+                students_in_course=get_total_no_of_student_by_course(course, offering_mode='online')
+            elif offering_mode=="offline":
+                students_in_course=get_total_no_of_student_by_course(course, offering_mode='offline')
+            elif offering_mode=="all":
+                students_in_course=get_total_no_of_student_by_course(course, offering_mode='all')
 
-        unique_students.update(students_in_course)
+            unique_students.update(students_in_course)
 
   
     return unique_students

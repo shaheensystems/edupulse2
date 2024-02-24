@@ -282,14 +282,18 @@ class ProgramOffering(BaseModel):
         
 
     def list_course_offerings(self):
+      
+            
+        # Fetch all related courses for the program
         courses = self.program.courses.all()
-        course_offerings_list = []
-        # Iterate over each course to collect course offerings
-        for course in courses:
-            # Get the course offerings associated with the current course
-            course_offerings = CourseOffering.objects.filter(course=course)
 
-            # Extend the list with the course offerings
+        # Initialize an empty list to store course offerings
+        course_offerings_list = []
+
+        # Iterate over each course and collect course offerings
+        for course in courses:
+            # Fetch course offerings for the current course and extend the list
+            course_offerings = course.course_offerings.all()
             course_offerings_list.extend(course_offerings)
 
         return course_offerings_list

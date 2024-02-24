@@ -162,19 +162,19 @@ def get_attendance_percentage_by_program_offering(program_offering,total_session
     # Get all the courses associated with the program
         if program_offering.offering_mode == "online":
             return "Not Applicable"
-        else:
-            total_sessions=total_sessions
-            present_sessions=present_sessions
-            courses = program_offering.program.courses.all()
+        courses = program_offering.program.courses.all()
 
-            for course in courses:
-                course_offerings=course.course_offerings.all()           
-                if course_offerings:                
-                    for course_offering in course_offerings:
-                        total_sessions += course_offering.attendances.count()
-                        present_sessions += course_offering.attendances.filter(is_present='present').count()
-
-            return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
+        for course in courses:
+            course_offerings = course.course_offerings.all()
+           
+            # course_offerings=course.course_offerings.all()        
+            if course_offerings:                  
+                for course_offering in course_offerings:
+                    total_sessions += course_offering.attendances.count()
+                    # below line is creating multiple query 
+                    present_sessions += course_offering.attendances.filter(is_present='present').count()
+                   
+        return get_attendance_percentage(present_sessions=present_sessions, total_sessions=total_sessions)
 
 def get_attendance_percentage_by_student(student):
     # Get all the courses associated with the program

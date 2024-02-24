@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="mt-10 mx-3">
+<section class="mt-10 mx-3 overflow-x-auto">
     <h1  class='text-md text-black font-semibold mb-5'>Attendance Marking </h1>
     {% comment %} CO :{{course_offerings}} {% endcomment %}
 
     <form id="attendanceForm" method="POST" class="row g-3 flex j items-center text-center flex-row gap-4 w-full">
         {% csrf_token %}
+        <!-- Add hidden fields to store filter values -->
+        <input type="hidden" id="course_offering_filter" name="course_offering" value="">
+        <input type="hidden" id="week_number_filter" name="week_number" value="">
+        <input type="hidden" id="student_filter" name="student" value="">
+
         <div class="flex flex-row  justify-center items-center border-2 border-gray-200 bg-gray-100">
              <label for="id_course_offering" class='px-3 border-gray-400 text-sm bg-gray-100'>Course Offering</label>
             <select name="course_offering" id="id_course_offering" class="form-select border-gray-200 text-xs text-gray-500">
@@ -51,6 +56,8 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+   
+
     $(document).ready(function () {
         // Function to update student dropdown based on selected course offering
         $('#id_course_offering').change(function () {
@@ -64,27 +71,50 @@
                     
                 },
                 success: function (data) {
+                     // Populate student
                     $('#id_student').empty();
                     $('#id_student').append($('<option>').text('Select Student').attr('value', ''));
                     $.each(data.students, function (index, student) {
                         $('#id_student').append($('<option>').text(student.first_name + ' ' + student.last_name).attr('value', student.id));
                     });
+                    var studentFilter = localStorage.getItem('student_filter');
+                    $('#id_student').val(studentFilter);
+
                     // Populate week numbers
                     $('#id_week_number').empty();
                     $('#id_week_number').append($('<option>').text('Select Week Number').attr('value', ''));
                     $.each(data.week_numbers, function (index, week) {
                         $('#id_week_number').append($('<option>').text("Week " + week).attr('value', week[0]));
                     });
+                    var weekNumberFilter = localStorage.getItem('week_number_filter');
+                    $('#id_week_number').val(weekNumberFilter);
                     
                     // Access weekly_reports from data
                    var weeklyReports = data.weekly_reports;
                    // Render weekly_reports in HTML
                    $('#weeklyReportsContainer').html(weeklyReports);
+
+                   // Save selected values in local storage
+                    localStorage.setItem('course_offering_filter', courseOfferingId);
+                    localStorage.setItem('week_number_filter', $('#id_week_number').val());
+                    localStorage.setItem('student_filter', $('#id_student').val());
                              
 
                 }
             });
         });
+
+         // Load values from local storage when the page is refreshed
+        var courseOfferingFilter = localStorage.getItem('course_offering_filter');
+        var weekNumberFilter = localStorage.getItem('week_number_filter');
+        var studentFilter = localStorage.getItem('student_filter');
+
+        $('#id_course_offering').val(courseOfferingFilter);
+        
+        $('#id_course_offering').val(courseOfferingFilter).trigger('change'); // Trigger change event
+        
+        
+        
 
         // Function to submit form data and fetch attendance data
         $('#attendanceForm').submit(function (event) {
@@ -95,10 +125,16 @@
                 data: $(this).serialize(),
                 success: function (data) {
                     $('#weeklyReportsContainer').html(data.html_content);
+                    // Save selected values in local storage
+                localStorage.setItem('course_offering_filter', $('#id_course_offering').val());
+                localStorage.setItem('week_number_filter', $('#id_week_number').val());
+                localStorage.setItem('student_filter', $('#id_student').val());
 
                 }
             });
         });
+       
+
         // Function to reset all dropdown values
         $('#resetBtn').click(function () {
             $('#id_course_offering').val('');
@@ -107,6 +143,10 @@
 
              // Clear weekly reports container
             $('#weeklyReportsContainer').html('');
+            // Clear values from local storage
+            localStorage.removeItem('course_offering_filter');
+            localStorage.removeItem('week_number_filter');
+            localStorage.removeItem('student_filter');
            
         });
     });
