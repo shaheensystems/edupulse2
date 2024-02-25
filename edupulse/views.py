@@ -205,11 +205,11 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
                 students = course_offering.student.all()
                 # week_numbers = course_offering.get_week_numbers()
                 week_numbers = [str(week_number[1]) for week_number in course_offering.get_week_numbers()]
-                print("course_offering",course_offering,"-","week Number:",week_numbers)
+                # print("course_offering",course_offering,"-","week Number:",week_numbers)
                 serialized_students = [{'id': student.temp_id, 'first_name': student.student.first_name, 'last_name': student.student.last_name} for student in students]
                 
-                print("W N",week_numbers)
-                print("S",serialized_students)
+                # print("W N",week_numbers)
+                # print("S",serialized_students)
                 response_data = {
                     'students': serialized_students,
                     'week_numbers': week_numbers,
@@ -246,7 +246,7 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
             course_offering_id = request.POST.get('course_offering')
             week_number = request.POST.get('week_number')
             student_id = request.POST.get('student')
-            print("Post :",course_offering_id,student_id,week_number)
+            # print("Post :",course_offering_id,student_id,week_number)
             if course_offering_id and week_number :
                 course_offering = get_object_or_404(CourseOffering, temp_id=course_offering_id)
                 
@@ -265,12 +265,15 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
 
                     student = get_object_or_404(Student, temp_id=student_id)
                     weekly_report_data=weekly_report_data.filter(student=student)
+                else:
+                    student=None
                     
                 # Render HTML using a Django template
                 html_content = render_to_string('components/weekly_reports/weekly_reports_list.html', {
                     'weekly_reports': weekly_report_data,
                     'course_offering':course_offering,
                     'week_number':week_number,
+                    'student':student,
                     })
 
                 return JsonResponse({'html_content': html_content}, status=200)
