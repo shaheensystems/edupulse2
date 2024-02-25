@@ -35,8 +35,8 @@
     {% comment %} <p>{{students|length}}</p> {% endcomment %}
   
     <section class='mt-5 w-full'>
-        
-    {% with students=students program=program %}
+
+    {% with students=students  course_offering=course_offering%}
         {% include 'components/flash_card/manage_students_FC.html' %}
     {% endwith %} 
     </section>

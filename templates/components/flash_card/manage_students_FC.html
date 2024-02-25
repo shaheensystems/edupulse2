@@ -36,18 +36,28 @@
                             </td>
                             
                             <td class="px-6 py-2 text-left"> 
-                                {% comment %} {% for enrollment in student.student_enrollments.all %}
-                                    {{ enrollment.program_offering.program.name }}<br>
-                                {% endfor %} {% endcomment %}
-                            
-                                {% if program is not None %}
                                
-                                    {% for p in program  %}
-                                        {{p}}<br>
-                                    {% endfor %}
-                                {% else %} 
-                                Not Found
-                                {% endif %}
+                               
+                                <span class=''> 
+                                    
+                                    {% if course_offering == 'all_courses' %}
+                                   
+                                        {% for enrolled_courses in student.list_of_enrolled_courses %}
+                                            {{enrolled_courses.1}}<br>
+                                        {% endfor %}
+                                    {% else %}
+                                    
+                                        {% for enrolled_courses in student.list_of_enrolled_courses %}
+                                            {% if course_offering == enrolled_courses.0 %}
+                                                {{enrolled_courses.1}}<br>
+                                            {% endif %}
+                                            {% endfor %}
+                                    
+                                    {% endif %}
+
+
+                                </span>
+                               
                             </td>
                           
                          

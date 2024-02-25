@@ -41,7 +41,9 @@ def filter_database_based_on_current_user(request_user):
                                                                             'course_offerings__course__program',
                                                                             'program_offering', 
                                                                             'program_offering__program', 
-                                                                            
+                                                                            'student_enrollments',
+                                                                            'student_enrollments__course_offering',
+                                                                            'student_enrollments__program_offering',
                                                                             'weekly_reports',
                                                                             'weekly_reports__sessions'
                                                                             ).all()

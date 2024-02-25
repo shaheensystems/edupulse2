@@ -114,8 +114,14 @@ class Student(BaseModel):
     fund_source=models.ForeignKey(StudentFundSource, verbose_name=("Student Fund Source"), on_delete=models.CASCADE, null=True,blank=True)
     
     @property
-    def list_of_course_offerings(self):
-        return ", ".join(co.course.name for co in self.course_offerings.all())
+    def list_of_enrolled_courses(self):
+
+        student_enrollment_courses=set()
+        for student_enrollment in self.student_enrollments.all():
+            student_enrollment_courses_new= student_enrollment.course_offering,student_enrollment.program_offering
+            student_enrollment_courses.add(student_enrollment_courses_new)
+    
+        return student_enrollment_courses
 
         
     def student_is_at_risk_for_last_week_status(self):

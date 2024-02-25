@@ -46,39 +46,31 @@ class ManageStudentsView(LoginRequiredMixin,ListView):
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']
         students=user_data['students']
         selected_course_offering_id=self.request.GET.get('sort_by','all_courses') # Default to sorting by id
-        
-        program=""
+      
         if selected_course_offering_id=='all_courses':
             students=students.filter(course_offerings__in=course_offerings_for_current_user)
-            program_queryset=set(StudentEnrollment.objects.filter(course_offering__in=course_offerings_for_current_user))
-            program_names_set = {enrollment.program_offering.program.name for enrollment in program_queryset}
-            print("Program:",program_names_set)
-            program=list(program_names_set)
+            course_offering='all_courses'
+            
             
         else:
             students=students.filter(course_offerings__in=[selected_course_offering_id])
             course_offering=course_offerings_for_current_user.get(id=selected_course_offering_id)
-            print("CO -N",course_offering.student_enrollments.all)
-            program_queryset=set(StudentEnrollment.objects.filter(course_offering=course_offering))
-            program_names_set = {enrollment.program_offering.program.name for enrollment in program_queryset}
-            print("Program:",program_names_set)
-            program=list(program_names_set)
-            
             
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
         
-        return students ,course_offerings_for_current_user,program
+        return students ,course_offerings_for_current_user,course_offering
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        students ,course_offerings_for_current_user,program=self.get_queryset()
+        students ,course_offerings_for_current_user,course_offering=self.get_queryset()
        
         context['course_offerings_for_current_user']=course_offerings_for_current_user
         context['students']=students
-        context['program']=program
+      
+        context['course_offering']=course_offering
         
         
         return context
