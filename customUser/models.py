@@ -60,7 +60,7 @@ class NewUser(AbstractUser):
         return self._cached_groups
     
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.username}:{self.first_name} {self.last_name}"
     
     def get_group_list(self):
         group_list=list()
