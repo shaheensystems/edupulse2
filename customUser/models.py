@@ -115,6 +115,8 @@ class Student(BaseModel):
     
     @property
     def list_of_enrolled_courses(self):
+        
+       
 
         student_enrollment_courses=set()
         for student_enrollment in self.student_enrollments.all():
@@ -123,6 +125,16 @@ class Student(BaseModel):
     
         return student_enrollment_courses
 
+    def list_of_enrolled_program_only(self):
+        student_enrollment_program=set()
+        for student_enrollment in self.student_enrollments.all():
+            student_enrollment_program.add(student_enrollment.program_offering)
+        
+        
+        return student_enrollment_program
+
+
+        
         
     def student_is_at_risk_for_last_week_status(self):
         # from report.models import WeeklyReport

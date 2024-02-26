@@ -39,12 +39,12 @@
                                
                                
                                 <span class=''> 
-                                    
+                                    {% comment %} <p class='bg-red-100'>{{student.list_of_enrolled_courses}}</p> {% endcomment %}
                                     {% if course_offering == 'all_courses' %}
-                                   
-                                        {% for enrolled_courses in student.list_of_enrolled_courses %}
-                                            {{enrolled_courses.1}}<br>
-                                        {% endfor %}
+                                    {% comment %} {{student.list_of_enrolled_program_only}} {% endcomment %}
+                                        {% for enrolled_program in student.list_of_enrolled_program_only %}
+                                            {{enrolled_program}}<br>
+                                        {% endfor %} 
                                     {% else %}
                                     
                                         {% for enrolled_courses in student.list_of_enrolled_courses %}

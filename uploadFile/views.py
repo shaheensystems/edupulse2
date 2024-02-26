@@ -275,7 +275,8 @@ def update_or_create_course_offering(data):
     print("start course offering start date  :",data['student_course_offer_start_date'])
     print("start course offering end date :",data['student_course_offer_end_date'])
     # Check if the program_code exits and doesn't contain spaces
-    if data['student_course_offer_code'] and  ' ' not in data['student_course_offer_code']:
+    # if data['student_course_offer_code'] and  ' ' not in data['student_course_offer_code']:
+    if data['student_course_offer_code'] : # some data has space between code 
         # validation for course_offering_name with linked course name
         try:
             course_offering = CourseOffering.objects.get(temp_id=data['student_course_offer_code'])
@@ -321,7 +322,8 @@ def update_or_create_course_offering(data):
 def update_or_create_program_offering(data):
     print("start program offering :",data['student_program_offer_code'])
     # Check if the program_code exits and doesn't contain spaces
-    if data['student_program_offer_code'] and  ' ' not in data['student_program_offer_code']:
+    # if data['student_program_offer_code'] and  ' ' not in data['student_program_offer_code']:
+    if data['student_program_offer_code']:
         # validation for program_offering_name with linked course name
         try:
             program_offering = ProgramOffering.objects.get(temp_id=data['student_program_offer_code'])
@@ -369,6 +371,9 @@ def update_or_create_student_enrollment(data):
     if linked_student and linked_course_offering and linked_program_offering:
         # Proceed with the enrollment process
         try:
+            if data['student_id']=='20220228':
+                print(linked_course_offering)
+                print(linked_program_offering)
             student_enrollment_object, created = StudentEnrollment.objects.get_or_create(
                 student=linked_student,
                 course_offering=linked_course_offering,
@@ -378,14 +383,14 @@ def update_or_create_student_enrollment(data):
             if not created:
                 # Update additional fields if needed
                 student_enrollment_object.save()
-            print("Student Enrollment created or update successfully")
+            print("Student Enrollment created or update successfully :",student_enrollment_object)
 
         except IntegrityError as e:
             print("Error creating or updating StudentEnrollment:", e)
     
     
     
-
+# Uplaod Student Data 
 def Upload_file_view(request):
     form = CSVModelForm(request.POST or None, request.FILES or None)
 
