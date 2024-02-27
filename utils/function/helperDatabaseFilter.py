@@ -22,13 +22,18 @@ def filter_database_based_on_current_user(request_user):
                                                             'program__courses__course_offerings__student__attendances__weekly_reports',
                                                             'program__program_offerings',
                                                             'program__courses__course_offerings__weekly_reports',
+                                                            'staff_program_offering_relations',
+                                                            'staff_program_offering_relations__staff',
+                                                      
 
                                                             ).all()
    
     course_offerings=CourseOffering.objects.select_related('course').prefetch_related(
             'student',
             'teacher',
-            'course__program'
+            'course__program',
+            'staff_course_offering_relations',
+            'staff_course_offering_relations__staff',
             # Prefetch('attendance', queryset=Attendance.objects.filter(is_present='present'), to_attr='present_attendance'),
             # Prefetch('attendance', queryset=Attendance.objects.exclude(is_present='present'), to_attr='absent_attendance')
             ).all()
@@ -45,7 +50,7 @@ def filter_database_based_on_current_user(request_user):
                                                                             'student_enrollments__course_offering',
                                                                             'student_enrollments__program_offering',
                                                                             'weekly_reports',
-                                                                            'weekly_reports__sessions'
+                                                                            'weekly_reports__sessions',
                                                                             ).all()
     attendances=Attendance.objects.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').all()
     weekly_reports=WeeklyReport.objects.select_related('course_offering','student').prefetch_related('student__attendances').all()
@@ -103,8 +108,8 @@ def filter_database_based_on_current_user(request_user):
         course_offerings=course_offerings
         students=students
         attendances=attendances
-        program_offerings_for_current_user=program_offerings.filter(program__courses__course_offerings__teacher__staff=request_user)
-        course_offerings_for_current_user=course_offerings.filter(teacher__staff=request_user)
+        program_offerings_for_current_user=program_offerings.filter(staff_program_offering_relations__staff__staff=request_user)
+        course_offerings_for_current_user=course_offerings.filter(staff_course_offering_relations__staff__staff=request_user)
         students=students.filter(course_offerings__teacher__staff=request_user)
         programs_for_current_user=None
         courses_for_current_user=None
