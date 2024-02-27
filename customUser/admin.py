@@ -4,7 +4,11 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from django.contrib.auth.models import Group
 
+from program.models import StaffCourseOfferingRelations,StaffProgramOfferingRelations
+
 from report.models import Attendance
+from django.forms import BaseInlineFormSet
+
 
 # Register your models here.
 # Extend the UserAdmin class
@@ -60,60 +64,56 @@ class CourseOfferingInline(admin.StackedInline):
     # model=CourseOffering
     extra=1
 
-class CourseOfferingStaffInline(admin.StackedInline):
-    model=Staff.course_offerings.through
-    # model=CourseOffering
-    extra=1
+# class CourseOfferingStaffInline(admin.StackedInline):
+#     model=Staff.course_offerings.through
+#     # model=CourseOffering
+#     extra=1
+ 
 
-class ProgramOfferingStaffInline(admin.StackedInline):
-    model=Staff.program_offerings.through
-    # model=CourseOffering
+
+# class ProgramOfferingStaffInline(admin.StackedInline):
+#     model=Staff.program_offerings.through
+#     # model=CourseOffering
+#     extra=1
+    
+
+
+class StaffCourseOfferingRelationInline(admin.StackedInline):
+    model=StaffCourseOfferingRelations
     extra=1
+    
+class StaffProgramOfferingRelationInline(admin.StackedInline):
+    model=StaffProgramOfferingRelations
+    extra=1
+    
+    
 
 class StaffAdmin(admin.ModelAdmin):
     list_display=('id','staff','joining_date','designation','role','remark',"get_courses_offered","get_programs_offered")
 
-    inlines=[ProgramOfferingStaffInline,CourseOfferingStaffInline]
+    inlines=[StaffCourseOfferingRelationInline,StaffProgramOfferingRelationInline]
 
-    # def get_inline_instances(self, request, obj=None):
-    #     inlines = super().get_inline_instances(request, obj)
-    #     # inlines=[CourseOfferingStaffInline,ProgramOfferingStaffInline]
-
-    #     print(obj.staff.groups.all)
-    #     print(obj.staff.groups.filter(name='Program_Leader').exists())
-    # def get_inline_instances(self, request, obj=None):
-    #     inlines = super().get_inline_instances(request, obj)
-    #     if obj.staff.groups.filter(name='Teacher').exists() or obj.staff.groups.filter(name='Lab_assistant').exists():
-    #         # If the user is in the 'Teacher' or 'Lab_assistant' group, include CourseOfferingStaffInline
-    #         inlines.append(CourseOfferingStaffInline)
-
-    #     #     # Check if the user is in the 'Program_Leader' group
-    #     if obj.staff.groups.filter(name='Program_Leader').exists():
-    #         # If the user is in the 'Program_Leader' group, include ProgramOfferingStaffInline
-    #         inlines.append(ProgramOfferingStaffInline)
-
-    #     return inlines
-  
+    
     
     # inlines=[CourseOfferingStaffInline,ProgramOfferingStaffInline]
     def get_courses_offered(self, obj):
         # courses_offered = obj.course_offering.through.objects.filter(student=obj)
-        courses_offered = obj.course_offerings.all()
+        courses_offered = obj.staff_course_offering_relations.all()
         # print("student name:",obj.student.first_name)
         # print( f"course name:", {str(course.course.name) for course in courses_offered})
 
-        return ',\n '.join([str(course.course.name) for course in courses_offered])
+        return ',\n '.join([str(relation.course_offering.course.name) for relation in courses_offered])
     get_courses_offered.short_description = 'Courses Assigned'
 
     def get_programs_offered(self, obj):
         # print(obj.student.first_name)
-        programs_offered = obj.program_offerings.all()
+        programs_offered = obj.staff_program_offering_relations.all()
         # print('program_offered:',programs_offered)
 
         # for program in programs_offered:
         #     print("prog object:",program.program.name)
     
-        return ',\n'.join([str(program.program.name) for program in programs_offered])
+        return ',\n'.join([str(relation.program_offering.program.name) for relation in programs_offered])
     get_programs_offered.short_description = 'Program Assigned'
 
 

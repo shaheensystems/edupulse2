@@ -19,6 +19,42 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 
+def create_groups_and_permission():
+    from django.contrib.auth.models import Group, Permission
+    from django.contrib.contenttypes.models import ContentType
+    # Create groups if they don't exist
+    head_of_school_group, _ = Group.objects.get_or_create(name='Head_of_School')
+    admin_group, _ = Group.objects.get_or_create(name='Admin')
+    program_leader_group, _ = Group.objects.get_or_create(name='Program_Leader')
+    teacher_group, _ = Group.objects.get_or_create(name='Teacher')
+    
+    # Create or get the necessary content types
+    content_type = ContentType.objects.get_for_models(
+            Group, Permission
+        )
+     # Assign permissions to groups
+    head_of_school_group.permissions.set(Permission.objects.all())
+    admin_group.permissions.set(Permission.objects.all())
+    program_leader_group.permissions.set(
+            Permission.objects.exclude(
+                content_type__in=content_type.values()
+            ).exclude(
+                codename__startswith='admin'
+            )
+        )
+    teacher_permissions = Permission.objects.filter(
+            codename__in=[
+                'view_program', 'change_program',
+                'view_programoffering', 'change_programoffering',
+                'view_courseoffering', 'change_courseoffering',
+                'view_course', 'change_course',
+                'view_attendance'
+            ]
+        )
+    teacher_group.permissions.set(teacher_permissions)
+    
+    
+
 def handle_ethnicity(user, ethnicity_name):
     print("Ethnicity name ",ethnicity_name)
     if ethnicity_name:
@@ -482,6 +518,9 @@ def Upload_file_view(request):
                 update_or_create_course_offering(data)
                 update_or_create_program_offering(data)
                 update_or_create_student_enrollment(data)
+                
+                # create group and add permission 
+                create_groups_and_permission()
 
         obj.activated = True
         obj.save()

@@ -1,9 +1,10 @@
 from django.db import models
-from base.models import BaseModel
+from base.models import BaseModel,Campus
 from customUser.models import Student, Staff
 from datetime import timedelta, datetime
 from django.utils import timezone
 from django.db.models import Q
+
 
 from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances,get_engagement_percentage_by_course,get_engagement_percentage_by_program,get_engagement_percentage_by_course_offering,get_engagement_percentage_by_course_offering_for_student
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
@@ -321,4 +322,23 @@ class ProgramOffering(BaseModel):
 
 
    
+
+class StaffCourseOfferingRelations(BaseModel):
+    CAMPUS_CHOICES = [(campus.id, campus.name) for campus in Campus.objects.all()]
+    CAMPUS_CHOICES.append(('all', 'All'))  # Append the 'all' choice
+    
+    staff=models.ForeignKey(Staff, verbose_name='staff', on_delete=models.PROTECT, related_name='staff_course_offering_relations')
+    course_offering=models.ForeignKey(CourseOffering, verbose_name='course_offering', on_delete=models.PROTECT,related_name='staff_course_offering_relations')
+    
+    students_by_campus = models.CharField(verbose_name='campus', max_length=100, choices=CAMPUS_CHOICES, default='all')
+
+class StaffProgramOfferingRelations(BaseModel):
+    CAMPUS_CHOICES = [(campus.id, campus.name) for campus in Campus.objects.all()]
+    CAMPUS_CHOICES.append(('all', 'All'))  # Append the 'all' choice
+    
+    staff=models.ForeignKey(Staff, verbose_name='staff', on_delete=models.PROTECT, related_name='staff_program_offering_relations')
+    program_offering=models.ForeignKey(ProgramOffering, verbose_name='program_offering', on_delete=models.PROTECT,related_name='staff_program_offering_relations')
+    
+    students_by_campus = models.CharField(verbose_name='campus', max_length=100, choices=CAMPUS_CHOICES, default='all')
+    
     
