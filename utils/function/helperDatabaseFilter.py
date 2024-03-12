@@ -110,7 +110,11 @@ def filter_database_based_on_current_user(request_user):
         attendances=attendances
         program_offerings_for_current_user=program_offerings.filter(staff_program_offering_relations__staff__staff=request_user)
         course_offerings_for_current_user=course_offerings.filter(staff_course_offering_relations__staff__staff=request_user)
-        students=students.filter(course_offerings__teacher__staff=request_user)
+        # students=students.filter(course_offerings__teacher__staff=request_user)
+        
+        students=students.filter(course_offerings__staff_course_offering_relations__staff__staff=request_user)
+        
+        
         programs_for_current_user=None
         courses_for_current_user=None
         # attendances = attendances.filter(student__in=students)

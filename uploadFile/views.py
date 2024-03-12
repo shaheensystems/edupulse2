@@ -11,13 +11,14 @@ from program.models import Program,Course,ProgramOffering,CourseOffering
 from customUser.models import NewUser,Student,Campus, Ethnicity, StudentFundSource
 import csv
 from django.contrib.auth.hashers import make_password
-from datetime import datetime
+from datetime import datetime,timedelta
 from django.urls import reverse
 
 from report.views import get_week_number
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+import pandas as pd
 
 def create_groups_and_permission():
     from django.contrib.auth.models import Group, Permission
@@ -802,22 +803,147 @@ def Upload_bulk_attendance_view(request):
             bulk_attendance_file = bulk_attendance_form.cleaned_data['file_name']
             timetable_file = bulk_attendance_form.cleaned_data['time_table']
             
-            print(bulk_attendance_file,timetable_file)
+            print("attendance data file name :",bulk_attendance_file)
+            print("timetable data file name :",timetable_file)
             
             
             # get the timetable details
-            with open(obj.time_table.path, 'r') as f:
-                reader = csv.reader(f)
+            # with open(obj.time_table.path, 'r') as f:
+            #     reader = csv.reader(f)
 
-                header = next(reader, None)
+            #     header = next(reader, None)
             
             # upload attendance 
-            with open(obj.file_name.path, 'r') as f:
-                reader = csv.reader(f)
+            
+            try:
+                # df = pd.read_excel(obj.file_name.path)
+    
+                # # Print the DataFrame to see the data
+                # print(df)
 
-                header = next(reader, None)
-            
-            
+                with open(obj.file_name.path, 'r',encoding='utf-8') as f:
+                    # Adjust the parsing logic based on the text file format
+                    lines = f.readlines()
+
+                    # Assuming the first section contains metadata and the second section contains data
+                    header_section = lines[:2]
+                    data_section = lines[1:]
+                    
+                    # print(header_section)
+                    # print("first row data :",data_section[1])
+                    header_line=data_section[0]
+                    # Split the header line by commas
+                    headers = header_line.split(',')
+
+                    # Create a list to store the generated column headers
+                    column_headers = []
+
+                    # Track the session count for each week
+                    session_counts = {}
+
+                    for header in headers:
+                        
+                       
+                        if header == "Session 1" or header == "Session 2" or header == "Engagement" or header == "Action" or header == "Follow Up"  :
+                            week = header  # Extract the week number from the header
+                            
+                            if week not in session_counts:
+                                session_counts[week] = 0  # Initialize the session count for the week if it's not already present
+                            session_counts[week] += 1  # Increment the session count for the week
+                            # Generate the column header with the session count
+                            # print("Header :",header)
+                            # print("Week :",week)
+                            # print("Session count :",session_counts)
+                            column_headers.append(f"W{session_counts[week]} {header}")
+                        else:
+                            column_headers.append(header)
+
+                    # Print the generated column headers
+                    # print("new column header",column_headers)            
+                    i=0
+        
+                    # Create variables for each column
+                    data = {variable_name: None for variable_name in column_headers}
+                    # print("all data:",data)  
+                    # Process data rows
+                    for row in data_section[1:]:  # Skip the header row
+                        print("row :",row)
+                        row_data = row.split(',')
+                        for header, value in zip(column_headers, row_data):
+                            header_index = column_headers.index(header)
+                            data[column_headers[header_index]] = value
+
+                        # Print the data for debugging
+                    
+                    
+                        # print("Data W1S1:", data['W1 Session 1'])
+                        # print("Data W1S2:", data['W1 Session 2'])
+                        # print("Data W2S1:", data['W2 Session 1'])
+                        # print("Data W2S2:", data['W2 Session 2'])
+                        # print("row data:",data)
+                        
+                        # process recording attendance start from here 
+                        student_id=data['Student ID']
+                        course_offering_id=data['Unit Offer Code']
+                        course_offering=CourseOffering.objects.get(temp_id=course_offering_id)
+                        course_offering_start_date=course_offering.start_date
+                        
+                        # Assuming course_offering_start_date is a datetime object
+                        # course_offering_start_date = datetime.strptime(course_offering.start_date, "%Y-%m-%d")  # Convert to datetime object if it's a string
+                        # course_offering_start_date_str = course_offering_start_date.strftime("%Y-%m-%d")
+
+                        # Course Offering Starting Week 
+                        course_starting_week_number = course_offering_start_date.isocalendar()[1]
+                        year = course_offering_start_date.year
+
+                        print("Week number of the year for the course offering start date:", course_starting_week_number)
+                                    
+                                    
+                        print("CO start Date :",course_offering.start_date)
+                        print(student_id,course_offering_id)
+                        
+                        print("all data:",data) 
+                        for key, value in data.items():
+                            week_number=0
+                            if key.endswith("Session 1"):
+                                # day will be calculated by Course Offering and session
+                                # with week and session and start date we wil find the session date 
+                                if value and value != "NA":
+                                    week_number=key.split(" ")[0][1:]
+                                    print("week Number :",week_number)
+                                    print(key,value)
+                                    
+                                    
+                                    print(course_offering)
+                                    # Assuming week_number is already extracted from the key
+                                    if week_number.isdigit():
+                                        week_number = int(week_number)
+                                        session_week_number=course_starting_week_number+week_number-1
+                                        print("session week Number :",session_week_number)
+                                        # Determine the year and ISO week day number of the Tuesday in the given week number
+                                        week_number = session_week_number
+                                        
+                                        iso_week_day_number = 2  # Tuesday is the second day of the ISO week
+                                        # Calculate the date of the Tuesday
+                                        tuesday_date = datetime.strptime(f"{year}-W{session_week_number}-{iso_week_day_number}", "%Y-W%W-%w").date()
+
+                                        print("Date of Tuesday in week", session_week_number, ":", tuesday_date)
+                                        
+                                    else:
+                                        print("Invalid week number:", week_number)
+                                    
+                        
+                        i+=1
+                        
+                        
+                        
+                        if i == 20:
+                            break
+                            
+                   
+                    
+            except Exception as e:
+             print(f'Error opening file: {e}')
             
             obj.activated = True
             obj.save()

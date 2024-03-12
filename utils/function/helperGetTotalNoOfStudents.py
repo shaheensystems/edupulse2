@@ -75,12 +75,15 @@ def get_total_no_of_student_by_program_offerings(program_offerings):
     return student_count
 
 def get_total_unique_no_of_student_by_program_offerings(program_offerings):
-    students=set()
-    for program_offering in program_offerings:
-        st_in_pro_offering=program_offering.student.all()
-        students.update(st_in_pro_offering)
-    
-    return students
+    if program_offerings:
+        students=set()
+        for program_offering in program_offerings:
+            st_in_pro_offering=program_offering.student.all()
+            students.update(st_in_pro_offering)
+        
+        return students
+    else:
+        return None
 
 def get_total_no_of_student_by_course_offerings(course_offerings):
     # this method has duplicate values dont use 

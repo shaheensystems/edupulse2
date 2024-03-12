@@ -45,8 +45,10 @@ class ManageStudentsView(LoginRequiredMixin,ListView):
         # course_offerings_for_current_user=user_data['course_offerings_for_current_user']
         course_offerings_for_current_user=user_data['course_offerings_for_current_user']
         students=user_data['students']
+        print(students)
         selected_course_offering_id=self.request.GET.get('sort_by','all_courses') # Default to sorting by id
-      
+
+        print("selected Co",selected_course_offering_id) 
         if selected_course_offering_id=='all_courses':
             students=students.filter(course_offerings__in=course_offerings_for_current_user)
             course_offering='all_courses'
@@ -66,6 +68,8 @@ class ManageStudentsView(LoginRequiredMixin,ListView):
         context = super().get_context_data(**kwargs)
         
         students ,course_offerings_for_current_user,course_offering=self.get_queryset()
+        print("students ",students)
+        print("Co",course_offerings_for_current_user)
        
         context['course_offerings_for_current_user']=course_offerings_for_current_user
         context['students']=students
