@@ -1,10 +1,10 @@
 # views.py
 from django.shortcuts import render, redirect,HttpResponse,get_object_or_404
 import csv
-from .forms import CSVModelForm,AttendanceUploadForm, CanvasStatsUploadForm
+from .forms import CSVModelForm,AttendanceUploadForm, CanvasStatsUploadForm,BulkAttendanceUploadForm
 # from .forms import CSVUploadForm
 # from .models import UploadFile
-from .models import Csv,CanvasStatsUpload
+from .models import Csv,CanvasStatsUpload,BulkAttendanceUpload
 from report.models import Attendance,WeeklyReport, StudentEnrollment
 from customUser.models import Student
 from program.models import Program,Course,ProgramOffering,CourseOffering
@@ -689,7 +689,7 @@ def Attendance_Upload_View(request, pk):
         except Exception as e:
              print(f'Error opening file: {e}')
 
-    pass      
+    # pass      
 
     return render(request, 'upload/upload_attendance.html', {'form': form, "course_offering": course_offering})
 
@@ -775,3 +775,60 @@ def Canvas_weekly_report_upload_view(request, pk,week_number):
         'week_number':week_number,
         'course_offering':course_offering
         })
+
+def Upload_bulk_attendance_view(request):
+    bulk_attendance_form=BulkAttendanceUploadForm(request.POST or None,request.FILES or None)
+   
+
+    if request.method == 'POST':
+        if bulk_attendance_form.is_valid():
+            bulk_attendance_obj = bulk_attendance_form.save(commit=False)  # Save the form data but don't commit yet
+            bulk_attendance_file = bulk_attendance_form.cleaned_data['file_name']
+            timetable_file = bulk_attendance_form.cleaned_data['time_table']
+            
+            # Save bulk attendance file
+            if bulk_attendance_file and timetable_file:
+                bulk_attendance_obj.file_name = bulk_attendance_file
+                # Save timetable file
+                bulk_attendance_obj.time_table = timetable_file
+            
+            bulk_attendance_obj.save()  # Now commit the changes
+            
+            
+            
+            
+            obj = BulkAttendanceUpload.objects.get(activated=False)
+            
+            bulk_attendance_file = bulk_attendance_form.cleaned_data['file_name']
+            timetable_file = bulk_attendance_form.cleaned_data['time_table']
+            
+            print(bulk_attendance_file,timetable_file)
+            
+            
+            # get the timetable details
+            with open(obj.time_table.path, 'r') as f:
+                reader = csv.reader(f)
+
+                header = next(reader, None)
+            
+            # upload attendance 
+            with open(obj.file_name.path, 'r') as f:
+                reader = csv.reader(f)
+
+                header = next(reader, None)
+            
+            
+            
+            obj.activated = True
+            obj.save()
+            # Clear the form after successful submission
+            bulk_attendance_form = BulkAttendanceUploadForm()
+        
+     
+    
+    context = {
+        'bulk_attendance_form': bulk_attendance_form,
+       
+    }
+    
+    return render(request, 'upload/upload_bulk_attendance.html', context)

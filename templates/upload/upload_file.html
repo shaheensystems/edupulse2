@@ -1,27 +1,23 @@
-
-{% extends "base.html" %}
-<!-- upload.html -->
-{% comment %} <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Upload CSV</button>
-</form> {% endcomment %}
+{% extends "base.html" %} 
 {% block content %}
-<section class="flex flex-row gap-5">
-    <section class='flex flex-col gap-3 bg-gray-200 p-4 rounded-sm'>
-        <h1 class='text-lg font-semibold'> Student data Upload file  </h1>
-    
-    {% comment %} #  user double quote otherwise form will get the error {% endcomment %}
+<section class="flex flex-row gap-5 mt-2">
+    <!-- Upload Student data -->
+  <section class="flex flex-col gap-3 bg-gray-200 p-4 rounded-sm">
+    <h1 class="text-lg font-semibold">Student data Upload file</h1>
+
+    <!-- #  user double quote otherwise form will get the error -->
     <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{form.as_p}}
-        <br>
-        <button type="submit" ><p class="px-4 py-1 bg-blue-300 rounded-lg">Confirm</P></button>
+      {% csrf_token %} {{form.as_p}}
+      <br />
+      <button type="submit">
+        <p class="px-4 py-1 bg-blue-300 rounded-lg">Confirm</p>
+      </button>
     </form>
-    </section>
-   
+  </section>
+<!-- Upload attendnace Data -->
+
+
+
 </section>
-
-
 
 {% endblock content %}

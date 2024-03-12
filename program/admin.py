@@ -57,7 +57,7 @@ class WeeklyReportInline(admin.TabularInline):
     extra=0
 
 class CourseOfferingAdmin(admin.ModelAdmin):
-    list_display=('temp_id','offering_mode','start_date','end_date','calculate_total_no_of_student','get_all_students','course','result_status','result_status_code')
+    list_display=('temp_id','offering_mode','start_date','end_date','calculate_total_no_of_student','get_all_students','course','result_status','result_status_code','get_all_teacher')
     # inlines=[WeeklyReportInline,AttendanceInline]
 
     def calculate_total_no_of_student(self,obj):
@@ -68,6 +68,13 @@ class CourseOfferingAdmin(admin.ModelAdmin):
     def get_all_students(self,obj):
         return obj.get_all_students().count()
     get_all_students.short_description = 'No. of  Students(D)'
+
+    def get_all_teacher(self,obj):
+        teachers = obj.staff_course_offering_relations.all()
+        teacher_names = [f"{teacher.staff.staff.first_name} {teacher.staff.staff.last_name}" for teacher in teachers]
+        return ", ".join(teacher_names) if teacher_names else "N/A"
+    
+    get_all_teacher.short_description="Teacher's"
 
 
 admin.site.register(Program, ProgramAdmin)

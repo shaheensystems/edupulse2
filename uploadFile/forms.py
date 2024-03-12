@@ -1,7 +1,7 @@
 # forms.py
 from django import forms
 # from uploadFile.models import UploadFile,Csv
-from uploadFile.models import Csv, AttendanceUpload, CanvasStatsUpload
+from uploadFile.models import Csv, AttendanceUpload, CanvasStatsUpload,BulkAttendanceUpload
 
 # class CSVUploadForm(forms.Form):
 #     csv_file = forms.FileField(label='Select a CSV File')
@@ -28,4 +28,10 @@ class CanvasStatsUploadForm(forms.ModelForm):
         model = CanvasStatsUpload
         fields = ("file_name",)
 
-        
+
+class BulkAttendanceUploadForm(forms.ModelForm):
+  
+    class Meta:
+        model = BulkAttendanceUpload
+        fields = ("file_name","time_table",)
+

@@ -180,16 +180,15 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
             'teacher__staff',
             'attendances',
             Prefetch('weekly_reports', queryset=WeeklyReport.objects.prefetch_related('sessions'))
-        ).filter(teacher__staff=user)
+        ).filter(staff_course_offering_relations__staff__staff=user)
         
-        # course_offerings=CourseOffering.objects.all()
-        
+        print(course_offerings)
         return course_offerings
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['course_offerings'] = self.get_queryset()
-        print(context['course_offerings'])
+        # print(context['course_offerings'])
         return context
 
     @method_decorator(csrf_exempt)

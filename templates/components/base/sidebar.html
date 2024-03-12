@@ -43,12 +43,23 @@
             </div>
         </div>
 
+        <!-- Group: Import Data-->
+        <div class="mb-4">
+            <h2 class="dropdown-toggle text-sm text-gray-400 uppercase mb-2">Import Data</h2>
+            <div class="dropdown-menu">
+         
+                {% sidebar_link 'Import Student Data' 'fas fa-file-import' 'upload_file:upload_csv' %}
+                {% sidebar_link 'Import Attendance Data' 'fas fa-file-import' 'upload_file:upload-bulk-attendance' %}
+               
+            </div>
+           
+        </div>
         <!-- Group: Other -->
         <div class="mb-4">
             <h2 class="dropdown-toggle text-sm text-gray-400 uppercase mb-2">Other</h2>
             <div class="dropdown-menu">
                 {% sidebar_link 'Admin' 'fas fa-user-cog' 'admin:index' %}
-                {% sidebar_link 'Import Data' 'fas fa-file-import' 'upload_file:upload_csv' %}
+               
                 {% sidebar_link 'Report' 'fas fa-chart-line' 'dashboard' %}
                 {% sidebar_link 'FAQ' 'fas fa-question-circle' 'dashboard' %}
             </div>
