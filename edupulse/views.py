@@ -34,6 +34,7 @@ from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by
 from utils.function.helperGetChartData import get_chart_data_program_offerings_student_enrollment,get_chart_data_course_offerings_student_enrollment,get_chart_data_student_and_Staff_by_campus,get_chart_data_student_enrollment_by_region,get_chart_data_programs_student_enrollment,get_chart_data_offering_type_student_enrollment,get_chart_data_attendance_report
 
 from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,default_start_and_end_date,filter_data_based_on_date_range
+from utils.function.helperAttendance import get_students_attendance_report_by_students
 # def home(request):
     
 #     return render(request,'index.html')
@@ -116,6 +117,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         
         chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
         
+        
         context['chart_data_attendance_report_attendance']=chart_data_attendance_report_attendance
         context['chart_data_attendance_report_engagement']=chart_data_attendance_report_engagement
         context['chart_data_attendance_report_action']=chart_data_attendance_report_action
@@ -147,7 +149,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['attendances']=attendances
 
 
-       
+        context['student_attendance_percentage']=get_students_attendance_report_by_students(students=students)
         # Check if the user has a staff_profile
         # if hasattr(self.request.user, 'staff_profile'):
         #     context['staff_profile'] = self.request.user.staff_profile
@@ -157,7 +159,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         
         context['staff_profile'] = self.request.user.staff_profile if hasattr(self.request.user, 'staff_profile') else None
 
-
+        
         # print("current user:", self.request.user.staff_profile)
         # print("staff profile:", self.request.user.staff_profile)
     

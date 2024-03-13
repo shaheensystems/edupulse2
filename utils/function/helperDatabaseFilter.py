@@ -53,7 +53,15 @@ def filter_database_based_on_current_user(request_user):
                                                                             'weekly_reports__sessions',
                                                                             ).all()
     attendances=Attendance.objects.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').all()
-    weekly_reports=WeeklyReport.objects.select_related('course_offering','student').prefetch_related('student__attendances').all()
+    weekly_reports=WeeklyReport.objects.select_related('course_offering','student').prefetch_related(
+        'student__attendances',
+        'course_offering__student_enrollments',
+        'course_offering__student_enrollments__student',
+        'course_offering__course__program__program_offering',
+        'sessions',
+        'sessions__course_offering',
+        
+        ).all()
 
   
 

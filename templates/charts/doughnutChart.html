@@ -1,39 +1,144 @@
 {% load static %} <!-- Load the static template tag -->
 {% block content %} 
    <section class='w-full'>
-    <p class='text-center'>Doughnut Chart </p>
-    <canvas id="doughnut{{id}}" style="width:100%;max-width:1200px"></canvas>
+
+    <p class='text-center hidden'>Chart </p>
+    
+    <canvas id="chart{{id}}" style="width:100%;max-width:1200px;max-height:300px"></canvas>
+ 
 
     <script>
-    var xValues = {{data.labels|safe}};
-    var yValues = {{data.data|safe}};
-    var limit =6
-    var barColors = [
-      "#b91d47",
-      "#00aba9",
-      "#2b5797",
-      "#e8c3b9",
-      "#1e7145"
-    ];
+      var xValues = {{ data.labels|safe }};
+      var yValues = {{ data.data|safe }};
+      var limit = {{ limitData }};
+      var barColors = [
+      {% if chartType == 'polarArea' or chartType == 'doughnut' or chartType == 'pie'  %}
+      'rgb(255, 99, 132)',
+      'rgb(75, 192, 192)',
+      'rgb(255, 205, 86)',
+      'rgb(201, 203, 207)',
+      'rgb(54, 162, 235)'
+      {% else %}
+
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(255, 205, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(201, 203, 207, 0.2)'
+
+      {% endif %}
+      
+      ];
+      var borderColor= [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(255, 205, 86)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+      'rgb(201, 203, 207)'
+    ],
+    borderW
     
-    new Chart("doughnut{{id}}" , {
-      type: "doughnut",
-      data: {
-        labels: xValues.slice(0,limit),
-        datasets: [{
-          backgroundColor: barColors,
-          data: yValues
-        }]
-      },
-      options: {
-        legend: {display: false},
-        title: {
-          display: true,
-          text: "{{text}}"
-        }
-      }
+      new Chart("chart{{ id }}", {
+        type: "{{ chartType }}",
+        data: {
+            labels: xValues.slice(0, limit),
+            datasets: [{
+                backgroundColor: barColors,
+                borderColor:borderColor,
+                borderWidth: 1,
+                data: yValues
+            }]
+        },
+        options: {
+                {% if orientation == 'horizontal' %}
+
+                indexAxis: 'y',
+
+                {% endif %}
+                {% if chartType == 'pie' or chartType == 'doughnut' or chartType == 'polarArea' %}
+                    scales: { 
+                        
+                    },
+                    {% elif chartType == 'line' %}
+                    scales:{
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            suggestedMin: 0,
+                        },
+                        x:{
+                            grid:{
+                                offset:true,
+                            },
+                            stacked: true,
+                            beginAtZero:true,
+                            suggestedMin: 0,
+                        },
+
+                    },
+                    {% else %}
+
+                    scales:{
+                        y: {
+                            beginAtZero: true,
+                            stacked: true,
+                            suggestedMin: 0,
+                        },
+                        x:{
+                            grid:{
+                                offset:true,
+                            },
+                            stacked: true,
+                            beginAtZero:true,
+                            suggestedMin: 0,
+                        },
+
+                    },
+                {% endif %}
+               
+            
+            plugins: {
+              legend: { 
+                display: {{ lengendDisplay }},
+                position: "{{ legendPosition }}",
+                labels: {
+                  generateLabels: function(chart) {
+                    var data = chart.data;
+                    if (data.labels.length && data.datasets.length) {
+                      return data.labels.map(function(label, i) {
+                        var meta = chart.getDatasetMeta(0);
+                        var ds = data.datasets[0];
+                        var value = ds.data[i];
+                        return {
+                          text: label.split(" ")[0] + ": " + value,
+                          fillStyle: meta.controller.getStyle(i).backgroundColor, // Set legend color to match data point color
+                          fontColor: 'black' // Set legend text color to black
+                        };
+                      });
+                    }
+                    return [];
+                  }
+                }
+              },
+                title: {
+                    display: true,
+                    text: "{{ title }}"
+                },
+                datalabels: {
+                    color: 'black', // Set the color of the labels to black
+                    align: 'start', // Set the alignment of the labels
+                    anchor: 'end' // Set the anchor point of the labels
+                },
+            }
+        },
     });
+    
     </script>
+    
 </section>
 
 {% endblock %}

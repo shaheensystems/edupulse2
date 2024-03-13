@@ -20,6 +20,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='weeklyreport',
             name='action',
-            field=models.CharField(blank=True, choices=[('na', 'N/A'), ('follow up email and call', 'Follow Up Email and Call'), ('pastoral care', 'Pastoral Care'), ('personalized study plan/Extra session', 'Personalized Study Plan /Extra Session'), ('emergency contact', 'Emergency Contact'), ('other', 'Other')], default='n/a', max_length=255, null=True),
+            field=models.CharField(blank=True, choices=[('na', 'N/A'), ('follow up email and call', 'Follow Up Email and Call'), ('pastoral care', 'Pastoral Care'), ('personalized study plan/Extra session', 'Personalized Study Plan /Extra Session'), ('emergency contact', 'Emergency Contact'), ('other', 'Other')], default='na', max_length=255, null=True),
         ),
     ]

@@ -1,8 +1,8 @@
 {% load static %} <!-- Load the static template tag -->
 {% block content %} 
-   <section class='w-full '>
+   <section class='w-full'>
 
-    <p class='text-center hidden'>Chart </p>
+    <p class='text-center hidden'>Chart</p>
     
     <canvas id="chart{{id}}" style="width:100%;max-width:1200px;max-height:300px"></canvas>
  
@@ -102,28 +102,10 @@
                
             
             plugins: {
-              legend: { 
-                display: {{ lengendDisplay }},
-                position: "{% if legendPosition %}{{ legendPosition }}{% else %}bottom{% endif %}",
-                labels: {
-                  generateLabels: function(chart) {
-                    var data = chart.data;
-                    if (data.labels.length && data.datasets.length) {
-                      return data.labels.map(function(label, i) {
-                        var meta = chart.getDatasetMeta(0);
-                        var ds = data.datasets[0];
-                        var value = ds.data[i];
-                        return {
-                          text: {% if legendName == "short" %}label.split(" ")[0] {% else %}label{% endif %}+ ": " + value ,
-                          fillStyle: meta.controller.getStyle(i).backgroundColor, // Set legend color to match data point color
-                          fontColor: 'black' // Set legend text color to black
-                        };
-                      });
-                    }
-                    return [];
-                  }
-                }
-              },
+                legend: { 
+                    display: {{ lengendDisplay }} ,
+                    position: 'bottom',
+                },
                 title: {
                     display: true,
                     text: "{{ title }}"

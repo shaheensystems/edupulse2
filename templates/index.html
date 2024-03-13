@@ -82,6 +82,22 @@
             <!-- Program Offering Details Section -->
           <div class='flex flex-col'>
             <p class='text-center text-lg font-bold mb-2'> Student Enrollment Status </p>
+            <div class='w-11/12 bg-gray-100 rounded-lg '>
+              <p>Progress bar </p>
+              
+              {% with data=student_attendance_percentage %}
+                {% comment %} {% include 'charts/progressBarHorizontal.html' %} {% endcomment %}
+                {% include 'charts/progressBarVertical.html' %}
+              {% endwith %}
+            </div>
+            <div class='w-11/12 bg-gray-100 rounded-lg '>
+              <p>Progress bar </p>
+              
+              {% with data=student_attendance_percentage %}
+                {% include 'charts/progressBarHorizontal.html' %}
+                
+              {% endwith %}
+            </div>
             
             <div class='flex flex-row gap-2 flex-wrap justify-center '>
               <div class='w-[32%] bg-gray-100 rounded-lg'>
@@ -89,28 +105,29 @@
               {% comment %} {% with data=chart_data_campus_enrollment_student text='Students Enrollment By Campus' id='students_enrollment_by_campus'%}
                 {% include 'charts/barChartHorizontal.html' %}
               {% endwith %}  {% endcomment %}
-              {% with data=chart_data_campus_enrollment_student title='Students Enrollment By Campus' id='students_enrollment_by_campus' chartType='pie' lengendDisplay='true' limitData=10 %}
+              {% with data=chart_data_campus_enrollment_student title='Students Enrollment By Campus' id='students_enrollment_by_campus' chartType='pie' lengendDisplay='true' limitData=10 legendPosition='right' legendName='short' %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
               
             </div>
-            <div class='w-[33%] bg-gray-100 rounded-lg'>
-              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode' chartType='polarArea' lengendDisplay='true' limitData=10 %}
+            <div class='w-[33%] bg-gray-100 rounded-lg '>
+              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode' chartType='doughnut' orientation='vertical' lengendDisplay='true' limitData=10 legendPosition='bottom' legendName='short' %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
             <div class='w-[33%] bg-gray-100 rounded-lg'>
-              {% with data=chart_data_student_region title='Domestic and International Studnets' id='students_by_country' chartType='doughnut' lengendDisplay='true' limitData=10 %}
+              {% with data=chart_data_student_region title='Domestic and International Students' id='students_by_country' chartType='doughnut' lengendDisplay='true' limitData=10 legendPosition='bottom' legendName='short' %}
                 {% include 'charts/chart.html' %}
+               
               {% endwith %}
             </div>
            
-              <div class='w-[33%] bg-gray-100 rounded-lg'>
+              <div class='w-[100%] bg-gray-100 rounded-lg'>
                 
                 {% comment %} {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program' id='program_students_enrollment2'%}
                   {% include 'charts/barChartHorizontal.html' %}
                 {% endwith %} {% endcomment %}
-                {% with data=chart_data_programs_student_enrollment title='Students Enrollment By Program' id='program_students_enrollment2' chartType='bar' orientation='horizontal' lengendDisplay='false' limitData=10 %}
+                {% with data=chart_data_programs_student_enrollment title='Students Enrollment By Program' id='program_students_enrollment2' chartType='bar' orientation='horizontal' lengendDisplay='true' limitData=10 legendPosition='right' legendName='full' %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
               </div>
@@ -121,7 +138,7 @@
                 {% endwith %}
               </div> {% endcomment %}
             <div class='w-[33%] bg-gray-100 rounded-lg hidden'>
-              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode2' chartType='pie' lengendDisplay='true' limitData=10 %}
+              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode2' chartType='pie' lengendDisplay='true' limitData=10   %}
                 {% include 'charts/chart.html' %}
               {% endwith %}
             </div>
@@ -133,6 +150,7 @@
             </div>
             
           </div>
+         
          
           
           {% comment %} {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set  %}
@@ -147,6 +165,7 @@
             {% endwith %}
             
         </div>
+        
         {% endif %}
 
 

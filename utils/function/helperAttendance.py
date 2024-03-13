@@ -6,6 +6,7 @@ from django.db.models import Q
 
 
 
+
 def get_attendance_percentage(present_sessions,total_sessions):
      # Check if there are any sessions before calculating the percentage to avoid division by zero
     if total_sessions > 0:
@@ -184,7 +185,40 @@ def get_attendance_percentage_by_student(student):
     
 
         return get_attendance_percentage(present_sessions=present_sessions,total_sessions=total_sessions)
-    
+
+def get_students_attendance_report_by_students(students):
+    all_attendance_count = 0
+    present_count = 0
+    absent_count = 0
+    informed_absent_count = 0
+    tardy_count = 0
+    # Define a list of colors for each category
+    category_colors = ['#FF5733', '#33FF57', '#FFFF33', '#FF33EE']  # Example colors
+
+
+    for student in students:
+        new_attendances = student.attendances.exclude(course_offering__offering_mode='online')
+        all_attendance_count += new_attendances.count()
+        present_count += new_attendances.filter(is_present="present").count()
+        absent_count += new_attendances.filter(is_present="absent").count()
+        informed_absent_count += new_attendances.filter(is_present="informed absent").count()
+        tardy_count += new_attendances.filter(is_present="tardy").count()
+
+    # Calculate percentages
+    present_percentage = 0 if all_attendance_count == 0 else (present_count / all_attendance_count) * 100
+    absent_percentage = 0 if all_attendance_count == 0 else (absent_count / all_attendance_count) * 100
+    informed_absent_percentage = 0 if all_attendance_count == 0 else (informed_absent_count / all_attendance_count) * 100
+    tardy_percentage = 0 if all_attendance_count == 0 else (tardy_count / all_attendance_count) * 100
+
+    # Create a list of dictionaries representing each category and its corresponding percentage
+    student_attendance_percentage = [
+        {'category': 'Present', 'percentage': present_percentage, 'color': category_colors[0]},
+        {'category': 'Absent', 'percentage': absent_percentage, 'color': category_colors[1]},
+        {'category': 'Informed Absent', 'percentage': informed_absent_percentage, 'color': category_colors[2]},
+        {'category': 'Tardy', 'percentage': tardy_percentage, 'color': category_colors[3]},
+    ]
+
+    return student_attendance_percentage
 
 def get_attendance_percentage_by_attendances(attendances):
     
