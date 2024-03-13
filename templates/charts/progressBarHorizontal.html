@@ -1,0 +1,38 @@
+{% load static %} <!-- Load the static template tag -->
+{% block content %} 
+   <section class='w-full justify-center flex my-2 flex-col'>
+
+    <p class='text-center ='>Students Attendance Percengate </p>
+    
+    
+
+    <div class='w-10/12 border-3 border-black bg-blue-300 h-[50px] mx-10 mt-3  flex flex-row'>
+        {% for report in student_attendance_percentage %}
+            {% if report.percentage > 0 %}
+            <div class='flex items-center justify-center text-xs ' style='width: {{ report.percentage }}%; background-color: {{ report.color }};'>
+                {{ report.category }}<br>{{report.percentage}}% 
+            </div>
+        
+            {% endif %}
+           
+           
+        {% endfor %}
+    </div>
+    <div class='flex flex-row gap-4 px-10 py-2'>
+        {% for report in student_attendance_percentage %}
+           <div class='flex flex-row gap-2'>
+            <div class='flex items-center justify-center text-xs w-4 rounded-lg h-4 ' style=' background-color: {{ report.color }};'>
+              
+            </div>
+            <p>   {{ report.category }}:{{report.percentage}}% </p>
+        </div>
+         
+           
+        {% endfor %}
+
+
+    </div>
+    
+</section>
+
+{% endblock %}
