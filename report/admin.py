@@ -46,5 +46,6 @@ admin.site.register(WeeklyReport, WeeklyReportAdmin)
 
 class StudentEnrollmentAdmin(admin.ModelAdmin):
     list_display=('student','course_offering','program_offering','status','result')
+    list_filter=("course_offering","program_offering")
 
 admin.site.register(StudentEnrollment,StudentEnrollmentAdmin)

@@ -1,6 +1,7 @@
 from program.models import Program,Course,ProgramOffering,CourseOffering
 from report.models import Attendance,WeeklyReport
 from customUser.models import Student
+from base.models import Campus
 from django.db.models import Q
 from datetime import datetime, timedelta
 from django.db.models import Count, Prefetch
@@ -10,7 +11,8 @@ def filter_database_based_on_current_user(request_user):
     program_offerings=ProgramOffering.objects.select_related('program',
                                                              
                                                              
-                                                            ).prefetch_related('student',
+                                                            ).prefetch_related(
+                                                            'student',
                                                             'program_leader',
                                                             'student__attendances',
                                                             'student__attendances__weekly_reports',
@@ -24,6 +26,12 @@ def filter_database_based_on_current_user(request_user):
                                                             'program__courses__course_offerings__weekly_reports',
                                                             'staff_program_offering_relations',
                                                             'staff_program_offering_relations__staff',
+                                                            'attendances',
+                                                            'attendances__weekly_reports',
+                                                            'student__attendances__weekly_reports',
+                                                            'student_enrollments__student',
+                                                            'student_enrollments__course_offering',
+                                                            'staff_program_offering_relations__staff__staff'
                                                       
 
                                                             ).all()
@@ -32,8 +40,10 @@ def filter_database_based_on_current_user(request_user):
             'student',
             'teacher',
             'course__program',
+            'course__program__program_offerings',
             'staff_course_offering_relations',
             'staff_course_offering_relations__staff',
+            'student_enrollments__student'
             # Prefetch('attendance', queryset=Attendance.objects.filter(is_present='present'), to_attr='present_attendance'),
             # Prefetch('attendance', queryset=Attendance.objects.exclude(is_present='present'), to_attr='absent_attendance')
             ).all()
@@ -55,13 +65,17 @@ def filter_database_based_on_current_user(request_user):
     attendances=Attendance.objects.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').all()
     weekly_reports=WeeklyReport.objects.select_related('course_offering','student').prefetch_related(
         'student__attendances',
+        'student__student_enrollments__course_offering',
+        'student__student_enrollments__program_offering',
         'course_offering__student_enrollments',
         'course_offering__student_enrollments__student',
         'course_offering__course__program__program_offering',
         'sessions',
-        'sessions__course_offering',
+        'sessions__course_offering__course__program',
         
         ).all()
+    
+    campuses=Campus.objects.all()
 
   
 
@@ -79,6 +93,7 @@ def filter_database_based_on_current_user(request_user):
         students=students
         # attendances=Attendance.objects.all()
         attendances=attendances
+        campuses=campuses
         # attendances=Attendance.objects.select_related('student','course_offering').all()
 
         program_offerings_for_current_user=program_offerings
@@ -88,8 +103,8 @@ def filter_database_based_on_current_user(request_user):
         students=students
         all_programs=program_offerings_for_current_user
 
-        attendances = attendances.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').order_by('course_offering').filter(student__in=students)
-        weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user)
+        attendances = attendances.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').order_by('course_offering').filter(student__in=students).distinct()
+        weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user).distinct()
 
         # print("Query :",program_offerings_for_current_user.query)
     elif user_groups.filter(name="Program_Leader").exists():
@@ -97,17 +112,22 @@ def filter_database_based_on_current_user(request_user):
         course_offerings=course_offerings
         students=students
         attendances=attendances
+        campuses=campuses
 
-        program_offerings_for_current_user=program_offerings.filter(program_leader=request_user.staff_profile)
-        course_offerings_for_current_user=course_offerings.filter(course__program__program_offerings__program_leader=request_user.staff_profile)
-        students=students.filter(program_offering__program_leader__staff=request_user)
+        
+        program_offerings_for_current_user=program_offerings.filter(staff_program_offering_relations__staff__staff=request_user)
+        
+        course_offerings_for_current_user=course_offerings.filter(course__program__program_offerings__in=program_offerings_for_current_user).distinct()
+        
+        
+        students=students.filter(student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
         
         programs_for_current_user=None
         courses_for_current_user=None
-        attendances = attendances.order_by('course_offering').filter(student__in=students)
+        attendances = attendances.order_by('course_offering').filter(student__in=students).distinct()
       
         all_programs=programs_for_current_user
-        weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user)
+        weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user).distinct()
 
         # print(attendances)
         # print(students)
@@ -116,6 +136,7 @@ def filter_database_based_on_current_user(request_user):
         course_offerings=course_offerings
         students=students
         attendances=attendances
+        campuses=campuses
         program_offerings_for_current_user=program_offerings.filter(staff_program_offering_relations__staff__staff=request_user)
         course_offerings_for_current_user=course_offerings.filter(staff_course_offering_relations__staff__staff=request_user)
         # students=students.filter(course_offerings__teacher__staff=request_user)
@@ -126,10 +147,10 @@ def filter_database_based_on_current_user(request_user):
         programs_for_current_user=None
         courses_for_current_user=None
         # attendances = attendances.filter(student__in=students)
-        attendances = attendances.order_by('course_offering').filter(student__in=students)
+        attendances = attendances.order_by('course_offering').filter(student__in=students).distinct()
       
         all_programs=program_offerings_for_current_user
-        weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user)
+        weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user).distinct()
 
     #    ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
     else:
@@ -141,6 +162,7 @@ def filter_database_based_on_current_user(request_user):
         attendances = None
         all_programs=None
         weekly_reports=None
+        campuses=None
      # Return the filtered data
     return {
         'program_offerings_for_current_user': program_offerings_for_current_user,
@@ -151,6 +173,7 @@ def filter_database_based_on_current_user(request_user):
         'attendances': attendances,
         'all_programs': all_programs,
         'weekly_reports':weekly_reports,
+        'campuses':campuses,
         
     }
 
@@ -230,7 +253,7 @@ def default_start_and_end_date():
 
     return default_start_date,default_end_date
 
-def filter_data_based_on_date_range(start_date,end_date,programs_for_current_user,courses_for_current_user,program_offerings_for_current_user,course_offerings_for_current_user,attendances,weekly_reports):
+def filter_data_based_on_date_range(start_date,end_date,programs_for_current_user,courses_for_current_user,program_offerings_for_current_user,course_offerings_for_current_user,attendances,weekly_reports,campuses):
     default_start_date ,default_end_date=default_start_and_end_date()
     if not start_date:
         start_date = default_start_date
@@ -256,7 +279,7 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
                                                             & Q(program_offerings__end_date__lte=end_date)
                                                         ).distinct()
             # Get the inactive programs (programs that do not match the date criteria)
-            inactive_programs = programs_for_current_user.exclude(id__in=active_programs.values_list('id', flat=True))
+            inactive_programs = programs_for_current_user.exclude(id__in=active_programs.values_list('id', flat=True)).distinct()
             
             programs_for_current_user = active_programs
             active_programs_for_current_user = active_programs
@@ -297,4 +320,5 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
         'weekly_reports':weekly_reports,
         'start_date':start_date,
         'end_date':end_date,
+        'campuses':campuses
     }

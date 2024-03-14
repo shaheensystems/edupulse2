@@ -301,7 +301,18 @@ class ProgramOffering(BaseModel):
     
     # this method is incorrect , it will calculate all student based on course Offering no on program offring 
     def calculate_total_no_of_student(self):
+        
+        from customUser.models import Student
+        
+        total_students=Student.objects.filter(student_enrollments__program_offering=self)
+        
          # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
+        student_enrollment=self.student_enrollments.all()
+        for relation in student_enrollment:
+            relation.student
+        
+         
+         
         courses = self.program.courses.all()
 
         # Use a set to store unique students
@@ -311,6 +322,7 @@ class ProgramOffering(BaseModel):
                 students_in_course = course_offering.student.all()
                 unique_students.update(students_in_course)
         return len(unique_students)
+        # return len(total_students)
     
     def get_all_students(self):
         students = self.student.all()
@@ -331,6 +343,9 @@ class StaffCourseOfferingRelations(BaseModel):
     course_offering=models.ForeignKey(CourseOffering, verbose_name='course_offering', on_delete=models.PROTECT,related_name='staff_course_offering_relations')
     
     students_by_campus = models.CharField(verbose_name='campus', max_length=100, choices=CAMPUS_CHOICES, default='all')
+    
+    def __str__(self):
+        return f"{self.course_offering}:{self.staff.staff} "
 
 class StaffProgramOfferingRelations(BaseModel):
     CAMPUS_CHOICES = [(campus.id, campus.name) for campus in Campus.objects.all()]

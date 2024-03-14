@@ -8,6 +8,8 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 import pytz
 from django.urls import reverse
+from django.db.models import Count
+
 
 pytz.timezone('Pacific/Auckland')
 
@@ -62,6 +64,19 @@ class Campus(BaseModel):
     name=models.CharField(max_length=255,null=True,blank=True)
     address=models.ForeignKey(Address,on_delete=models.PROTECT,null=True,blank=True,related_name='campuses')
 
+    def get_total_users(self):
+        return self.users.all()
+    
+    def get_total_students_with_enrollment(self):
+        return self.users.filter(student_profile__isnull=False)  # Count students with enrollment
+    
+    def get_total_students_by_gender(self):
+        return self.users.values('gender').annotate(total=Count('gender'))
+
+    def get_total_students_by_ethnicity(self):
+        return self.users.values('ethnicities__name').annotate(total=Count('ethnicities__name'))
+
+    
     class Meta:
         verbose_name = "Campus"  # Set the verbose name for the singular form
         verbose_name_plural = "Campuses"

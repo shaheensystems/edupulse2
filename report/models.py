@@ -73,7 +73,7 @@ class WeeklyReport(BaseModel):
     engagement=models.CharField(choices=ENGAGEMENT_CHOICE,default="na",null=True,blank=True, max_length=255)
     action=models.CharField(choices=ACTION_CHOICE,null=True,blank=True, max_length=255,default='na')
     follow_up=models.CharField(choices=FOLLOW_UP_CHOICE,null=True,blank=True, max_length=255,default="na")
-    course_offering=models.ForeignKey(CourseOffering, verbose_name=("Course Offering"), on_delete=models.CASCADE,related_name='weekly_reports',null=True, blank=True )
+    course_offering=models.ForeignKey(CourseOffering, verbose_name=("Course Offering"), on_delete=models.CASCADE,null=True, blank=True ,related_name='weekly_reports')
     student=models.ForeignKey(Student, verbose_name=("Student"), on_delete=models.CASCADE,related_name='weekly_reports')
     no_of_pages_viewed_on_canvas=models.PositiveIntegerField(null=True,blank=True, default=0)
     login_in_on_canvas=models.BooleanField(default=False, blank=True,null=True)
@@ -129,3 +129,5 @@ class StudentEnrollment(BaseModel):
     program_offering=models.ForeignKey(ProgramOffering, verbose_name='program_offering', on_delete=models.CASCADE,related_name='student_enrollments')
     status=models.BooleanField(default=True)
     result=models.CharField(choices=RESULT_CHOICE,null=True,blank=True, max_length=255,default='awaited')
+    
+    

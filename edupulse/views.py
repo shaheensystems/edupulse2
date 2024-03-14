@@ -54,6 +54,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         attendances=user_data['attendances']
         all_programs=user_data['all_programs']
         weekly_reports=user_data['weekly_reports']
+        campuses=user_data['campuses']
         # context.update(user_data)
 
         
@@ -76,7 +77,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                                         program_offerings_for_current_user=program_offerings_for_current_user,
                                         course_offerings_for_current_user=course_offerings_for_current_user,
                                         attendances =attendances,
-                                        weekly_reports=weekly_reports)
+                                        weekly_reports=weekly_reports,
+                                        campuses=campuses)
             
             program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
             course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -86,6 +88,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             inactive_programs_for_current_user=filtered_data_by_date_range['inactive_programs_for_current_user']
             attendances=filtered_data_by_date_range['attendances']
             weekly_reports=filtered_data_by_date_range['weekly_reports']
+            campuses=filtered_data_by_date_range['campuses']
             context.update(filtered_data_by_date_range)
                
         context['date_filter_form']=date_filter_form
@@ -101,7 +104,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
         # # print("chart data programs and student:",get_chart_data_programs_student_enrollment(programs=programs_for_current_user))
         # print("chart data offering type student enrollment :",get_chart_data_offering_type_student_enrollment(course_offerings=course_offerings_for_current_user))
-        print(start_date,":",end_date)
+        print("data intialise with start and end date :",start_date,":",end_date)
         chart_data_student_enrollment_by_campus,chart_data_staff_enrollment_by_campus=get_chart_data_student_and_Staff_by_campus()
         # context['start_date']=start_date
         # context['end_date']=end_date
@@ -137,13 +140,65 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['courses_for_current_user']=courses_for_current_user
         context['program_offerings_for_current_user']=program_offerings_for_current_user
         context['course_offerings_for_current_user']=course_offerings_for_current_user
-        context['total_students_in_program_offerings_for_current_user']=len(get_total_unique_no_of_student_by_program_offerings(program_offerings=program_offerings_for_current_user))
-        context['total_students_in_course_offerings_for_current_user']=len(get_total_unique_no_of_student_by_course_offerings(course_offerings=course_offerings_for_current_user))
+        if get_total_unique_no_of_student_by_program_offerings(program_offerings=program_offerings_for_current_user) is not None:
+            context['total_students_in_program_offerings_for_current_user']=len(get_total_unique_no_of_student_by_program_offerings(program_offerings=program_offerings_for_current_user))
+        else:
+            context['total_students_in_program_offerings_for_current_user']=0
+        
+        if get_total_unique_no_of_student_by_course_offerings(course_offerings=course_offerings_for_current_user) is not None:
+               
+            context['total_students_in_course_offerings_for_current_user']=len(get_total_unique_no_of_student_by_course_offerings(course_offerings=course_offerings_for_current_user))
+        else:
+            context['total_students_in_course_offerings_for_current_user']=0
+            
 
         # context['total_students_in_program_offerings_for_current_user']=total_unique_students_in_program_offerings_for_current_user
         # context['course_offerings']=course_offerings
+        
+        for campus in campuses:
+            print("campus name :",campus)
+            campus_students=campus.get_total_students_with_enrollment()
+            filtered_students=campus_students.filter(student_profile__student_enrollments__program_offering__in=program_offerings_for_current_user)
+            print("filtered students by program offering :",len(filtered_students))
+            print(len(campus.get_total_students_with_enrollment()))
+            # print("ethinicity",campus.get_total_students_by_ethnicity())
+        
+        
+        
         context['students']=students
 
+        
+        
+        
+        # Construct the query for blended and micro cred offerings
+        blended_query = Q(student_enrollments__course_offering__offering_mode='micro cred') | \
+                Q(student_enrollments__course_offering__offering_mode='blended')
+        blended_students=students.filter(blended_query)
+        blended_students=students.exclude(Q(student_enrollments__course_offering__offering_mode = 'online') )
+        online_students=students.filter(Q(student_enrollments__course_offering__offering_mode = 'online') )
+
+        
+        context['total_students_in_blended_course_offerings']=set(blended_students)
+        context['total_students_in_online_course_offerings']=set(online_students)
+
+        
+        enrolled_students=[]
+        enrolled_students_for_blended_course_offerings=[]
+        enrolled_students_for_online_course_offerings=[]
+        for co in course_offerings_for_current_user:
+            for r in co.student_enrollments.all():
+                new_student=r.student
+                if co.offering_mode=='online':
+                    enrolled_students_for_online_course_offerings.append(new_student)
+                else:
+                    enrolled_students_for_blended_course_offerings.append(new_student)
+                enrolled_students.append(new_student)
+                # print(enrolled_students)
+        
+        
+        context['total_students_enrollment']=enrolled_students
+        context['total_enrollment_in_blended_course_offerings']=enrolled_students_for_blended_course_offerings
+        context['total_enrollment_in_online_course_offerings']=enrolled_students_for_online_course_offerings
 
         context['total_students_at_risk_query_set']=get_no_of_at_risk_students_by_program_offerings(program_offerings_for_current_user)
         context['attendances']=attendances
@@ -175,16 +230,28 @@ class ManageAttendanceView(LoginRequiredMixin, TemplateView):
     
     def get_queryset(self):
         # Assuming you want to filter course offerings based on the user
-        user = self.request.user
-        course_offerings= CourseOffering.objects.prefetch_related(
-            'teacher',
-            'student',
-            'teacher__staff',
-            'attendances',
-            Prefetch('weekly_reports', queryset=WeeklyReport.objects.prefetch_related('sessions'))
-        ).filter(staff_course_offering_relations__staff__staff=user)
         
-        print(course_offerings)
+        user_data=filter_database_based_on_current_user(request_user=self.request.user)
+
+        program_offerings_for_current_user=user_data['program_offerings_for_current_user']
+        course_offerings_for_current_user=user_data['course_offerings_for_current_user']
+        programs_for_current_user=user_data['programs_for_current_user']
+        courses_for_current_user=user_data['courses_for_current_user']
+        students=user_data['students']
+        attendances=user_data['attendances']
+        all_programs=user_data['all_programs']
+        weekly_reports=user_data['weekly_reports']
+      
+        course_offerings= course_offerings_for_current_user
+        # course_offerings=CourseOffering.objects.prefetch_related(
+        #     'teacher',
+        #     'student',
+        #     'teacher__staff',
+        #     'attendances',
+        #     Prefetch('weekly_reports', queryset=WeeklyReport.objects.prefetch_related('sessions'))
+        # ).filter(staff_course_offering_relations__staff__staff=self.request.user)
+        
+        # print("manage Attendance CO :",course_offerings)
         return course_offerings
 
     def get_context_data(self, **kwargs):

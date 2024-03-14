@@ -11,7 +11,7 @@
       
 
         {% if request.user|user_belongs_to_group:'Teacher' %}
-        {% comment %} {{total_students_at_risk_query_set}} {% endcomment %}
+       
             <!-- Course Offering Details Section -->
             <div class='hidden'>
             {% with course_offerings=course_offerings_for_current_user students=total_students_in_course_offerings_for_current_user total_no_of_at_risk_student=total_students_at_risk_query_set %}
@@ -83,7 +83,7 @@
           <div class='flex flex-col'>
             <p class='text-center text-lg font-bold mb-2'> Student Enrollment Status </p>
             <div class='w-11/12 bg-gray-100 rounded-lg '>
-              <p>Progress bar </p>
+              <p> Vertical Progress bar </p>
               
               {% with data=student_attendance_percentage %}
                 {% comment %} {% include 'charts/progressBarHorizontal.html' %} {% endcomment %}
@@ -91,7 +91,7 @@
               {% endwith %}
             </div>
             <div class='w-11/12 bg-gray-100 rounded-lg '>
-              <p>Progress bar </p>
+              <p>Horizontal Progress bar </p>
               
               {% with data=student_attendance_percentage %}
                 {% include 'charts/progressBarHorizontal.html' %}
@@ -170,13 +170,68 @@
 
 
         {% if  request.user|user_belongs_to_group:'Program_Leader'  %}
+            <!--New Attendnace Engagement Action Report -->
+            <!-- Student and enrollment status -->
+            <div class='flex flex-row gap-10 justify-start  text-gray-400 font-normal px-5'>
+              <div class='flex flex-col'>
+                  <span class='flex flex-row '>
+                    <span> Total Students blended :</span>
+                    <span>{{total_students_in_blended_course_offerings |length}}</span>
+                  </span>
+                  <span class='flex flex-row'>
+                    <span>Total Student Online :</span>
+                    <span>{{total_students_in_online_course_offerings |length}}</span>
+                  </span>
+              </div>
+              <div>
+                <span class='flex flex-row '>
+                  <span> Total Enrollment blended :</span>
+                  <span>{{total_enrollment_in_blended_course_offerings |length}}</span>
+                </span>
+                <span>
+                  <span>Total Enrollment Online :</span>
+                  <span>{{total_enrollment_in_online_course_offerings |length}}</span>
+                </span>
+              </div>
+              
+            </div>
+            <!--Attendnace Engagement Action report -->
+            <div class='mt-5'>
+
+              {% if attendances|length > 0 %}
+                  {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Overall Attendance'  chart2_title='Overall Average Engagement Rate Blended'  chart3_title='Absent Engagement Analysis'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
+                    {% include 'components/dashboard/student_attendance_engagement_action_report.html' %}
+                  {% endwith %}
+                {% else %}
+                  <div class='bg-gray-200 p-4'>
+                    <p> No students found for students attendance report </p>
+                  </div>
+                {% endif %}
+            </div>
+
+            <!--campus proram and lecture wise deatil -->
+
+            <div>
+                
+
+
+            </div>
+
+
+
             <!-- Program Offering Details Section -->
+          
           {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
             {% include 'components/dashboard/program_offering_info_bar.html' %}
           {% endwith %}
-          {% with data=chart_data_offering_mode_enrollment_students text='Students Enrollment' id='students_enrollment'%}
-            {% include 'charts/barChartHorizontal.html' %}
-          {% endwith %}
+          
+          
+          {% if chart_data_offering_mode_enrollment_students %}
+            {% with data=chart_data_offering_mode_enrollment_students text='Students Enrollment' id='students_enrollment'%}
+              {% include 'charts/barChartHorizontal.html' %}
+            {% endwith %}
+          {% endif %}
+          
 
           {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
             {% include 'components/dashboard/program_offering_attendance_info.html' %}
