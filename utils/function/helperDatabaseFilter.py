@@ -125,7 +125,8 @@ def filter_database_based_on_current_user(request_user):
         
         print("Student from filter :",len(students))
         
-        programs_for_current_user=None
+        # programs_for_current_user=None
+        programs_for_current_user=Program.objects.filter(staff_program_relations__staff__staff=request_user)
         courses_for_current_user=None
         attendances = attendances.order_by('course_offering').filter(student__in=students).distinct()
       

@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from django.contrib.auth.models import Group
 
-from program.models import StaffCourseOfferingRelations,StaffProgramOfferingRelations
+from program.models import StaffCourseOfferingRelations,StaffProgramOfferingRelations, StaffProgramRelations
 
 from report.models import Attendance
 from django.forms import BaseInlineFormSet
@@ -85,13 +85,17 @@ class StaffCourseOfferingRelationInline(admin.StackedInline):
 class StaffProgramOfferingRelationInline(admin.StackedInline):
     model=StaffProgramOfferingRelations
     extra=1
+
+class StaffProgramRelationInline(admin.StackedInline):
+    model=StaffProgramRelations
+    extra=1
     
     
 
 class StaffAdmin(admin.ModelAdmin):
     list_display=('id','staff','joining_date','designation','role','remark',"get_courses_offered","get_programs_offered")
 
-    inlines=[StaffCourseOfferingRelationInline,StaffProgramOfferingRelationInline]
+    inlines=[StaffProgramRelationInline,StaffCourseOfferingRelationInline,StaffProgramOfferingRelationInline]
 
     
     
