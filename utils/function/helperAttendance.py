@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from django.utils import timezone
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from utils.function.BaseValues_List import ATTENDANCE_CHOICE
+from utils.function.BaseValues_List import ATTENDANCE_CHOICE, ENGAGEMENT_CHOICE, ACTION_CHOICE, FOLLOW_UP_CHOICE
 
 
 
@@ -240,13 +240,13 @@ def get_attendance_percentage_by_attendances(attendances):
 
 
 
-def record_attendance(student_obj,course_offering_obj,attendance_date,is_present_value,week_number):
+def get_create_or_update_attendance(student_obj,course_offering_obj,attendance_date,is_present_value,week_number):
     
     from report.models import Attendance,WeeklyReport
-    print(f"Start recording attendance as per detail : {course_offering_obj}-{student_obj} on {attendance_date} is {is_present_value}")
+    print(f"Start recording attendance as per detail : {course_offering_obj}-{student_obj} on {attendance_date} is {is_present_value} for week number :{week_number}")
   
     if is_present_value.lower() not in [choice[0] for choice in ATTENDANCE_CHOICE]:
-        print("Error: is_present value does not exist in attendance choices")
+        print("Error: is_present value does not exist in attendance choices :",is_present_value)
             
     
     
@@ -259,14 +259,16 @@ def record_attendance(student_obj,course_offering_obj,attendance_date,is_present
         )
         new_attendance.save()
         
-        print(f"new attendance recorded : {new_attendance}:{new_attendance.is_present}")
+        print(f"new attendance recorded : {new_attendance} for student :{student_obj}, course Offering:{course_offering_obj} for attendance date :{attendance_date} {new_attendance.is_present}")
         # now generate weekly report
+        print(f"Initialise Weekly report create or update with student :{student_obj}, course Offering:{course_offering_obj} for week number :{week_number}")
         if week_number>0 :
             weekly_report , created=WeeklyReport.objects.get_or_create(
                 student=student_obj,
                 course_offering=course_offering_obj,
                 week_number=week_number
             )
+            weekly_report.save()
             if not weekly_report.sessions.filter(Q(id=new_attendance.id)).exists():
                 weekly_report.sessions.add(new_attendance)
             else:
@@ -276,5 +278,49 @@ def record_attendance(student_obj,course_offering_obj,attendance_date,is_present
     else:
         print("error !!! student is not enrolled in selected course_offering ")
             
-     
+
+def get_create_or_update_weekly_report(student_obj,course_offering_obj,week_number,engagement_status,action_status,follow_up_status):
+    from report.models import Attendance,WeeklyReport
+    
+
+    
+    
+    if student_obj and course_offering_obj and week_number>0:
+       
+        try:
+            weekly_report_obj = WeeklyReport.objects.get(
+                student=student_obj,
+                course_offering=course_offering_obj,
+                week_number=week_number
+            )
+            #validation  and update 
+            if engagement_status is not None:
+                if engagement_status.lower() in [choice[0] for choice in ENGAGEMENT_CHOICE]:
+                    weekly_report_obj.engagement=engagement_status
+                else:
+                    print(f"Error !!! , engagement_status value :{engagement_status} for Weekly report doesn't exist")
+                    return
+            
+            if action_status is not None :
+                if action_status.lower() in [choice[0] for choice in ACTION_CHOICE]:
+                    weekly_report_obj.action=action_status
+                else:
+                    print(f"Error !!! , action_status value :{action_status} for Weekly report doesn't exist")
+            
+            if follow_up_status is not None:
+                if follow_up_status.lower() in [choice[0] for choice in FOLLOW_UP_CHOICE]:
+                    weekly_report_obj.follow_up=follow_up_status
+                else:
+                    print(f"Error !!! , follow_up_status value :{follow_up_status} for Weekly report doesn't exist")
+        
+            
+            
+            weekly_report_obj.save()
+        except WeeklyReport.DoesNotExist:
+            print (f"Weekly Report not found for student :{student_obj}, course_offering :{course_offering_obj} for week number :{week_number}")
+        
+       
+        
+        
+        
      

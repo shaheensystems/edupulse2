@@ -6,13 +6,15 @@ from django.utils import timezone
 from django.db import models
 from datetime import date
 
+from utils.function.BaseValues_List import ATTENDANCE_CHOICE, ENGAGEMENT_CHOICE, ACTION_CHOICE, FOLLOW_UP_CHOICE, PERFORMANCE_CHOICE, ASSESSMENT_CHOICE
+
 class Attendance(BaseModel):
-    ATTENDANCE_CHOICE=[
-        ('present','Present'),
-        ('absent','Absent'),
-        ('informed absent','Informed Absent'),
-        ('tardy','Tardy'),
-    ]
+    # ATTENDANCE_CHOICE=[
+    #     ('present','Present'),
+    #     ('absent','Absent'),
+    #     ('informed absent','Informed Absent'),
+    #     ('tardy','Tardy'),
+    # ]
     # this table can be access by teacher for each course and each student to mark attendance
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True,related_name='attendances')
     program_offering = models.ForeignKey(ProgramOffering, on_delete=models.CASCADE, null=True, blank=True,related_name='attendances')
@@ -30,43 +32,45 @@ class Attendance(BaseModel):
         return f"{self.student} - {self.course_offering} - {self.attendance_date}-{self.is_present}"
 
 class WeeklyReport(BaseModel):
-    ENGAGEMENT_CHOICE=[
-        ('na','N/A'),
-        ('on track canvas','On Track - CANVAS'),
-        ('on track assessment','On Track - Assessment'),
-        ('on track learning activity','On Track - Learning Activity'),
-        ('on track blended','On Track - Blended'),
-        ('not engaged','Not Engaged'),
-    ]
-    ACTION_CHOICE=[
-        ('na','N/A'),
-        ('follow up email and call','Follow Up Email and Call'),
-        ('pastoral care','Pastoral Care'),
-        ('personalized study plan/Extra session','Personalized Study Plan /Extra Session'),
-        ('emergency contact','Emergency Contact'),
-        ('other','Other'),
-    ]
-    FOLLOW_UP_CHOICE=[
-        ('na','N/A'),
-        ('warning letter 1','Warning Letter 1'),
-        ('warning letter 2','Warning Letter 2'),
-    ]
-    PERFORMANCE_CHOICE=[
-        ('na','N/A'),
-        ('poor','POOR'),
-        ('good','GOOD'),
-        ('moderate','MODERATE'),
-    ]
-    ASSESSMENT_CHOICE=[
-        ('na','N/A'),
-        ('making progress','MAKING PROGRESS '),
-        ('no progress','NO PROGRESS'),
-        ('request extension','REQUEST EXTENSION'),
-        ('submitted','SUBMITTED'),
-        ('not submitted','NOT SUBMITTED'),
-        ('failed','FAILED'),
-        ('re-sit','RE-SIT'),
-    ]
+    # ENGAGEMENT_CHOICE=[
+    #     ('na','N/A'),
+    #     ('on track canvas','On Track - CANVAS'),
+    #     ('on track assessment','On Track - Assessment'),
+    #     ('on track learning activity','On Track - Learning Activity'),
+    #     ('on track blended','On Track - Blended'),
+    #     ('not engaged','Not Engaged'),
+    # ]
+    # ACTION_CHOICE=[
+    #     ('na','N/A'),
+    #     ('follow up email and call','Follow Up Email and Call'),
+    #     ('pastoral care','Pastoral Care'),
+    #     ('personalized study plan/Extra session','Personalized Study Plan /Extra Session'),
+    #     ('emergency contact','Emergency Contact'),
+    #     ('other','Other'),
+    # ]
+    # FOLLOW_UP_CHOICE=[
+    #     ('na','N/A'),
+    #     ('warning letter 1','Warning Letter 1'),
+    #     ('warning letter 2','Warning Letter 2'),
+    # ]
+    # PERFORMANCE_CHOICE=[
+    #     ('na','N/A'),
+    #     ('poor','POOR'),
+    #     ('good','GOOD'),
+    #     ('moderate','MODERATE'),
+    # ]
+    # ASSESSMENT_CHOICE=[
+    #     ('na','N/A'),
+    #     ('making progress','MAKING PROGRESS '),
+    #     ('no progress','NO PROGRESS'),
+    #     ('request extension','REQUEST EXTENSION'),
+    #     ('submitted','SUBMITTED'),
+    #     ('not submitted','NOT SUBMITTED'),
+    #     ('failed','FAILED'),
+    #     ('re-sit','RE-SIT'),
+    # ]
+    
+    
     week_number=models.PositiveIntegerField(blank=True,null=True)
     # sessions will be list of all attendance in one week
     sessions=models.ManyToManyField(Attendance, verbose_name=("sessions"))
