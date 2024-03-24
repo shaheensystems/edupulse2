@@ -159,8 +159,9 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             print("campus name :",campus)
             campus_students=campus.get_total_students_with_enrollment()
             filtered_students=campus_students.filter(student_profile__student_enrollments__program_offering__in=program_offerings_for_current_user)
+            print("filtered students by program offering unique:",len(set(filtered_students)))
             print("filtered students by program offering :",len(filtered_students))
-            print(len(campus.get_total_students_with_enrollment()))
+            print(len(set(campus.get_total_students_with_enrollment())))
             # print("ethinicity",campus.get_total_students_by_ethnicity())
         
         

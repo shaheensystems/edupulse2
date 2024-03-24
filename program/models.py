@@ -9,7 +9,7 @@ from django.db.models import Q
 from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances,get_engagement_percentage_by_course,get_engagement_percentage_by_program,get_engagement_percentage_by_course_offering,get_engagement_percentage_by_course_offering_for_student
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
 from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program,get_total_no_of_student_by_course
-from utils.function.helperProgram import OFFERING_CHOICES
+from utils.function.BaseValues_List import OFFERING_CHOICES
 from utils.function.helperGetChartData import get_chart_data_attendance_report
 
 
@@ -137,11 +137,11 @@ class Course(BaseModel):
 
 class CourseOffering(BaseModel):
     
-    OFFERING_CHOICES1 = [
-        ('online', 'ONLINE'),
-        ('micro cred', 'MICRO CRED'),
-        ('blended', 'BLENDED'),
-    ]
+    # OFFERING_CHOICES1 = [
+    #     ('online', 'ONLINE'),
+    #     ('micro cred', 'MICRO CRED'),
+    #     ('blended', 'BLENDED'),
+    # ]
 
     course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True,related_name='course_offerings')
     start_date=models.DateField( auto_now=False, auto_now_add=False)
@@ -154,7 +154,7 @@ class CourseOffering(BaseModel):
 
     student = models.ManyToManyField(Student,blank=True ,related_name='course_offerings')
     teacher = models.ManyToManyField(Staff,blank=True ,related_name='course_offerings')
-    offering_mode = models.CharField(max_length=10,choices=OFFERING_CHOICES1,default='online',blank=True, null=True,help_text='Select the mode of course offering: Online, Offline, or Blended'
+    offering_mode = models.CharField(max_length=10,choices=OFFERING_CHOICES,default='online',blank=True, null=True,help_text='Select the mode of course offering: Online, Offline, or Blended'
     )
     
     def get_week_numbers(self):

@@ -121,6 +121,9 @@ def filter_database_based_on_current_user(request_user):
         
         
         students=students.filter(student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
+        # students=students.filter(student_enrollments__program_offering__in=program_offerings_for_current_user).distinct()
+        
+        print("Student from filter :",len(students))
         
         programs_for_current_user=None
         courses_for_current_user=None

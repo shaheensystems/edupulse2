@@ -18,7 +18,10 @@ from report.views import get_week_number
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
+from utils.function.helperAttendance import record_attendance
 import pandas as pd
+
+
 
 def create_groups_and_permission():
     from django.contrib.auth.models import Group, Permission
@@ -408,9 +411,9 @@ def update_or_create_student_enrollment(data):
     if linked_student and linked_course_offering and linked_program_offering:
         # Proceed with the enrollment process
         try:
-            if data['student_id']=='20220228':
-                print(linked_course_offering)
-                print(linked_program_offering)
+            # if data['student_id']=='20220228':
+            #     print(linked_course_offering)
+            #     print(linked_program_offering)
             student_enrollment_object, created = StudentEnrollment.objects.get_or_create(
                 student=linked_student,
                 course_offering=linked_course_offering,
@@ -498,30 +501,32 @@ def Upload_file_view(request):
                         if index >= 0:
                             data[variable_name] = row[index]
 
-                # Access the data using the variable names
-                # student_offer_id = data['student_offer_id']
+                # # Access the data using the variable names
+                # # student_offer_id = data['student_offer_id']
 
-                # create object as needed for data by importing models here 
+                # # create object as needed for data by importing models here 
                 
-                # add Program temp- student_program_code, student_program_desc
-                update_or_create_program(data=data)
+                # # add Program temp- student_program_code, student_program_desc
+                # update_or_create_program(data=data)
                
-                # Print or process the variables
-                # print(data['student_program_code'])
+                # # Print or process the variables
+                # # print(data['student_program_code'])
                 
-                # add Course temp- student_program_code, student_program_desc
-                update_or_create_course(data=data)
+                # # add Course temp- student_program_code, student_program_desc
+                # update_or_create_course(data=data)
 
-                # add or update Student
-                updated_or_create_student(data)
+                # # add or update Student
+                # updated_or_create_student(data)
 
-                # add course and program offering after creating student 
-                update_or_create_course_offering(data)
-                update_or_create_program_offering(data)
+                # # add course and program offering after creating student 
+                # update_or_create_course_offering(data)
+                # update_or_create_program_offering(data)
                 update_or_create_student_enrollment(data)
                 
                 # create group and add permission 
                 create_groups_and_permission()
+                
+                print("All data updated successfully !!!")
 
         obj.activated = True
         obj.save()
@@ -805,16 +810,91 @@ def Upload_bulk_attendance_view(request):
             
             print("attendance data file name :",bulk_attendance_file)
             print("timetable data file name :",timetable_file)
-            
-            
+            days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday","Saturday","Sunday"]
+        
             # get the timetable details
-            # with open(obj.time_table.path, 'r') as f:
-            #     reader = csv.reader(f)
+            try:
+                # with open(obj.time_table.path, 'r') as f:
+                with open(obj.time_table.path, 'r', encoding='utf-8-sig') as f:  # Use 'utf-8-sig' encoding to handle BOM
+        
+                    time_table_data = []
+                    reader = csv.reader(f)
 
-            #     header = next(reader, None)
+                    header = next(reader, None)
+                    
+                    print("time table header ",header)
+                    # Define a dictionary to map header names to variable names
+                    header_mappings = {
+                                        "unit offer code":"course_offering_code",
+                                        "unit offer description":"course_offering_name",
+                                        "Lecturer":"lecturer_name",
+                                        "Session Day":"session_day",
+                                    
+                    }
+
+                    # Create variables for each column
+                    data = {variable_name: None for header_name, variable_name in header_mappings.items()}
+
+                    
+                    
+                    for row in reader:
+                        print("header value",header)
+                        print("row value :",row)
+                        if header is not None:
+                            for header_name, variable_name in header_mappings.items():
+                                index = header.index(header_name) if header_name in header else -1
+                                if index >= 0:
+                                    data[variable_name] = row[index]
+                    
+                        print("all time table data:",data)
+                        course_offering_code = data['course_offering_code']
+                        course_offering_name = data['course_offering_name']
+                        lecturer_name = data['lecturer_name']
+                        session_day = data['session_day']
+                        
+                        if session_day:
+                            print("row wise data :",course_offering_code,course_offering_name,lecturer_name,session_day)
+                            # Find existing entry for course_offering_code in time_table_data
+                            existing_entry = next((item for item in time_table_data if item["course_offering_code"] == course_offering_code), None)
+                            if existing_entry:
+                                # Update session list for existing entry
+                                session_index=existing_entry['session_index']
+                                session_index += 1
+                                existing_entry["sessions"][f"session_{session_index}"]=session_day
+                                existing_entry['session_index']= session_index
+                                session_days = []
+                                for i in range(1, existing_entry['session_index']):
+                                    session_days.append(existing_entry['sessions'][f"session_{i}"])
+                                session_days.append(session_day)  # Add the new session day
+                                print("before sort :",session_days)
+                             
+                                session_days=sorted(session_days,key=lambda x:days_of_week.index(x))
+                                print("after sort :",session_days)
+                                # Update the session days in the existing entry
+                                for i, day in enumerate(session_days, start=1):
+                                    existing_entry['sessions'][f"session_{i}"] = day
+                            else:
+                                # Create a new entry for course_offering_code
+                                session_index = 1
+                                new_entry = {
+                                    "course_offering_code": course_offering_code,
+                                    "course_offering_name": course_offering_name,
+                                    "lecturer_name":lecturer_name,
+                                    "sessions": {f"session_{session_index}": session_day},
+                                    'session_index':session_index
+                                }
+                                time_table_data.append(new_entry)
+
+                    print("time_table_data:",time_table_data)
+                        
+
+                    
+            except Exception as e:
+             print(f'Error opening time table file: {e}')
+            
+            
             
             # upload attendance 
-            
             try:
                 # df = pd.read_excel(obj.file_name.path)
     
@@ -885,8 +965,9 @@ def Upload_bulk_attendance_view(request):
                         # process recording attendance start from here 
                         student_id=data['Student ID']
                         course_offering_id=data['Unit Offer Code']
-                        course_offering=CourseOffering.objects.get(temp_id=course_offering_id)
-                        course_offering_start_date=course_offering.start_date
+                        course_offering_obj=CourseOffering.objects.get(temp_id=course_offering_id)
+                        student_obj = get_object_or_404(Student, temp_id=student_id)
+                        course_offering_start_date=course_offering_obj.start_date
                         
                         # Assuming course_offering_start_date is a datetime object
                         # course_offering_start_date = datetime.strptime(course_offering.start_date, "%Y-%m-%d")  # Convert to datetime object if it's a string
@@ -899,36 +980,62 @@ def Upload_bulk_attendance_view(request):
                         print("Week number of the year for the course offering start date:", course_starting_week_number)
                                     
                                     
-                        print("CO start Date :",course_offering.start_date)
+                        print("CO start Date :",course_offering_obj.start_date)
                         print(student_id,course_offering_id)
                         
                         print("all data:",data) 
                         for key, value in data.items():
                             week_number=0
-                            if key.endswith("Session 1"):
+                            session_number=0
+                            
+                            # if key.endswith("Session 1"):
+                            if "Session" in key:
+                                print("key :",key)
+                                
                                 # day will be calculated by Course Offering and session
                                 # with week and session and start date we wil find the session date 
                                 if value and value != "NA":
                                     week_number=key.split(" ")[0][1:]
+                                    session_number=key.split(" ")[2]
                                     print("week Number :",week_number)
-                                    print(key,value)
+                                    print("session Number :",session_number)
+                                    print(key,":",value)
                                     
+                                    # value in import sheet has to be changed 
+                                    if value == "Informed - Absent" :
+                                        is_present_value='Informed Absent'
+                                    else:
+                                        is_present_value=value
+
+                                    print("is Present:",is_present_value)
                                     
-                                    print(course_offering)
+                                    for data in time_table_data:
+                                        if data['course_offering_code'] == course_offering_obj.temp_id:
+                                            print("related time table  data to course offering ",data)
+                                            session_day=data["sessions"][f"session_{session_number}"]
+                                            session_day_number=days_of_week.index(session_day) + 1
+                                           
+                                            print("session day ",session_day ,":",session_day_number)
+                                            
+                                    print(course_offering_obj)
                                     # Assuming week_number is already extracted from the key
                                     if week_number.isdigit():
                                         week_number = int(week_number)
+                                        
                                         session_week_number=course_starting_week_number+week_number-1
                                         print("session week Number :",session_week_number)
                                         # Determine the year and ISO week day number of the Tuesday in the given week number
                                         week_number = session_week_number
                                         
-                                        iso_week_day_number = 2  # Tuesday is the second day of the ISO week
+                                        iso_week_day_number = session_day_number  # Tuesday is the second day of the ISO week
                                         # Calculate the date of the Tuesday
-                                        tuesday_date = datetime.strptime(f"{year}-W{session_week_number}-{iso_week_day_number}", "%Y-W%W-%w").date()
+                                        attendance_date = datetime.strptime(f"{year}-W{session_week_number}-{iso_week_day_number}", "%Y-W%W-%w").date()
 
-                                        print("Date of Tuesday in week", session_week_number, ":", tuesday_date)
+                                        print(f"Date of {session_day} in week, {session_week_number}, {attendance_date}")
                                         
+                                        # now record attendance in attendance model 
+                                        record_attendance(student_obj,course_offering_obj,attendance_date,is_present_value,week_number)
+                                      
                                     else:
                                         print("Invalid week number:", week_number)
                                     
@@ -943,7 +1050,7 @@ def Upload_bulk_attendance_view(request):
                    
                     
             except Exception as e:
-             print(f'Error opening file: {e}')
+             print(f'Error opening attendance file: {e}')
             
             obj.activated = True
             obj.save()
