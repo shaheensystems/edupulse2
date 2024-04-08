@@ -195,8 +195,8 @@
               </div>
               
             </div>
-            <!--Attendnace Engagement Action report -->
-            <div class='mt-5'>
+            <!--Attendnace Engagement Action report (by Vivian)-->
+            <div class='mt-5 border-b-2 border-gray-300'>
 
               {% if attendances|length > 0 %}
                   {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Overall Attendance'  chart2_title='Overall Average Engagement Rate Blended'  chart3_title='Absent Engagement Analysis'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
@@ -211,8 +211,54 @@
 
             <!--campus proram and lecture wise deatil -->
 
-            <div>
-                
+            <div class='mt-5 flex flex-row border-b-2 border-gray-300 '>
+                <div class ='flex w-1/2 flex-row gap-1 justify-start'>
+                  <div class='flex w-1/3 p-4 flex-col gap-3 justify-start items-start'>
+                    <span class='clickable-span px-4 bg-gray-100 text-blue-400 font-xs rounded-lg' onclick="showData('campus')"> campus wise</span>
+                    <span class='clickable-span px-4 bg-gray-100 text-blue-400 font-xs rounded-lg' onclick="showData('program')"> program wise </span>
+                    <span class='clickable-span px-4 bg-gray-100 text-blue-400 font-xs rounded-lg' onclick="showData('lecturer')"> leacturer wise</span>
+                </div>
+                <button class='btn-danger' id='test_btn'> Red 2 </button>
+                    <div class ='flex w-2/3 p-4'>
+
+                      <table id="data-table"  class="w-full rounded-lg  border-gray-400">
+                        <thead class='rounded-lg border-2'>
+                            <tr class='bg-gray-200'>
+                                <th class="px-4 py-2">Program</th>
+                                <th class="px-4 py-2">Student Count</th>
+                                <th class="px-4 py-2">Enrollment Count</th>
+                            </tr>
+                        </thead>
+                        <tbody class='border-2'>
+                           
+                            {% for data in campus_sample_data %}
+                            <tr>
+                                <td class="border px-4 py-2">{{ data.title }}</td>
+                                <td class="border px-4 py-2">{{ data.student_count }}</td>
+                                <td class="border px-4 py-2">{{ data.enrollment_count }}</td>
+                            </tr>
+                          
+                            {% endfor %}
+                            
+                        </tbody>
+                      
+                        <!-- Last row for totals -->
+                          <tfoot class="">
+                            <tr>
+                                <td class="py-2 px-4"></td>
+                                <td class="py-2 px-4 font-semibold" id="total-students"></td>
+                                <td class="py-2 px-4 font-semibold" id="total-enrollments"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    
+                    </div>
+
+
+                </div>
+
+
+                <div class ='flex w-1/2 p-4'>Program wise attendnace enrollment </div>
 
 
             </div>
@@ -221,21 +267,21 @@
 
             <!-- Program Offering Details Section -->
           
-          {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
+          {% comment %} {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
             {% include 'components/dashboard/program_offering_info_bar.html' %}
-          {% endwith %}
+          {% endwith %} {% endcomment %}
           
           
-          {% if chart_data_offering_mode_enrollment_students %}
+          {% comment %} {% if chart_data_offering_mode_enrollment_students %}
             {% with data=chart_data_offering_mode_enrollment_students text='Students Enrollment' id='students_enrollment'%}
               {% include 'charts/barChartHorizontal.html' %}
             {% endwith %}
-          {% endif %}
+          {% endif %} {% endcomment %}
           
 
-          {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
+          {% comment %} {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
             {% include 'components/dashboard/program_offering_attendance_info.html' %}
-          {% endwith %}
+          {% endwith %} {% endcomment %}
 
         {% endif %}
 
@@ -251,19 +297,21 @@
           {% include 'components/dashboard/alerts_messages.html' %}
         {% endwith %}
          
-
-          <!-- Student Performance Pie Chart Section -->
-        {% comment %} {{attendances|length}} {% endcomment %}
-        {% if attendances|length > 0 %}
-          {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
-            {% include 'components/dashboard/student_performance_pieChart_flow.html' %}
-          {% endwith %}
-        {% else %}
-          <div class='bg-gray-200 p-4'>
-            <p> No students found for students attendance report </p>
-          </div>
+        {% if  request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin' or request.user|user_belongs_to_group:'Teacher'   %}
+              <!-- Student Performance Pie Chart Section -->
+            {% comment %} {{attendances|length}} {% endcomment %}
+            {% if attendances|length > 0 %}
+              {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
+                {% include 'components/dashboard/student_performance_pieChart_flow.html' %}
+              {% endwith %}
+            {% else %}
+              <div class='bg-gray-200 p-4'>
+                <p> No students found for students attendance report </p>
+              </div>
+            {% endif %}
+            
+        
         {% endif %}
-          
 
      {% comment %} <p>Total Program Offerings :  {{program_offerings.count}}</p>
      <p>Total course Offerings :  {{course_offerings.count}}</p>
@@ -443,6 +491,84 @@
           populateDurationValues();  // Populate quarter dropdown options
           document.getElementById('quarterDropdown').value = defaultQuarter;
       }
+
+    
+      
+     
+    // filter campus, program and lecturer data with student and enrollment count
+        // Initially show campus data
+        highlight('campus');
+
+        // Function to show data based on user selection
+        function showData(type) {
+          console.log('Clicked on:', type);
+            const campusData = JSON.parse('{{ campus_sample_data | safe }}');
+            const programData = JSON.parse('{{ program_sample_data |  safe }}');
+            const lecturerData = JSON.parse('{{ lecturer_sample_data |  safe }}');
+
+            let data = [];
+            switch (type) {
+                case 'campus':
+                    data = campusData;
+                    break;
+                case 'program':
+                    data = programData;
+                    break;
+                case 'lecturer':
+                    data = lecturerData;
+                    break;
+            }
+
+            // Update table body with new data
+            const tableBody = $('#data-table tbody');
+            tableBody.empty();
+            data.forEach(item => {
+                const row = `
+                    <tr>
+                        <td class="border px-4 py-2">${item.title}</td>
+                        <td class="border px-4 py-2">${item.student_count}</td>
+                        <td class="border px-4 py-2">${item.enrollment_count}</td>
+                    </tr>`;
+                tableBody.append(row);
+            });
+
+            // Update totals
+            const totalStudents = data.reduce((acc, curr) => acc + curr.student_count, 0);
+            const totalEnrollments = data.reduce((acc, curr) => acc + curr.enrollment_count, 0);
+            $('#total-students').text(totalStudents);
+            $('#total-enrollments').text(totalEnrollments);
+
+            // Highlight selected navigation link
+            highlight(type);
+        }
+
+        // Function to highlight selected navigation link
+        function highlight(type) {
+            $('.bg-gray-100').removeClass('bg-blue-400');
+            $(`.bg-gray-100:contains(${type})`).addClass('bg-blue-400');
+        }
+
+
+        //Ajax and jquery function to calculate sum of all studnet and enrollment
+      //calculate sum of student count and enrollment count  for program leader page
+      $(document).ready(function() {
+        
+        // Initialize total variables
+        let totalStudents = 0;
+        let totalEnrollments = 0;
+
+        // Iterate through table rows and sum up values
+        $('#data-table tbody tr').each(function() {
+            let studentCount = parseInt($(this).find('td:eq(1)').text()) || 0;
+            let enrollmentCount = parseInt($(this).find('td:eq(2)').text()) || 0;
+            totalStudents += studentCount;
+            totalEnrollments += enrollmentCount;
+        });
+
+        // Update totals in the footer
+        $('#total-students').text(totalStudents);
+        $('#total-enrollments').text(totalEnrollments);
+    });
     </script>
    </section>
 {% endblock content %}

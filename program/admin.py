@@ -9,9 +9,14 @@ class CourseInline(admin.StackedInline):  # You can use TabularInline if you pre
     model = Program.courses.through
     extra = 1  # Number of empty forms to display
 
+
+class ProgramOfferingInline(admin.StackedInline):
+    model=ProgramOffering
+    extra=1
+    
 class ProgramAdmin(admin.ModelAdmin):
     list_display=['temp_id','name','description','calculate_total_no_of_student','calculate_attendance_percentage','calculate_no_at_risk_student_for_last_week']
-    inlines = [CourseInline]
+    inlines = [ProgramOfferingInline,CourseInline]
     def calculate_attendance_percentage(self, obj):
         return obj.calculate_attendance_percentage()
 

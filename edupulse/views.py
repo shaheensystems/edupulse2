@@ -57,18 +57,19 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         campuses=user_data['campuses']
         # context.update(user_data)
 
-        
+        print("View program for current user before date filter :",programs_for_current_user)
         # filter data with start and end date
         date_filter_form = DateFilterForm(self.request.GET)
         # print("context data ",user_data['program_offerings_for_current_user'])
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
-
+        
+        
         if date_filter_form.is_valid():
             start_date=date_filter_form.cleaned_data['start_date']
             end_date=date_filter_form.cleaned_data['end_date']
-
+            # print("sent program for current user for date filter :",programs_for_current_user)
             filtered_data_by_date_range=filter_data_based_on_date_range(
                                         start_date=start_date,
                                         end_date=end_date,
@@ -93,7 +94,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                
         context['date_filter_form']=date_filter_form
 
-
+        # print("View program for current user after date filter :",filtered_data_by_date_range['programs_for_current_user'])
 
 
         # calculated online and offline program after all filter, search and query
@@ -155,14 +156,9 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         # context['total_students_in_program_offerings_for_current_user']=total_unique_students_in_program_offerings_for_current_user
         # context['course_offerings']=course_offerings
         
-        for campus in campuses:
-            print("campus name :",campus)
-            campus_students=campus.get_total_students_with_enrollment()
-            filtered_students=campus_students.filter(student_profile__student_enrollments__program_offering__in=program_offerings_for_current_user)
-            print("filtered students by program offering unique:",len(set(filtered_students)))
-            print("filtered students by program offering :",len(filtered_students))
-            print(len(set(campus.get_total_students_with_enrollment())))
-            # print("ethinicity",campus.get_total_students_by_ethnicity())
+        print("Programs for current User :",programs_for_current_user)
+        
+        
         
         
         
@@ -218,7 +214,167 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         
         # print("current user:", self.request.user.staff_profile)
         # print("staff profile:", self.request.user.staff_profile)
-    
+        
+        # temp data for Program Leader : 
+        
+        campus_sample_data = [
+                {
+                    'title': "campus_1",
+                    'student_count': 40,
+                    'enrollment_count': 50
+                },
+                {
+                    'title': "campus_2",
+                    'student_count': 35,
+                    'enrollment_count': 45
+                },
+                {
+                    'title': "campus_3",
+                    'student_count': 55,
+                    'enrollment_count': 60
+                },
+                {
+                    'title': "campus_4",
+                    'student_count': 30,
+                    'enrollment_count': 40
+                },
+                {
+                    'title': "campus_5",
+                    'student_count': 45,
+                    'enrollment_count': 55
+                },
+                {
+                    'title': "campus_6",
+                    'student_count': 25,
+                    'enrollment_count': 35
+                },
+                {
+                    'title': "campus_7",
+                    'student_count': 50,
+                    'enrollment_count': 65
+                },
+                {
+                    'title': "campus_8",
+                    'student_count': 60,
+                    'enrollment_count': 70
+                },
+                {
+                    'title': "campus_9",
+                    'student_count': 20,
+                    'enrollment_count': 30
+                },
+                {
+                    'title': "campus_10",
+                    'student_count': 55,
+                    'enrollment_count': 65
+                }
+            ]
+        program_sample_data = [
+                {
+                    'title': "program_data",
+                    'student_count': 40,
+                    'enrollment_count': 50
+                },
+                {
+                    'title': "program_2",
+                    'student_count': 35,
+                    'enrollment_count': 45
+                },
+                {
+                    'title': "program_3",
+                    'student_count': 55,
+                    'enrollment_count': 60
+                },
+                {
+                    'title': "program_4",
+                    'student_count': 30,
+                    'enrollment_count': 40
+                },
+                {
+                    'title': "program_5",
+                    'student_count': 45,
+                    'enrollment_count': 55
+                },
+                {
+                    'title': "program_6",
+                    'student_count': 25,
+                    'enrollment_count': 35
+                },
+                {
+                    'title': "program_7",
+                    'student_count': 50,
+                    'enrollment_count': 65
+                },
+                {
+                    'title': "program_8",
+                    'student_count': 60,
+                    'enrollment_count': 70
+                },
+                {
+                    'title': "program_9",
+                    'student_count': 20,
+                    'enrollment_count': 30
+                },
+                {
+                    'title': "program_10",
+                    'student_count': 55,
+                    'enrollment_count': 65
+                }
+            ]
+        lecturer_sample_data = [
+                {
+                    'title': "lecturer_data",
+                    'student_count': 40,
+                    'enrollment_count': 50
+                },
+                {
+                    'title': "lecturer_2",
+                    'student_count': 35,
+                    'enrollment_count': 45
+                },
+                {
+                    'title': "lecturer_3",
+                    'student_count': 55,
+                    'enrollment_count': 60
+                },
+                {
+                    'title': "lecturer_4",
+                    'student_count': 30,
+                    'enrollment_count': 40
+                },
+                {
+                    'title': "lecturer_5",
+                    'student_count': 45,
+                    'enrollment_count': 55
+                },
+                {
+                    'title': "lecturer_6",
+                    'student_count': 25,
+                    'enrollment_count': 35
+                },
+                {
+                    'title': "lecturer_7",
+                    'student_count': 50,
+                    'enrollment_count': 65
+                },
+                {
+                    'title': "lecturer_8",
+                    'student_count': 60,
+                    'enrollment_count': 70
+                },
+                {
+                    'title': "lecturer_9",
+                    'student_count': 20,
+                    'enrollment_count': 30
+                },
+                {
+                    'title': "lecturer_10",
+                    'student_count': 55,
+                    'enrollment_count': 65
+                }
+            ]
+
+        context['campus_sample_data']=campus_sample_data
         # Add other necessary context data
 
         return context

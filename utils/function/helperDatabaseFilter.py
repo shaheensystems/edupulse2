@@ -8,6 +8,47 @@ from django.db.models import Count, Prefetch
 
 def filter_database_based_on_current_user(request_user):
     user_groups=request_user.groups.all()
+    programs=Program.objects.prefetch_related(
+                                    'courses',
+                                    'program_offerings',
+                                    'program_offerings__student',
+                                    'program_offerings__program_leader',
+                                    'program_offerings__student__attendances',
+                                    'program_offerings__student__attendances__weekly_reports',
+                                    'program_offerings__program__courses',
+                                    'program_offerings__program__courses__course_offerings',
+                                    'program_offerings__program__courses__course_offerings__attendances',
+                                    'program_offerings__program__courses__course_offerings__student',
+                                    'program_offerings__program__courses__course_offerings__student__attendances',
+                                    'program_offerings__program__courses__course_offerings__student__attendances__weekly_reports',
+                                    'program_offerings__program__program_offerings',
+                                    'program_offerings__program__courses__course_offerings__weekly_reports',
+                                    'program_offerings__staff_program_offering_relations',
+                                    'program_offerings__staff_program_offering_relations__staff',
+                                    'program_offerings__attendances',
+                                    'program_offerings__attendances__weekly_reports',
+                                    'program_offerings__attendances__weekly_reports__sessions__program_offering',
+                                    'program_offerings__attendances__weekly_reports__sessions__course_offering',
+                                    'program_offerings__attendances__weekly_reports__sessions__student',
+                                    'program_offerings__attendances__weekly_reports__student',
+                                    'program_offerings__student__attendances__weekly_reports__sessions',
+                                    'program_offerings__student_enrollments__student',
+                                    'program_offerings__student_enrollments__course_offering',
+                                    'program_offerings__staff_program_offering_relations__staff__staff',
+                                    
+                                    'courses__course_offerings',
+                                    'courses__course_offerings__teacher',
+                                    'courses__course_offerings__course__program',
+                                    'courses__course_offerings__course__program__program_offerings',
+                                    'courses__program',
+                                    'courses__program__program_offerings',
+                                    'courses__course_offerings__staff_course_offering_relations',
+                                    'courses__course_offerings__staff_course_offering_relations__staff',
+                                    'courses__course_offerings__student_enrollments__student',
+                                    'courses__course_offerings__student',
+                                    'courses__course_offerings__weekly_reports'
+                                    ).all()
+    courses=Course.objects.prefetch_related('course_offerings','program').all()
     program_offerings=ProgramOffering.objects.select_related('program',
                                                              
                                                              
@@ -88,8 +129,7 @@ def filter_database_based_on_current_user(request_user):
         
 
         # programs=Program.objects.all()
-        programs=Program.objects.prefetch_related('courses','program_offerings','courses__course_offerings','courses__course_offerings__student','courses__course_offerings__weekly_reports').all()
-        courses=Course.objects.prefetch_related('course_offerings','program').all()
+        
         students=students
         # attendances=Attendance.objects.all()
         attendances=attendances
@@ -114,8 +154,12 @@ def filter_database_based_on_current_user(request_user):
         attendances=attendances
         campuses=campuses
 
+         # programs_for_current_user=None
+        programs_for_current_user=programs.filter(staff_program_relations__staff__staff=request_user)
+        courses_for_current_user=None
         
-        program_offerings_for_current_user=program_offerings.filter(staff_program_offering_relations__staff__staff=request_user)
+        # program_offerings_for_current_user=program_offerings.filter(staff_program_offering_relations__staff__staff=request_user)
+        program_offerings_for_current_user=program_offerings.filter(program__in=programs_for_current_user).distinct()
         
         course_offerings_for_current_user=course_offerings.filter(course__program__program_offerings__in=program_offerings_for_current_user).distinct()
         
@@ -123,16 +167,18 @@ def filter_database_based_on_current_user(request_user):
         students=students.filter(student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
         # students=students.filter(student_enrollments__program_offering__in=program_offerings_for_current_user).distinct()
         
-        print("Student from filter :",len(students))
         
-        # programs_for_current_user=None
-        programs_for_current_user=Program.objects.filter(staff_program_relations__staff__staff=request_user)
-        courses_for_current_user=None
+    
+       
+        
         attendances = attendances.order_by('course_offering').filter(student__in=students).distinct()
       
         all_programs=programs_for_current_user
         weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user).distinct()
-
+        # print("initialise  program for program leader ",programs_for_current_user)
+        # print("initialise  course offerings  for program leader ",course_offerings_for_current_user)
+       
+            
         # print(attendances)
         # print(students)
     elif user_groups.filter(name="Teacher").exists():
@@ -249,38 +295,63 @@ def get_online_offline_course_offerings(course_offerings_for_current_user):
 
 
 def default_start_and_end_date():
-    # default_start_date = datetime.now() - timedelta(days=365)  # One year ago
-    default_start_date = datetime(datetime.now().year - 2, 1, 1).strftime('%Y-%m-%d')  # 1st Jan of lst year
-    # default_end_date=datetime.now().strftime('%Y-%m-%d')
-    default_end_date=datetime(datetime.now().year,12,31).strftime('%Y-%m-%d')
+    current_date = datetime.now()
+    
+    # start date : 1st jan of last year and end date 31st dec of current year 
+    # default_start_date = datetime(current_date.year - 2, 1, 1).strftime('%Y-%m-%d')  # 1st Jan of lst year
+    # default_end_date=datetime(current_date.year,12,31).strftime('%Y-%m-%d')
+    
+    
+    # calculate current quarter start and end date 
+    start_date = current_date.replace(month=((current_date.month - 1) // 3) * 3 + 1, day=1)
+    next_quarter_start_date = start_date.replace(month=start_date.month + 3, day=1)
+    end_date = next_quarter_start_date - timedelta(days=1)
+    
+    
+    
+    default_start_date=start_date
+    default_end_date=end_date
+    
+
+    print("Start Date of Current Quarter:", start_date.strftime('%Y-%m-%d'))
+    print("End Date of Current Quarter:", end_date.strftime('%Y-%m-%d'))
+    
     # default_end_date = datetime(2024, 3, 31).strftime('%Y-%m-%d')
 
     return default_start_date,default_end_date
 
 def filter_data_based_on_date_range(start_date,end_date,programs_for_current_user,courses_for_current_user,program_offerings_for_current_user,course_offerings_for_current_user,attendances,weekly_reports,campuses):
+    # print(" programs for current user value for date filter function  ",program_offerings_for_current_user)
+  
     default_start_date ,default_end_date=default_start_and_end_date()
     if not start_date:
         start_date = default_start_date
     if not end_date:
         end_date=default_end_date
-
+        
+    
     # filter data according to start and end date 
     if start_date and end_date:
 
         if program_offerings_for_current_user is not None :
             program_offerings_for_current_user=program_offerings_for_current_user.filter(
-                   start_date__gte=start_date,end_date__lte=end_date)
+                   Q(start_date__gte=start_date)| Q(end_date__lte=end_date))
         
       
         if course_offerings_for_current_user is not None :
-            course_offerings_for_current_user=course_offerings_for_current_user.filter(start_date__gte=start_date,end_date__lte=end_date)
+            course_offerings_for_current_user=course_offerings_for_current_user.filter(
+                Q(start_date__gte=start_date)|Q(end_date__lte=end_date))
         
         # all program and course need to be shown 
         if programs_for_current_user is not None:
-
+            # print(" date filter initializing for programs for current user ",programs_for_current_user)
+            # for p in programs_for_current_user:
+            #     for po in p.program_offerings.all():
+            #         print(f"PO:{po} : start date :{po.start_date} and end date :{po.end_date}")
+                    
             active_programs = programs_for_current_user.filter(
                                                             Q(program_offerings__start_date__gte=start_date) 
-                                                            & Q(program_offerings__end_date__lte=end_date)
+                                                            | Q(program_offerings__end_date__lte=end_date)
                                                         ).distinct()
             # Get the inactive programs (programs that do not match the date criteria)
             inactive_programs = programs_for_current_user.exclude(id__in=active_programs.values_list('id', flat=True)).distinct()
@@ -289,6 +360,8 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
             active_programs_for_current_user = active_programs
 
             inactive_programs_for_current_user=inactive_programs
+            # print(" active  for current user after date filter ",active_programs_for_current_user)
+            # print(" inactive  for current user after date filter ",inactive_programs_for_current_user)
             # print(len(programs_for_current_user))
             # print(len(inactive_programs_for_current_user))
         else:
@@ -299,7 +372,7 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
         if courses_for_current_user is not None:
             courses_for_current_user = courses_for_current_user.filter(
                                                             Q(course_offerings__start_date__gte=start_date) 
-                                                            & Q(course_offerings__end_date__lte=end_date)
+                                                            | Q(course_offerings__end_date__lte=end_date)
                                                         ).distinct()
         
         
