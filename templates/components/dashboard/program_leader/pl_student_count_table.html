@@ -1,0 +1,121 @@
+<section class='flex flex-row w-full'>
+    
+
+ 
+       
+        <div class='flex w-1/3 p-4 flex-col gap-3 justify-start items-start'>
+            {% for data in pl_student_count_table_data  %}
+            <button id='id_data_table_button_{{data.title|lower}}' class='px-4 font-xs rounded-lg' > 
+                {{data.title}} Wise 
+            </button>
+            {% endfor %}
+
+            
+        </div>
+  
+
+
+ 
+    <div class ='flex w-2/3 p-4' id="id_{{data.title|lower}}_student_count_table">
+        {% for data  in pl_student_count_table_data %}
+
+        <table id="id_data_table_{{data.title|lower}}"  class="w-full rounded-lg  border-gray-400">
+          <thead class='rounded-lg border-2'>
+              <tr class='bg-gray-200'>
+                  <th class="px-4 py-2 text-left">{{data.title}}</th>
+                  <th class="px-4 py-2 text-center ">Student Count</th>
+                  <th class="px-4 py-2 text-center ">Enrollment Count</th>
+              </tr>
+          </thead>
+          <tbody class='border-2'>
+              
+              {% for data in data.data_list %}
+              <tr class='w-full'>
+                  <td class="border px-4 py-2 text-left w-2/3">{{ data.title }}</td>
+                  <td class="border px-4 py-2 text-center">{{ data.student_count }}</td>
+                  <td class="border px-4 py-2 text-center">{{ data.enrollment_count }}</td>
+              </tr>
+            
+              {% endfor %}
+              
+          </tbody>
+        
+          <!-- Last row for totals -->
+            <tfoot class="">
+              <tr>
+                  <td class="py-2 px-4"></td>
+                  <td class="py-2 px-4 font-semibold text-center" id="id_total_students_{{ data.title|lower }}"></td>
+                  <td class="py-2 px-4 font-semibold text-center" id="id_total_enrollments_{{ data.title|lower }}"></td>
+              </tr>
+            </tfoot>
+      </table>
+      {% endfor %}
+      </div>
+    
+
+    
+
+    <script>
+        $(document).ready(function() {
+            let totalStudents = 0;
+            let totalEnrollments = 0;
+            {% for data in pl_student_count_table_data %}
+                // Initialize table and button loads 
+                {% if data.title|lower  == 'campus' %}
+                
+                    $('#id_data_table_button_{{ data.title|lower }}').addClass('text-white bg-blue-300')
+                    $('#id_data_table_{{data.title|lower}}').addClass('block')
+                {% else %}
+                $('#id_data_table_button_{{ data.title|lower }}').addClass('bg-gray-100 text-blue-400')
+                $('#id_data_table_{{data.title|lower}}').addClass('hidden')
+
+                {% endif %}
+               
+        
+                // initial value of table needs to be set set total number os students and enrollment for each table 
+                $('#id_data_table_{{ data.title|lower }} tbody tr').each(function() {
+                    let studentCount = parseInt($(this).find('td:eq(1)').text()) || 0;
+                    let enrollmentCount = parseInt($(this).find('td:eq(2)').text()) || 0;
+                    totalStudents += studentCount;
+                    totalEnrollments += enrollmentCount;
+                   
+                });
+        
+                // Update totals in the footer
+                $('#id_total_students_{{ data.title|lower }}').text(totalStudents);
+                $('#id_total_enrollments_{{ data.title|lower }}').text(totalEnrollments);
+                totalStudents = 0;
+                totalEnrollments = 0;
+
+
+                
+
+               
+    
+            {% endfor %}
+            
+                
+                    // Event handler for button click
+                     $('button[id^="id_data_table_button_"]').click(function() {
+                         // Remove 'text-white bg-blue-100' classes from all buttons
+                         $('button[id^="id_data_table_button_"]').removeClass('text-white bg-blue-300').addClass('bg-gray-100 text-blue-400');
+                         // Add 'text-white bg-blue-100' classes to the clicked button
+                         $(this).removeClass(('bg-gray-100 text-blue-400')).addClass('text-white bg-blue-300');
+                         // Remove 'bg-blue-100 text-white' classes from all other buttons
+                         $('button[id^="id_data_table_button_"]').not(this).removeClass('text-white bg-blue-300').addClass('bg-gray-100 text-blue-400');
+                         
+                         // Hide all data tables
+                         $('table[id^="id_data_table_"]').removeClass('block').addClass('hidden');
+                         // Show corresponding data table
+                         var tableId = $(this).attr('id').replace('id_data_table_button_', 'id_data_table_');
+                         console.log(tableId);
+                         $('#' + tableId).removeClass('hidden').addClass('block');
+                         
+                      
+                     });
+                   
+
+        });
+    </script>
+
+    </section>

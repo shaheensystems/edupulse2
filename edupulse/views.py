@@ -220,8 +220,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         campus_sample_data = [
                 {
                     'title': "campus_1",
-                    'student_count': 40,
-                    'enrollment_count': 50
+                    'student_count': 00,
+                    'enrollment_count': 00
                 },
                 {
                     'title': "campus_2",
@@ -272,8 +272,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         program_sample_data = [
                 {
                     'title': "program_data",
-                    'student_count': 40,
-                    'enrollment_count': 50
+                    'student_count': 10,
+                    'enrollment_count': 10
                 },
                 {
                     'title': "program_2",
@@ -324,8 +324,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         lecturer_sample_data = [
                 {
                     'title': "lecturer_data",
-                    'student_count': 40,
-                    'enrollment_count': 50
+                    'student_count': 20,
+                    'enrollment_count': 20
                 },
                 {
                     'title': "lecturer_2",
@@ -375,6 +375,15 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             ]
 
         context['campus_sample_data']=campus_sample_data
+        pl_student_count_table_data=[
+            {'title':"Campus",'data_list':campus_sample_data},
+            {'title':"Program",'data_list':program_sample_data},
+            {'title':"Lecturer",'data_list':lecturer_sample_data},
+           
+        ]
+        
+        context['pl_student_count_table_data']=pl_student_count_table_data
+
         # Add other necessary context data
 
         return context

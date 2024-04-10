@@ -213,46 +213,55 @@
 
             <div class='mt-5 flex flex-row border-b-2 border-gray-300 '>
                 <div class ='flex w-1/2 flex-row gap-1 justify-start'>
-                  <div class='flex w-1/3 p-4 flex-col gap-3 justify-start items-start'>
+                  {% comment %} {{pl_student_count_table_data}} {% endcomment %}
+
+                  {% with pl_student_count_table_data=pl_student_count_table_data %}
+                  {% include "components/dashboard/program_leader/pl_student_count_table.html" %}
+                  
+                  {% endwith %}
+                   
+                  
+                  
+
+                  {% comment %} <div class='flex w-1/3 p-4 flex-col gap-3 justify-start items-start'>
                     <span class='clickable-span px-4 bg-gray-100 text-blue-400 font-xs rounded-lg' onclick="showData('campus')"> campus wise</span>
                     <span class='clickable-span px-4 bg-gray-100 text-blue-400 font-xs rounded-lg' onclick="showData('program')"> program wise </span>
                     <span class='clickable-span px-4 bg-gray-100 text-blue-400 font-xs rounded-lg' onclick="showData('lecturer')"> leacturer wise</span>
-                </div>
-                <button class='btn-danger' id='test_btn'> Red 2 </button>
-                    <div class ='flex w-2/3 p-4'>
+                  </div>
+                  <div class ='flex w-2/3 p-4'>
 
-                      <table id="data-table"  class="w-full rounded-lg  border-gray-400">
-                        <thead class='rounded-lg border-2'>
-                            <tr class='bg-gray-200'>
-                                <th class="px-4 py-2">Program</th>
-                                <th class="px-4 py-2">Student Count</th>
-                                <th class="px-4 py-2">Enrollment Count</th>
-                            </tr>
-                        </thead>
-                        <tbody class='border-2'>
-                           
-                            {% for data in campus_sample_data %}
-                            <tr>
-                                <td class="border px-4 py-2">{{ data.title }}</td>
-                                <td class="border px-4 py-2">{{ data.student_count }}</td>
-                                <td class="border px-4 py-2">{{ data.enrollment_count }}</td>
-                            </tr>
+                    <table id="data-table"  class="w-full rounded-lg  border-gray-400">
+                      <thead class='rounded-lg border-2'>
+                          <tr class='bg-gray-200'>
+                              <th class="px-4 py-2">Program</th>
+                              <th class="px-4 py-2">Student Count</th>
+                              <th class="px-4 py-2">Enrollment Count</th>
+                          </tr>
+                      </thead>
+                      <tbody class='border-2'>
                           
-                            {% endfor %}
-                            
-                        </tbody>
-                      
-                        <!-- Last row for totals -->
-                          <tfoot class="">
-                            <tr>
-                                <td class="py-2 px-4"></td>
-                                <td class="py-2 px-4 font-semibold" id="total-students"></td>
-                                <td class="py-2 px-4 font-semibold" id="total-enrollments"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                          {% for data in campus_sample_data %}
+                          <tr>
+                              <td class="border px-4 py-2">{{ data.title }}</td>
+                              <td class="border px-4 py-2">{{ data.student_count }}</td>
+                              <td class="border px-4 py-2">{{ data.enrollment_count }}</td>
+                          </tr>
+                        
+                          {% endfor %}
+                          
+                      </tbody>
                     
-                    </div>
+                      <!-- Last row for totals -->
+                        <tfoot class="">
+                          <tr>
+                              <td class="py-2 px-4"></td>
+                              <td class="py-2 px-4 font-semibold" id="total-students"></td>
+                              <td class="py-2 px-4 font-semibold" id="total-enrollments"></td>
+                          </tr>
+                        </tfoot>
+                  </table>
+                  
+                  </div> {% endcomment %}
 
 
                 </div>
