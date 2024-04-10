@@ -26,6 +26,7 @@ from django.core import serializers
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+from utils.function.BaseValues_List import ATTENDANCE_CHOICE
 
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_program_offerings,get_no_of_at_risk_students_by_course_offerings
 
@@ -382,7 +383,45 @@ class DashboardView(LoginRequiredMixin,TemplateView):
            
         ]
         
+        program_wise_sample_attendance_data=[
+            {'program':'program 1' ,
+             'attendance_percentage':{
+                "present":10,
+                'absent':30,
+                'informed_absent':40,
+                'tardy':20
+            }
+             },
+            {'program':'program 2' ,
+             'attendance_percentage':{
+                "present":30,
+                'absent':10,
+                'informed_absent':10,
+                'tardy':50
+            }
+             },
+            {'program':'program 3' ,
+             'attendance_percentage':{
+                "present":70,
+                'absent':10,
+                'informed_absent':5,
+                'tardy':15
+            }
+             },
+            {
+                'program': 'Program 4',
+                'attendance_percentage': {
+                    'present': 85,
+                    'absent': 8,
+                    'informed_absent': 4,
+                    'tardy': 3
+                }
+            },
+        ]
+        
         context['pl_student_count_table_data']=pl_student_count_table_data
+        context['program_wise_sample_attendance_data']=program_wise_sample_attendance_data
+        context['attendance_choice']=ATTENDANCE_CHOICE
 
         # Add other necessary context data
 
