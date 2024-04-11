@@ -115,9 +115,6 @@ class Student(BaseModel):
     
     @property
     def list_of_enrolled_courses(self):
-        
-       
-
         student_enrollment_courses=set()
         for student_enrollment in self.student_enrollments.all():
             student_enrollment_courses_new= student_enrollment.course_offering,student_enrollment.program_offering

@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances,get_engagement_percentage_by_course,get_engagement_percentage_by_program,get_engagement_percentage_by_course_offering,get_engagement_percentage_by_course_offering_for_student
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
-from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program,get_total_no_of_student_by_course
+from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program,get_total_no_of_student_by_course, get_all_student_enrollments_by_program, get_all_student_enrollments_by_program_offering
 from utils.function.BaseValues_List import OFFERING_CHOICES
 from utils.function.helperGetChartData import get_chart_data_attendance_report
 
@@ -88,7 +88,9 @@ class Program(BaseModel):
 
         return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
    
-
+    def calculate_total_student_enrollments(self):
+        
+        return get_all_student_enrollments_by_program(program=self)
 
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
@@ -280,6 +282,13 @@ class ProgramOffering(BaseModel):
 
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_program_offering(program_offering=self)
+    
+    
+    
+    def calculate_total_student_enrollments(self):
+        
+        return get_all_student_enrollments_by_program_offering(program_offering=self)
+
         
 
     def list_course_offerings(self):
@@ -302,27 +311,15 @@ class ProgramOffering(BaseModel):
     # this method is incorrect , it will calculate all student based on course Offering no on program offring 
     def calculate_total_no_of_student(self):
         
-        from customUser.models import Student
+        total_students=set()
         
-        total_students=Student.objects.filter(student_enrollments__program_offering=self)
+        student_enrollments=self.student_enrollments.all()
         
-         # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
-        student_enrollment=self.student_enrollments.all()
-        for relation in student_enrollment:
-            relation.student
-        
-         
-         
-        courses = self.program.courses.all()
+        for student_enrollment in student_enrollments:
+            total_students.add(student_enrollment.student)
 
-        # Use a set to store unique students
-        unique_students = set()
-        for course in courses:
-            for course_offering in course.course_offerings.all():
-                students_in_course = course_offering.student.all()
-                unique_students.update(students_in_course)
-        return len(unique_students)
-        # return len(total_students)
+        return total_students
+     
     
     def get_all_students(self):
         students = self.student.all()

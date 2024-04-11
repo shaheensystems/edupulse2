@@ -31,6 +31,37 @@ def get_total_no_of_student_by_program(program,offering_mode):
  
     return unique_students
 
+def get_all_student_enrollments_by_program(program):
+    # students enrollments allow count duplicate students enrolled in program too
+    total_enrolled_students = []
+    
+    program_offerings=program.program_offerings.all()
+    for program_offering in program_offerings:
+        enrolled_students=program_offering.calculate_total_student_enrollments()
+        total_enrolled_students.extend(enrolled_students)
+    
+    return total_enrolled_students
+
+
+def get_all_student_enrollments_by_program_offering(program_offering):
+    total_enrolled_students = []
+    student_enrollments=program_offering.student_enrollments.all()
+    
+    for student_enrollment in student_enrollments:
+        enrolled_student=student_enrollment.student
+        total_enrolled_students.append(enrolled_student)
+        
+    #     print(f"Student enrolled in program offering {program_offering}: { enrolled_student}")
+        
+    # print(f"Total Enrolled students by program Offering {program_offering} :{len(total_enrolled_students)}")
+    # print(f"Total Enrolled students by program Offering {program_offering} :{len(set(total_enrolled_students))}")
+    
+    
+    return total_enrolled_students
+ 
+
+
+
 def get_total_no_of_student_by_course(course, offering_mode):
     unique_students = set()
     if offering_mode=="online":

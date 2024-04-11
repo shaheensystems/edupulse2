@@ -216,6 +216,57 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         # print("current user:", self.request.user.staff_profile)
         # print("staff profile:", self.request.user.staff_profile)
         
+        # program Leader Data 
+        pl_program_wise_student_count_table_data=[]
+        for program in programs_for_current_user:
+            program_data={
+                'title':program.name,
+                # 'student_count': len(program.calculate_total_no_of_student()),
+                'student_count': len(set(program.calculate_total_student_enrollments())),
+                'enrollment_count': len(program.calculate_total_student_enrollments())
+            }
+            pl_program_wise_student_count_table_data.append(program_data)
+        
+        
+        # print("pl_program_student_count_table_data:",pl_program_student_count_table_data)
+        
+        total_student_enrollments=[]
+        
+        for program_offering in program_offerings_for_current_user:
+            student_enrollment=program_offering.calculate_total_student_enrollments()
+            total_student_enrollments.extend(student_enrollment)
+            
+        # print(f" total student enrolled {len(total_student_enrollments)} and total student count is {len(set(total_student_enrollments))}")
+        
+        pl_campus_wise_student_count_table_data=[]
+        # Initialize a dictionary to store enrollments grouped by campus
+        enrollments_by_campus = {}
+
+        # Iterate over each student enrollment
+        for student_enrollment in total_student_enrollments:
+            campus_name = student_enrollment.student.campus.name
+            
+            # Check if the campus already exists in the dictionary
+            if campus_name in enrollments_by_campus:
+                # If the campus exists, append the enrollment to its list
+                enrollments_by_campus[campus_name].append(student_enrollment)
+            else:
+                # If the campus doesn't exist, create a new list with the enrollment
+                enrollments_by_campus[campus_name] = [student_enrollment]
+                    
+        # print("enrollments_by_campus:",enrollments_by_campus)
+        for enrollment in enrollments_by_campus:
+            # print("enrollment :",enrollments_by_campus[enrollment])
+            enrollment_data={
+                'title':enrollment,
+                'student_count': len(set(enrollments_by_campus[enrollment])),    
+                'enrollment_count': len(enrollments_by_campus[enrollment])  
+            }
+            pl_campus_wise_student_count_table_data.append(enrollment_data)
+        
+        # print("pl_campus_wise_student_count_table_data:",pl_campus_wise_student_count_table_data)
+        
+        
         # temp data for Program Leader : 
         
         campus_sample_data = [
@@ -377,8 +428,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
         context['campus_sample_data']=campus_sample_data
         pl_student_count_table_data=[
-            {'title':"Campus",'data_list':campus_sample_data},
-            {'title':"Program",'data_list':program_sample_data},
+            {'title':"Campus",'data_list':pl_campus_wise_student_count_table_data},
+            {'title':"Program",'data_list':pl_program_wise_student_count_table_data},
             {'title':"Lecturer",'data_list':lecturer_sample_data},
            
         ]

@@ -36,7 +36,8 @@
                 {% endif %}
                   
                 </h1>|
-                <p class="mb-2">Total Students Enrolled: {{total_students}}</p> |
+                <p class="mb-2">Total Students : {{program_offering.calculate_total_no_of_student|length}}</p> |
+                <p class="mb-2">Total Students Enrolled: {{program_offering.calculate_total_student_enrollments|length}}</p> |
                 <p class="mb-2">Attendnace Percentage: {{program_offering.calculate_attendance_percentage}} %</p> |
                 {% if program_offering.calculate_no_at_risk_student_for_last_week|length  >  0 %}
                 <p class='text-red-500'>Students at Risk: {{program_offering.calculate_no_at_risk_student_for_last_week|length}}</p>

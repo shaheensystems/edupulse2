@@ -111,13 +111,14 @@ class StaffAdmin(admin.ModelAdmin):
 
     def get_programs_offered(self, obj):
         # print(obj.student.first_name)
-        programs_offered = obj.staff_program_offering_relations.all()
-        # print('program_offered:',programs_offered)
+        programs_offered = obj.staff_program_relations.all()
+        print('program_offered:',programs_offered)
+        
 
         # for program in programs_offered:
         #     print("prog object:",program.program.name)
     
-        return ',\n'.join([str(relation.program_offering.program.name) for relation in programs_offered])
+        return ',\n'.join([str(relation.program.name) for relation in programs_offered])
     get_programs_offered.short_description = 'Program Assigned'
 
 
