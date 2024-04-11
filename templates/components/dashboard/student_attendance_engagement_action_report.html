@@ -4,61 +4,68 @@
     
     {% comment %} <a href="{% url 'course_offering_detail' course_offering.pk %}" > {% endcomment %}
        <!-- student perforamnce Pie chart -->
-       <div class=" pb-8  ">
+      <div class=" pb-8  ">
+        
         {% comment %} <h2 class="text-xl font-bold mb-2">{{title}}</h2> {% endcomment %}
-        <div class='flex flex-row justify-center gap-4 flex-wrap py-4'>
-          
-        <!-- Add three pie charts with dummy data linked with attendance, engagement, and actions -->
-        <div class='w-4/12 min-w-[500px] rounded-lg relative'>
-          <div class ='flex flex-col absolute top-0 right-0 p-0 z-50 '> 
-            <div class="flex flex-row  justify-center items-center  bg-gray-100">
-              {% comment %} <label for="id_course_offering" class='px-3 border-gray-400 text-sm bg-gray-100 hidden'>Course Offering</label> {% endcomment %}
-             <select name="program_offering" id="id_program_offering" class="form-select border-2 border-gray-200 text-xs text-gray-500">
-                 <option value="" class=''>Select Program Offering</option>
-                 {% for offering in program_offerings_for_current_user %}
-                     <option class='text-black ' value="{{ offering.temp_id }}">{{ offering.program.name }}</option>
-                 {% endfor %}
-              
-             </select>
-            </div>
-            <div class="flex flex-row  justify-end  mt-2 ">
-              {% comment %} <label for="id_attendnace_session" class='px-3 border-gray-400 text-sm bg-gray-100 hidden'>Sessions</label> {% endcomment %}
-             <select name="course_offering" id="id_course_offering" class="form-select border-2 border-gray-200 text-xs text-gray-500">
-                 <option value="" class=''>Session</option>
-              
-                     <option class='text-black ' value="session_1">Session 1 </option>
-                     <option class='text-black ' value="session_1">Session 2 </option>
-                 
-              
-             </select>
-            </div>
-              
-              
-          </div>
-            <span class='flex text-sm font-medium '>{{chart1_title}}</span>
+          <div class='flex flex-row justify-center gap-4 flex-wrap py-4'>
+
             
-            {% with data=chart1_data title="" id=chart1_id chartType='pie' lengendDisplay='true' limitData=10 legendPosition='right' %}
-              {% include 'charts/chart.html' %}
-            {% endwith %}
+              <!-- Add three pie charts with dummy data linked with attendance, engagement, and actions -->
+              <div class='w-4/12 min-w-[500px] rounded-lg relative'>
+                
+                <div class ='flex flex-col absolute top-0 right-0 p-0 z-50 '> 
+                  <div class="flex flex-row  justify-center items-center  bg-gray-100">
+                    <select name="program_offering" id="id_program_offering" class="form-select border-2 border-gray-200 text-xs text-gray-500">
+                        <option value="" class=''>Select Program Offering</option>
+                        {% for offering in program_offerings_for_current_user %}
+                            <option class='text-black ' value="{{ offering.temp_id }}">{{ offering.program.name }}</option>
+                        {% endfor %}
+                      
+                    </select>
+                  </div>
+                  
+                  <div class="flex flex-row  justify-end  mt-2 ">
+                          <select name="course_offering" id="id_course_offering" class="form-select border-2 border-gray-200 text-xs text-gray-500">
+                          <option value="" class=''>Session</option>
+                        
+                              <option class='text-black ' value="session_1">Session 1 </option>
+                              <option class='text-black ' value="session_1">Session 2 </option>
+                          
+                        
+                      </select>
+                  </div>
+                </div>
+                  
+                
+                <div class='flex relative flex-col  mt-10 '>
+                  <div class='flex text-sm font-medium text-center align-middle justify-center '>{{chart1_title}}</div>
+                  <div class='flex justify-start items-start content-center align-baseline w-full'>
+                  {% with data=chart1_data title="" id=chart1_id chartType='pie' lengendDisplay='true' limitData=10 legendPosition='right' %}
+                    {% include 'charts/chart.html' %}
+                  {% endwith %}
+                </div>
+                </div>
+                
+                  
+              </div>
+              <div class='w-7/12 min-w-[700px]  flex flex-row border-2 border-black p-2'>
+                  <div class='w-6/12 rounded-lg '>
+                    <span class='flex text-sm font-medium '>{{chart2_title}}</span>
+                    {% with data=chart2_data title="" id=chart2_id chartType='pie' lengendDisplay='true' limitData=10 legendPosition='right' %}
+                      {% include 'charts/chart.html' %}
+                    {% endwith %}
+                  </div>
+                  <div class='w-6/12 rounded-lg '>
+                    <span class='flex text-sm font-medium '>{{chart3_title}}</span>
+                    {% with data=chart3_data title="" id=chart3_id chartType='pie' lengendDisplay='true' limitData=10 legendPosition='right'%}
+                      {% include 'charts/chart.html' %}
+                    {% endwith %}
+                  </div>
+              </div>
           </div>
-          <div class='w-7/12 min-w-[700px]  flex flex-row border-2 border-black p-2'>
-          <div class='w-6/12 rounded-lg '>
-            <span class='flex text-sm font-medium '>{{chart2_title}}</span>
-            {% with data=chart2_data title="" id=chart2_id chartType='pie' lengendDisplay='true' limitData=10 legendPosition='right' %}
-              {% include 'charts/chart.html' %}
-            {% endwith %}
-          </div>
-          <div class='w-6/12 rounded-lg '>
-            <span class='flex text-sm font-medium '>{{chart3_title}}</span>
-            {% with data=chart3_data title="" id=chart3_id chartType='pie' lengendDisplay='true' limitData=10 legendPosition='right'%}
-              {% include 'charts/chart.html' %}
-            {% endwith %}
-          </div>
-        </div>
-        </div>
       </div>
       
-    {% comment %} </a> {% endcomment %}
+   
 </section>
 
 {% endblock content %}

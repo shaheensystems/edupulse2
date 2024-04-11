@@ -426,7 +426,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                 }
             ]
 
-        context['campus_sample_data']=campus_sample_data
+        # context['campus_sample_data']=campus_sample_data
         pl_student_count_table_data=[
             {'title':"Campus",'data_list':pl_campus_wise_student_count_table_data},
             {'title':"Program",'data_list':pl_program_wise_student_count_table_data},
