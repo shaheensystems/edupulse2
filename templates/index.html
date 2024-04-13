@@ -245,20 +245,22 @@
                   </ul>
                   <div class='mt-10 flex flex-col gap-4'>
                   {% for program in program_wise_sample_attendance_data %}
+                 
                     <div class='w-full flex flex-row  '>
                       <div class='w-1/5 align-middle items-center justify-end flex   text-right pr-2'>{{program.program.temp_id}} </div>
-                      <div class="w-4/5 flex flex-row border-1  border-gray-500" title="Absent:{{ program.attendance_percentage.absent }}, Informed Absent{{ program.attendance_percentage.informed_absent }}, Tardy: {{ program.attendance_percentage.tardy }}, Present:{{ program.attendance_percentage.present }}">
+                      
+                      <div class="w-4/5 flex flex-row border-1  border-gray-500" title="Absent:{{ program.attendance_percentage.absent }}, Informed Absent:{{ program.attendance_percentage.informed_absent }}, Tardy: {{ program.attendance_percentage.tardy }}, Present:{{ program.attendance_percentage.present }}">
                         {% if program.attendance_status %}
-                              <div class=" bg-blue-200 text-center py-2" style="width: {{ program.attendance_percentage.absent }};" t>
+                              <div class=" bg-blue-200 text-center py-2" style="width: {{ program.attendance_percentage.absent }};" >
                                 <span class="text-xs ">{{ program.attendance_percentage.absent }}</span>
                             </div>
-                            <div class=" bg-blue-600 text-center py-2" style="width: {{ program.attendance_percentage.informed_absent }};" title={{ program.attendance_percentage.informed_absent }}>
+                            <div class=" bg-blue-600 text-center py-2" style="width: {{ program.attendance_percentage.informed_absent }};" >
                                 <span class="text-xs ">{{ program.attendance_percentage.informed_absent }}</span>
                             </div>
-                            <div class=" bg-orange-300 text-center py-2" style="width: {{ program.attendance_percentage.tardy }};" title={{ program.attendance_percentage.tardy }}>
+                            <div class=" bg-orange-300 text-center py-2" style="width: {{ program.attendance_percentage.tardy }};" >
                                 <span class="text-xs ">{{ program.attendance_percentage.tardy }}</span>
                             </div>
-                            <div class=" bg-red-600 text-center py-2" style="width: {{ program.attendance_percentage.present }};" title={{ program.attendance_percentage.present }}>
+                            <div class=" bg-red-600 text-center py-2" style="width: {{ program.attendance_percentage.present }};" >
                                 <span class="text-xs ">{{ program.attendance_percentage.present }}</span>
                             </div>
                         {% else %}

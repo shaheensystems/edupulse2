@@ -404,6 +404,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             
             for attendance_count in attendance_counts:
                 attendance_cat= attendance_count['is_present']
+                if attendance_cat=='informed absent':
+                    attendance_cat="informed_absent"
                 count=attendance_count['count']
                 if count>0:
                     attendance_status=True
