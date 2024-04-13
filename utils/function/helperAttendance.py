@@ -243,10 +243,12 @@ def get_attendance_percentage_by_attendances(attendances):
 def get_create_or_update_attendance(student_obj,course_offering_obj,attendance_date,is_present_value,week_number):
     
     from report.models import Attendance,WeeklyReport
-    print(f"Start recording attendance as per detail : {course_offering_obj}-{student_obj} on {attendance_date} is {is_present_value} for week number :{week_number}")
+    # print(f"Start recording attendance as per detail : {course_offering_obj}-{student_obj} on {attendance_date} is {is_present_value} for week number :{week_number}")
   
     if is_present_value.lower() not in [choice[0] for choice in ATTENDANCE_CHOICE]:
+        print(f"Start recording attendance as per detail : {course_offering_obj}-{student_obj} on {attendance_date} is {is_present_value} for week number :{week_number}")
         print("Error: is_present value does not exist in attendance choices :",is_present_value)
+        return
             
     
     
@@ -259,9 +261,9 @@ def get_create_or_update_attendance(student_obj,course_offering_obj,attendance_d
         )
         new_attendance.save()
         
-        print(f"new attendance recorded : {new_attendance} for student :{student_obj}, course Offering:{course_offering_obj} for attendance date :{attendance_date} {new_attendance.is_present}")
+        # print(f"new attendance recorded : {new_attendance} for student :{student_obj}, course Offering:{course_offering_obj} for attendance date :{attendance_date} {new_attendance.is_present}")
         # now generate weekly report
-        print(f"Initialise Weekly report create or update with student :{student_obj}, course Offering:{course_offering_obj} for week number :{week_number}")
+        # print(f"Initialise Weekly report create or update with student :{student_obj}, course Offering:{course_offering_obj} for week number :{week_number}")
         if week_number>0 :
             weekly_report , created=WeeklyReport.objects.get_or_create(
                 student=student_obj,
@@ -271,8 +273,8 @@ def get_create_or_update_attendance(student_obj,course_offering_obj,attendance_d
             weekly_report.save()
             if not weekly_report.sessions.filter(Q(id=new_attendance.id)).exists():
                 weekly_report.sessions.add(new_attendance)
-            else:
-                print("attendance already exits in weekly report")
+            # else:
+            #     print("attendance already exits in weekly report")
             
             weekly_report.save()
     else:

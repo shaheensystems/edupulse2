@@ -36,6 +36,7 @@ from utils.function.helperGetChartData import get_chart_data_program_offerings_s
 
 from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,default_start_and_end_date,filter_data_based_on_date_range
 from utils.function.helperAttendance import get_students_attendance_report_by_students
+from utils.function.helperGetTableData import get_table_data_student_and_enrollment_count_by_programs,get_table_data_student_and_enrollment_count_by_campus_through_program_offerings
 # def home(request):
     
 #     return render(request,'index.html')
@@ -213,57 +214,9 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['staff_profile'] = self.request.user.staff_profile if hasattr(self.request.user, 'staff_profile') else None
 
         
-        # print("current user:", self.request.user.staff_profile)
-        # print("staff profile:", self.request.user.staff_profile)
+        pl_program_wise_student_count_table_data=get_table_data_student_and_enrollment_count_by_programs(programs=programs_for_current_user)
         
-        # program Leader Data 
-        pl_program_wise_student_count_table_data=[]
-        for program in programs_for_current_user:
-            program_data={
-                'title':program.name,
-                # 'student_count': len(program.calculate_total_no_of_student()),
-                'student_count': len(set(program.calculate_total_student_enrollments())),
-                'enrollment_count': len(program.calculate_total_student_enrollments())
-            }
-            pl_program_wise_student_count_table_data.append(program_data)
-        
-        
-        # print("pl_program_student_count_table_data:",pl_program_student_count_table_data)
-        
-        total_student_enrollments=[]
-        
-        for program_offering in program_offerings_for_current_user:
-            student_enrollment=program_offering.calculate_total_student_enrollments()
-            total_student_enrollments.extend(student_enrollment)
-            
-        # print(f" total student enrolled {len(total_student_enrollments)} and total student count is {len(set(total_student_enrollments))}")
-        
-        pl_campus_wise_student_count_table_data=[]
-        # Initialize a dictionary to store enrollments grouped by campus
-        enrollments_by_campus = {}
-
-        # Iterate over each student enrollment
-        for student_enrollment in total_student_enrollments:
-            campus_name = student_enrollment.student.campus.name
-            
-            # Check if the campus already exists in the dictionary
-            if campus_name in enrollments_by_campus:
-                # If the campus exists, append the enrollment to its list
-                enrollments_by_campus[campus_name].append(student_enrollment)
-            else:
-                # If the campus doesn't exist, create a new list with the enrollment
-                enrollments_by_campus[campus_name] = [student_enrollment]
-                    
-        # print("enrollments_by_campus:",enrollments_by_campus)
-        for enrollment in enrollments_by_campus:
-            # print("enrollment :",enrollments_by_campus[enrollment])
-            enrollment_data={
-                'title':enrollment,
-                'student_count': len(set(enrollments_by_campus[enrollment])),    
-                'enrollment_count': len(enrollments_by_campus[enrollment])  
-            }
-            pl_campus_wise_student_count_table_data.append(enrollment_data)
-        
+        pl_campus_wise_student_count_table_data=get_table_data_student_and_enrollment_count_by_campus_through_program_offerings(program_offerings=program_offerings_for_current_user)
         # print("pl_campus_wise_student_count_table_data:",pl_campus_wise_student_count_table_data)
         
         
@@ -434,6 +387,50 @@ class DashboardView(LoginRequiredMixin,TemplateView):
            
         ]
         
+        
+        table_data_student_attendance_details_by_programs=[]
+        for program in programs_for_current_user:
+            
+            students =set(program.calculate_total_student_enrollments())
+            
+            attendances=Attendance.objects.filter(student__in =students).distinct()
+            attendance_counts = attendances.values('is_present').annotate(count=Count('is_present'))
+            
+            total_attendance=attendances.count()
+            
+            attendance_percentage={}
+            
+            attendance_status=False
+            
+            for attendance_count in attendance_counts:
+                attendance_cat= attendance_count['is_present']
+                count=attendance_count['count']
+                if count>0:
+                    attendance_status=True
+                percentage=(count*100)/total_attendance
+                attendance_percentage[attendance_cat]="{:.2%}".format(percentage/100)
+            
+            
+                
+            table_data_student_attendance_details_by_programs.append(
+                    {
+                    'program':program,
+                    'attendance_status':attendance_status,
+                    'attendance_percentage':attendance_percentage
+                    }
+                )
+            
+        
+        print("attendance percentage status:",table_data_student_attendance_details_by_programs)
+                    
+                    
+            
+           
+            
+           
+        
+        
+        
         program_wise_sample_attendance_data=[
             {'program':'program 1' ,
              'attendance_percentage':{
@@ -471,7 +468,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         ]
         
         context['pl_student_count_table_data']=pl_student_count_table_data
-        context['program_wise_sample_attendance_data']=program_wise_sample_attendance_data
+        context['program_wise_sample_attendance_data']=table_data_student_attendance_details_by_programs
         context['attendance_choice']=ATTENDANCE_CHOICE
 
         # Add other necessary context data

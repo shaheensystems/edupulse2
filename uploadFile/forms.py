@@ -30,6 +30,8 @@ class CanvasStatsUploadForm(forms.ModelForm):
 
 
 class BulkAttendanceUploadForm(forms.ModelForm):
+    file_name = forms.FileField(label="Choose bulk attendance Excel file")
+    time_table = forms.FileField(label="Choose timetable CSV file ")
   
     class Meta:
         model = BulkAttendanceUpload

@@ -3,7 +3,7 @@ from report.models import Attendance, CourseResult, WeeklyReport,StudentEnrollme
 
 class AttendanceAdmin(admin.ModelAdmin):
     list_display = ('student', 'program_offering', 'course_offering', 'is_present', 'attendance_date')
-    list_filter = ('student', 'program_offering', 'course_offering', 'is_present', 'attendance_date')
+    list_filter = ('is_present','student', 'program_offering', 'course_offering',  'attendance_date')
     search_fields = ('student__student__first_name', 'student__student__last_name', 'program_offering__program__name', 'course__name')
     
     # Customize the admin change form for the 'Attendance' model if needed

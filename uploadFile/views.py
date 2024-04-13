@@ -20,6 +20,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from utils.function.helperAttendance import get_create_or_update_attendance,get_create_or_update_weekly_report
 
+from utils.function.helperExportFileFormat import export_excel_to_csv
+
 from utils.function.BaseValues_List import ENGAGEMENT_CHOICE, ACTION_CHOICE, FOLLOW_UP_CHOICE
 import pandas as pd
 
@@ -824,7 +826,7 @@ def Upload_bulk_attendance_view(request):
 
                     header = next(reader, None)
                     
-                    print("time table header ",header)
+                    # print("time table header ",header)
                     # Define a dictionary to map header names to variable names
                     header_mappings = {
                                         "unit offer code":"course_offering_code",
@@ -840,22 +842,22 @@ def Upload_bulk_attendance_view(request):
                     
                     
                     for row in reader:
-                        print("header value",header)
-                        print("row value :",row)
+                        # print("header value",header)
+                        # print("row value :",row)
                         if header is not None:
                             for header_name, variable_name in header_mappings.items():
                                 index = header.index(header_name) if header_name in header else -1
                                 if index >= 0:
                                     data[variable_name] = row[index]
                     
-                        print("all time table data:",data)
+                        # print("all time table data:",data)
                         course_offering_code = data['course_offering_code']
                         course_offering_name = data['course_offering_name']
                         lecturer_name = data['lecturer_name']
                         session_day = data['session_day']
                         
                         if session_day:
-                            print("row wise data :",course_offering_code,course_offering_name,lecturer_name,session_day)
+                            # print("row wise data :",course_offering_code,course_offering_name,lecturer_name,session_day)
                             # Find existing entry for course_offering_code in time_table_data
                             existing_entry = next((item for item in time_table_data if item["course_offering_code"] == course_offering_code), None)
                             if existing_entry:
@@ -868,10 +870,10 @@ def Upload_bulk_attendance_view(request):
                                 for i in range(1, existing_entry['session_index']):
                                     session_days.append(existing_entry['sessions'][f"session_{i}"])
                                 session_days.append(session_day)  # Add the new session day
-                                print("before sort :",session_days)
+                                # print("before sort :",session_days)
                              
                                 session_days=sorted(session_days,key=lambda x:days_of_week.index(x))
-                                print("after sort :",session_days)
+                                # print("after sort :",session_days)
                                 # Update the session days in the existing entry
                                 for i, day in enumerate(session_days, start=1):
                                     existing_entry['sessions'][f"session_{i}"] = day
@@ -887,12 +889,17 @@ def Upload_bulk_attendance_view(request):
                                 }
                                 time_table_data.append(new_entry)
 
-                    print("time_table_data:",time_table_data)
+                    # print("time_table_data:",time_table_data)
                         
 
                     
             except Exception as e:
-             print(f'Error opening time table file: {e}')
+               print(f'Error opening time table file: {e}')
+            
+            
+            csv_file_path =export_excel_to_csv(obj.file_name.path)
+            
+            print(csv_file_path)
             
             
             
@@ -903,7 +910,7 @@ def Upload_bulk_attendance_view(request):
                 # # Print the DataFrame to see the data
                 # print(df)
 
-                with open(obj.file_name.path, 'r',encoding='utf-8') as f:
+                with open(csv_file_path, 'r',encoding='utf-8') as f:
                     # Adjust the parsing logic based on the text file format
                     lines = f.readlines()
 
@@ -915,7 +922,8 @@ def Upload_bulk_attendance_view(request):
                     # print("first row data :",data_section[1])
                     header_line=data_section[0]
                     # Split the header line by commas
-                    headers = header_line.split(',')
+                    headers = header_line.split(';')
+                    # print("headers",headers)
 
                     # Create a list to store the generated column headers
                     column_headers = []
@@ -949,10 +957,16 @@ def Upload_bulk_attendance_view(request):
                     # print("all data:",data)  
                     # Process data rows
                     for row in data_section[1:]:  # Skip the header row
-                        print("row :",row)
-                        row_data = row.split(',')
+                        print("initial row wise data for attendance :",row)
+                        
+                        row_data = row.split(';')
+                        # print("new column header",column_headers) 
+                        print("initial row wise data for attendance after split by ;:",row_data)
+                        
                         for header, value in zip(column_headers, row_data):
                             header_index = column_headers.index(header)
+                            # print("header :",header)
+                            # print("value :",value)
                             data[column_headers[header_index]] = value
 
                         # Print the data for debugging
@@ -962,7 +976,7 @@ def Upload_bulk_attendance_view(request):
                         # print("Data W1S2:", data['W1 Session 2'])
                         # print("Data W2S1:", data['W2 Session 1'])
                         # print("Data W2S2:", data['W2 Session 2'])
-                        # print("row data:",data)
+                        print("row data:",data)
                         
                         # process recording attendance start from here 
                         student_id=data['Student ID']
@@ -972,6 +986,7 @@ def Upload_bulk_attendance_view(request):
                         except CourseOffering.DoesNotExist:
                             print(f"error !!! Course offering doesn't exits :{course_offering_id}")
                             
+                            
                         
                         try:
                             # student_obj = get_object_or_404(Student, temp_id=student_id)
@@ -979,6 +994,7 @@ def Upload_bulk_attendance_view(request):
                             
                         except Student.DoesNotExist:
                             print(f"error !!! Student doesn't exits :{student_id}")
+                            
                             
                             
                         if course_offering_obj and student_obj:
@@ -992,54 +1008,63 @@ def Upload_bulk_attendance_view(request):
                             course_starting_week_number = course_offering_start_date.isocalendar()[1]
                             year = course_offering_start_date.year
 
-                            print("Week number of the year for the course offering start date:", course_starting_week_number)
+                            # print("Week number of the year for the course offering start date:", course_starting_week_number)
                                         
                                         
-                            print("CO start Date :",course_offering_obj.start_date)
-                            print(student_id,course_offering_id)
+                            # print("CO start Date :",course_offering_obj.start_date)
+                            # print(student_id,course_offering_id)
                             
-                            print("all data:",data) 
+                            # print("all data:",data) 
                             for key, value in data.items():
                                 week_number=0
                                 session_number=0
                                 
                                 # if key.endswith("Session 1"):
                                 if "Session" in key:
-                                    print("key :",key)
+                                    print("initial row wise data for attendance :",row)
+                                    print("row data:",data)
+                                    print("key :",key ,"and Value :",value)
                                     
                                     # day will be calculated by Course Offering and session
                                     # with week and session and start date we wil find the session date 
                                     if value and value != "NA":
                                         week_number=key.split(" ")[0][1:]
                                         session_number=key.split(" ")[2]
-                                        print("week Number :",week_number)
-                                        print("session Number :",session_number)
-                                        print(key,":",value)
+                                        # print("week Number :",week_number)
+                                        # print("session Number :",session_number)
+                                        # print(key,":",value)
                                         
                                         # value in import sheet has to be changed 
                                         if value == "Informed - Absent" :
                                             is_present_value='Informed Absent'
                                         else:
                                             is_present_value=value
+                                        
+                                        
+                                        if is_present_value.lower() not in ['absent', 'present','tardy','informed absent']:
+                                            print("initial row wise data for attendance :",row)
+                                            print("row data:",data)
+                                            print("key :",key ,"and Value :",value)
 
-                                        print("is Present:",is_present_value)
+                                        # print("is Present:",is_present_value)
+                                        
                                         
                                         for data in time_table_data:
                                             if data['course_offering_code'] == course_offering_obj.temp_id:
-                                                print("related time table  data to course offering ",data)
+                                                # print("related time table  data to course offering ",data)
                                                 session_day=data["sessions"][f"session_{session_number}"]
                                                 session_day_number=days_of_week.index(session_day) + 1
                                             
-                                                print("session day ",session_day ,":",session_day_number)
+                                                # print("session day ",session_day ,":",session_day_number)
                                                 
-                                        print(course_offering_obj)
+                                        # print(course_offering_obj)
                                         # Assuming week_number is already extracted from the key
                                         if week_number.isdigit():
                                             week_number = int(week_number)
                                             
                                             # session week number is actual week number start from 1st jan to find out the exact date for attendance 
                                             session_week_number=course_starting_week_number+week_number-1
-                                            print("session week Number :",session_week_number)
+                                            # print("session week Number :",session_week_number)
                                             # Determine the year and ISO week day number of the Tuesday in the given week number
                                         
                                             
@@ -1047,9 +1072,11 @@ def Upload_bulk_attendance_view(request):
                                             # Calculate the date of the Tuesday
                                             attendance_date = datetime.strptime(f"{year}-W{session_week_number}-{iso_week_day_number}", "%Y-W%W-%w").date()
 
-                                            print(f"Date of {session_day} in week, {session_week_number}, {attendance_date}")
+                                            # print(f"Date of {session_day} in week, {session_week_number}, {attendance_date}")
                                             
                                             # now record attendance in attendance model 
+                                            
+                                                
                                             get_create_or_update_attendance(student_obj=student_obj,
                                                                             course_offering_obj=course_offering_obj,
                                                                             attendance_date=attendance_date,
@@ -1060,110 +1087,110 @@ def Upload_bulk_attendance_view(request):
                                         else:
                                             print("Invalid week number:", week_number)
                                             
-                                if "Engagement" in key:
-                                    print("key :",key)
+                                # if "Engagement" in key:
+                                #     print("key :",key)
                                     
                                     
-                                    if value :
-                                        week_number=key.split(" ")[0][1:]
-                                        print("week Number :",week_number)
-                                        print("Engagement :",key,":",value)
-                                        if week_number.isdigit():
-                                            week_number = int(week_number)
-                                            if value =="NA":
-                                                value="N/A"
-                                            engagement_status=""
-                                            for choice in ENGAGEMENT_CHOICE:
-                                                if value == choice[1]:
-                                                    engagement_status=choice[0]
+                                #     if value :
+                                #         week_number=key.split(" ")[0][1:]
+                                #         print("week Number :",week_number)
+                                #         print("Engagement :",key,":",value)
+                                #         if week_number.isdigit():
+                                #             week_number = int(week_number)
+                                #             if value =="NA":
+                                #                 value="N/A"
+                                #             engagement_status=""
+                                #             for choice in ENGAGEMENT_CHOICE:
+                                #                 if value == choice[1]:
+                                #                     engagement_status=choice[0]
                                             
-                                            if engagement_status == "":
-                                                print(f"Error !!! Engagement Status value :{value} , doesn't not exits in Engagement Choice ")
-                                            else :
+                                #             if engagement_status == "":
+                                #                 print(f"Error !!! Engagement Status value :{value} , doesn't not exits in Engagement Choice ")
+                                #             else :
                                                 
-                                                    get_create_or_update_weekly_report(student_obj=student_obj,
-                                                                                course_offering_obj=course_offering_obj,
-                                                                                week_number=week_number,
-                                                                                engagement_status=engagement_status,
-                                                                                action_status= None,
-                                                                                follow_up_status=None
-                                                                                )
+                                #                     get_create_or_update_weekly_report(student_obj=student_obj,
+                                #                                                 course_offering_obj=course_offering_obj,
+                                #                                                 week_number=week_number,
+                                #                                                 engagement_status=engagement_status,
+                                #                                                 action_status= None,
+                                #                                                 follow_up_status=None
+                                #                                                 )
                                         
-                                        else:
-                                            print("Invalid week number for Engagement Status update :", week_number) 
+                                #         else:
+                                #             print("Invalid week number for Engagement Status update :", week_number) 
                                             
-                                if "Action" in key:
-                                    print("key :",key)
+                                # if "Action" in key:
+                                #     print("key :",key)
                                     
                                     
-                                    if value :
-                                        week_number=key.split(" ")[0][1:]
-                                        print("week Number :",week_number)
-                                        print("Action :",key,":",value)
-                                        if week_number.isdigit():
-                                            week_number = int(week_number)
-                                            if value =="NA":
-                                                value="N/A"
-                                            action_status=""
-                                            for choice in ACTION_CHOICE:
-                                                if value.lower() == choice[1].lower():
-                                                    action_status=choice[0]
+                                #     if value :
+                                #         week_number=key.split(" ")[0][1:]
+                                #         print("week Number :",week_number)
+                                #         print("Action :",key,":",value)
+                                #         if week_number.isdigit():
+                                #             week_number = int(week_number)
+                                #             if value =="NA":
+                                #                 value="N/A"
+                                #             action_status=""
+                                #             for choice in ACTION_CHOICE:
+                                #                 if value.lower() == choice[1].lower():
+                                #                     action_status=choice[0]
                                             
-                                            if action_status == "":
-                                                print(f"Error !!! Action Status value :{value} , doesn't not exits in Action Choice ")
-                                            else :
-                                                    print("Action status :",action_status)
-                                                    get_create_or_update_weekly_report(student_obj=student_obj,
-                                                                                course_offering_obj=course_offering_obj,
-                                                                                week_number=week_number,
-                                                                                engagement_status=None,
-                                                                                action_status= action_status,
-                                                                                follow_up_status=None
-                                                                                )
+                                #             if action_status == "":
+                                #                 print(f"Error !!! Action Status value :{value} , doesn't not exits in Action Choice ")
+                                #             else :
+                                #                     print("Action status :",action_status)
+                                #                     get_create_or_update_weekly_report(student_obj=student_obj,
+                                #                                                 course_offering_obj=course_offering_obj,
+                                #                                                 week_number=week_number,
+                                #                                                 engagement_status=None,
+                                #                                                 action_status= action_status,
+                                #                                                 follow_up_status=None
+                                #                                                 )
                                         
-                                        else:
-                                            print("Invalid week number for Action Status update :", week_number) 
-                                if "Follow Up" in key:
-                                    print("key :",key)
+                                #         else:
+                                #             print("Invalid week number for Action Status update :", week_number) 
+                                # if "Follow Up" in key:
+                                #     print("key :",key)
                                     
                                     
-                                    if value :
-                                        week_number=key.split(" ")[0][1:]
-                                        print("week Number :",week_number)
-                                        print("Follow Up :",key,":",value)
-                                        if week_number.isdigit():
-                                            week_number = int(week_number)
-                                            if value =="NA":
-                                                value="N/A"
-                                            elif value == "Warning Letter - 1":
-                                                value ='Warning Letter 1'
-                                            elif value == "Warning Letter - 2":
-                                                value ='Warning Letter 2'
+                                #     if value :
+                                #         week_number=key.split(" ")[0][1:]
+                                #         print("week Number :",week_number)
+                                #         print("Follow Up :",key,":",value)
+                                #         if week_number.isdigit():
+                                #             week_number = int(week_number)
+                                #             if value =="NA":
+                                #                 value="N/A"
+                                #             elif value == "Warning Letter - 1":
+                                #                 value ='Warning Letter 1'
+                                #             elif value == "Warning Letter - 2":
+                                #                 value ='Warning Letter 2'
                                             
-                                            follow_up_status=""
-                                            for choice in FOLLOW_UP_CHOICE:
-                                                if value.lower() == choice[1].lower():
-                                                    follow_up_status=choice[0]
+                                #             follow_up_status=""
+                                #             for choice in FOLLOW_UP_CHOICE:
+                                #                 if value.lower() == choice[1].lower():
+                                #                     follow_up_status=choice[0]
                                             
-                                            if follow_up_status == "":
-                                                print(f"Error !!! Follow Up Status value :{value} , doesn't not exits in Follow Up Choice ")
-                                            else :
-                                                    print("Follow Up status :",follow_up_status)
-                                                    get_create_or_update_weekly_report(student_obj=student_obj,
-                                                                                course_offering_obj=course_offering_obj,
-                                                                                week_number=week_number,
-                                                                                engagement_status=None,
-                                                                                action_status= None,
-                                                                                follow_up_status=follow_up_status
-                                                                                )
+                                #             if follow_up_status == "":
+                                #                 print(f"Error !!! Follow Up Status value :{value} , doesn't not exits in Follow Up Choice ")
+                                #             else :
+                                #                     print("Follow Up status :",follow_up_status)
+                                #                     get_create_or_update_weekly_report(student_obj=student_obj,
+                                #                                                 course_offering_obj=course_offering_obj,
+                                #                                                 week_number=week_number,
+                                #                                                 engagement_status=None,
+                                #                                                 action_status= None,
+                                #                                                 follow_up_status=follow_up_status
+                                #                                                 )
                                         
-                                        else:
-                                            print("Invalid week number for follow up Status update :", week_number) 
+                                #         else:
+                                #             print("Invalid week number for follow up Status update :", week_number) 
                                         
                                     
                                         
                                             
-                                        #   
+                                #         #   
                             
                         # i+=1
                         
