@@ -15,17 +15,27 @@
                 
                 <div class ='flex flex-col absolute top-0 right-0 p-0 z-50 '> 
                   <div class="flex flex-row  justify-center items-center  bg-gray-100">
-                    <select name="program_offering" id="id_program_offering" class="form-select border-2 border-gray-200 text-xs text-gray-500">
-                        <option value="" class=''>Select Program Offering</option>
-                        {% for offering in program_offerings_for_current_user %}
-                            <option class='text-black ' value="{{ offering.temp_id }}">{{ offering.program.name }}</option>
+                    <select name="program" id="program-dropdown" class="form-select border-2 border-gray-200 text-xs text-gray-500">
+                        <option value="" class=''>Select Program </option>
+                        {% for program in programs_for_current_user %}
+                            <option class='text-black ' value="{{ program.id }}">{{ program.temp_id }}:{{ program.name }}</option>
                         {% endfor %}
                       
                     </select>
                   </div>
                   
                   <div class="flex flex-row  justify-end  mt-2 ">
-                          <select name="course_offering" id="id_course_offering" class="form-select border-2 border-gray-200 text-xs text-gray-500">
+                          <select name="week" id="id_week" class="form-select border-2 border-gray-200 text-xs text-gray-500">
+                          <option value="" class=''>Week</option>
+                        
+                              <option class='text-black ' value="session_1">Week 1 </option>
+                              <option class='text-black ' value="session_1">Week 2 </option>
+                          
+                        
+                      </select>
+                  </div>
+                  <div class="flex flex-row  justify-end  mt-2 ">
+                          <select name="sessiion" id="id_session" class="form-select border-2 border-gray-200 text-xs text-gray-500">
                           <option value="" class=''>Session</option>
                         
                               <option class='text-black ' value="session_1">Session 1 </option>
@@ -67,5 +77,52 @@
       
    
 </section>
+<script>
+  $(document).ready(function (){
+        $('#program-dropdown').change(function() {
+          var programId = $(this).val();
+          console.log("Program ID selected :",programId)
+          updateChartData(programId);
+      });
+        // Function to update chart data
+        function updateChartData(programId) {
+          $.ajax({
+              url: '/',
+              method: 'GET',
+              data: {
+                  program_id: programId
+              },
+              success: function(response) {
+                  // Update chart data based on the response
+                  updateChart('attendance-chart', response.chart_data_attendance_report_attendance);
+                  updateChart('engagement-chart', response.chart_data_attendance_report_engagement);
+                  updateChart('action-chart', response.chart_data_attendance_report_action);
+                  
+                  // Display a success message or handle other actions
+                  console.log(response.message);
+              },
+              error: function(xhr, status, error) {
+                  // Handle errors
+                  console.error(xhr.responseText);
+              }
+          });
+      }
+       // Function to update a chart
+       function updateChart(chartId, newData) {
+        // Code to update the chart using your chart library (e.g., Chart.js, Highcharts, etc.)
+        // Example:
+        // var chart = new Chart(document.getElementById(chartId), { ... });
+        // chart.data = newData;
+        // chart.update();
+    }
+
+
+
+  })
+
+
+
+
+</script>
 
 {% endblock content %}

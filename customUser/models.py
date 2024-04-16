@@ -96,7 +96,7 @@ class Staff(BaseModel):
         verbose_name_plural = "Staff"
 
     def __str__(self):
-        return f"{self.staff.gender} {self.email_id} {self.joining_date} {self.designation}"
+        return f"{self.staff.first_name} {self.staff.last_name} : {self.designation}"
 
 class Student(BaseModel):
     
@@ -130,7 +130,7 @@ class Student(BaseModel):
         
         return student_enrollment_program
 
-
+   
         
         
     def student_is_at_risk_for_last_week_status(self):

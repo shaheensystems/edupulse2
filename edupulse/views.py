@@ -36,7 +36,7 @@ from utils.function.helperGetChartData import get_chart_data_program_offerings_s
 
 from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,default_start_and_end_date,filter_data_based_on_date_range
 from utils.function.helperAttendance import get_students_attendance_report_by_students
-from utils.function.helperGetTableData import get_table_data_student_and_enrollment_count_by_programs,get_table_data_student_and_enrollment_count_by_campus_through_program_offerings
+from utils.function.helperGetTableData import get_table_data_student_and_enrollment_count_by_programs,get_table_data_student_and_enrollment_count_by_campus_through_program_offerings, get_table_data_student_and_enrollment_count_by_lecturer_through_course_offerings
 # def home(request):
     
 #     return render(request,'index.html')
@@ -121,6 +121,10 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['chart_data_student_region']=get_chart_data_student_enrollment_by_region(students=students)
         # context['chart_data_student_region']=get_chart_data_student_enrollment_by_region(students=context['students'])
         
+        # when filter applies for Attendance Engagement and action page data will be change for attendance 
+        # 1. attendance  filter by program 
+        # 2. attendance filter by week , week start from program offering start date 
+        # 3. attendance filter by session , each week has session 1 and session 2 according to the date 
         chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
         
         
@@ -219,7 +223,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         pl_campus_wise_student_count_table_data=get_table_data_student_and_enrollment_count_by_campus_through_program_offerings(program_offerings=program_offerings_for_current_user)
         # print("pl_campus_wise_student_count_table_data:",pl_campus_wise_student_count_table_data)
         
-        
+        pl_course_offerings_wise_student_count_table_data=get_table_data_student_and_enrollment_count_by_lecturer_through_course_offerings(course_offerings=course_offerings_for_current_user)
+        # print("pl_course_offerings_wise_student_count_table_data:",pl_course_offerings_wise_student_count_table_data)
         # temp data for Program Leader : 
         
         campus_sample_data = [
@@ -383,7 +388,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         pl_student_count_table_data=[
             {'title':"Campus",'data_list':pl_campus_wise_student_count_table_data},
             {'title':"Program",'data_list':pl_program_wise_student_count_table_data},
-            {'title':"Lecturer",'data_list':lecturer_sample_data},
+            {'title':"Lecturer",'data_list':pl_course_offerings_wise_student_count_table_data},
            
         ]
         
@@ -423,15 +428,8 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                 )
             
         
-        print("attendance percentage status:",table_data_student_attendance_details_by_programs)
-                    
-                    
-            
-           
-            
-           
-        
-        
+        # print("attendance percentage status:",table_data_student_attendance_details_by_programs)
+  
         
         program_wise_sample_attendance_data=[
             {'program':'program 1' ,
@@ -477,7 +475,30 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
         return context
     
-
+    def get(self,request,*args,**kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttprequest':
+            #AjAX Request
+            program_id=request.GET.get('program_id')
+            print("Program ID selected :",program_id)
+            if program_id:
+                attendances =  self.get_context_data().get('attendances')
+                attendances=attendances.filter(program_offering__program_id=program_id)
+                chart_data_attendance_report_attendance, chart_data_attendance_report_engagement, chart_data_attendance_report_action = get_chart_data_attendance_report(attendances=attendances)
+        
+                response_data = {
+                    'chart_data_attendance_report_attendance': chart_data_attendance_report_attendance,
+                    'chart_data_attendance_report_engagement': chart_data_attendance_report_engagement,
+                    'chart_data_attendance_report_action': chart_data_attendance_report_action,
+                    'message': 'Data updated successfully'
+                }
+                return JsonResponse(response_data)
+            else:
+                return JsonResponse({'error': 'Program ID not provided'}, status=400)
+        
+        else:
+            # Non-AJAX Request
+            # Handle non-AJAX requests here, possibly by rendering a template
+            return super().get(request, *args, **kwargs)
 class ManageAttendanceView(LoginRequiredMixin, TemplateView):
     template_name = 'report/manage_attendance.html'
     context_object_name = 'course_offerings'

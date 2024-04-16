@@ -1,5 +1,6 @@
 def get_table_data_student_and_enrollment_count_by_programs(programs):
     table_data_student_and_enrollment_count_by_programs=[]
+    enrollment_list=[]
     for program in programs:
         program_data={
             'title':program.name,
@@ -7,8 +8,11 @@ def get_table_data_student_and_enrollment_count_by_programs(programs):
             'student_count': len(set(program.calculate_total_student_enrollments())),
             'enrollment_count': len(program.calculate_total_student_enrollments())
         }
+        enrollment_list.extend(program.calculate_total_student_enrollments())
+        
         table_data_student_and_enrollment_count_by_programs.append(program_data)
     
+    print(f"By Program  Enrollment count:{len(enrollment_list)} and student count :{len(set(enrollment_list))} ")
     return table_data_student_and_enrollment_count_by_programs
 
 
@@ -46,3 +50,81 @@ def get_table_data_student_and_enrollment_count_by_campus_through_program_offeri
         table_data_student_and_enrollment_count_by_campus_through_program_offerings.append(enrollment_data)
     
     return table_data_student_and_enrollment_count_by_campus_through_program_offerings
+
+def get_table_data_student_and_enrollment_count_by_course_offerings(course_offerings):
+ 
+    
+    table_data_student_and_enrollment_count_by_campus_through_course_offerings=[]   
+    enrollment_list=[]
+    for course_offering in course_offerings:
+  
+        student_enrollment=course_offering.calculate_total_student_enrollments()
+        enrollment_list.extend(student_enrollment)
+        student_enrollment_list=student_enrollment
+        
+        unique_student_list = set(student_enrollment)
+        
+        enrollment_data={
+            'title':course_offering,
+            # 'student_count': len(enrollments_by_course_offerings[course_offering]),    
+            'student_count': len(unique_student_list),    
+            'enrollment_count': len(student_enrollment_list)  
+        }
+        table_data_student_and_enrollment_count_by_campus_through_course_offerings.append(enrollment_data)
+    
+    
+    print(f"By Course offering   Enrollment count:{len(enrollment_list)} and student count :{len(set(enrollment_list))} ")
+    return table_data_student_and_enrollment_count_by_campus_through_course_offerings
+
+def get_table_data_student_and_enrollment_count_by_lecturer_through_course_offerings(course_offerings):
+    # print(f"student count by course offerings: {get_table_data_student_and_enrollment_count_by_course_offerings(course_offerings)}")
+    table_data_student_and_enrollment_count_by_campus_through_course_offerings=[]
+    lecturer_data=[]
+
+    for course_offering in course_offerings:
+        lecturer_objs=course_offering.staff_course_offering_relations.all()
+        lecturer_name_list=[]
+        for lecturer in lecturer_objs:
+            lecturer_name=lecturer.staff.staff.first_name+" "+lecturer.staff.staff.last_name
+            lecturer_name_list.append(lecturer_name)
+            # [{lecturer_1},{lecturer_2}]
+            
+        # print(f"lecturer name :{lecturer_name_list}")
+        
+        student_enrollment=course_offering.calculate_total_student_enrollments()
+        # print(f"Student Enrollment from course offering : {student_enrollment}")
+        # Convert the list to a tuple before using it as a key
+        lecturer_name_tuple = tuple(lecturer_name_list)
+        
+        # Check if the lecturer already exists in the lecturer_data list
+        lecturer_exists = False
+        
+        for lecturer in lecturer_data:
+            if lecturer['name'] == lecturer_name_tuple:
+                lecturer['enrolled_students'].extend(student_enrollment)
+                # print("enrolled students :",lecturer['enrolled_students'])
+                lecturer_exists = True
+                break
+        
+        if not lecturer_exists:
+            data = {
+                "name": lecturer_name_tuple,
+                "enrolled_students": student_enrollment
+            }
+            lecturer_data.append(data)
+    
+    for data in lecturer_data:
+        # print("Enrolled Students:",data['enrolled_students'])
+        enrollment_data={
+            'title':data['name'],
+            'student_count':  len(set(data['enrolled_students'])),     
+            'enrollment_count': len(data['enrolled_students'])
+        }
+        
+        table_data_student_and_enrollment_count_by_campus_through_course_offerings.append(enrollment_data)
+    # print(table_data_student_and_enrollment_count_by_campus_through_course_offerings)
+    
+    
+    
+    
+    return table_data_student_and_enrollment_count_by_campus_through_course_offerings

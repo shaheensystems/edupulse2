@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from utils.function.helperAttendance import get_attendance_percentage,get_attendance_percentage_by_program,get_attendance_percentage_by_course,get_attendance_percentage_by_program_offering,get_attendance_percentage_by_course_offering,get_attendance_percentage_by_attendances,get_engagement_percentage_by_course,get_engagement_percentage_by_program,get_engagement_percentage_by_course_offering,get_engagement_percentage_by_course_offering_for_student
 from utils.function.helperGetAtRiskStudent import get_no_of_at_risk_students_by_course_offering,get_no_of_at_risk_students_by_program_offering,get_no_of_at_risk_students_by_course,get_no_of_at_risk_students_by_program
-from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program,get_total_no_of_student_by_course, get_all_student_enrollments_by_program, get_all_student_enrollments_by_program_offering
+from utils.function.helperGetTotalNoOfStudents import get_total_no_of_student_by_program,get_total_no_of_student_by_course, get_all_student_enrollments_by_program, get_all_student_enrollments_by_program_offering, get_all_student_enrollments_by_course_offering
 from utils.function.BaseValues_List import OFFERING_CHOICES
 from utils.function.helperGetChartData import get_chart_data_attendance_report
 
@@ -76,21 +76,29 @@ class Program(BaseModel):
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_program(program=self)
     
-
+    def calculate_total_student_enrollments(self,offering_mode='all'):
+        return get_all_student_enrollments_by_program(program=self,offering_mode=offering_mode)
+    
+    def calculate_total_student_enrollments_for_online_program(self,offering_mode='online'):
+        return get_all_student_enrollments_by_program(program=self,offering_mode=offering_mode)
+    
+    def calculate_total_student_enrollments_for_offline_program(self,offering_mode='all'):
+        return get_all_student_enrollments_by_program(program=self,offering_mode=offering_mode)
+    
+    # wrong method getting all value incorrect and repeated 
     def calculate_total_no_of_student(self,offering_mode='all'):
         return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
 
+    # wrong method getting all value incorrect and repeated 
     def calculate_total_no_of_student_for_online_program(self,offering_mode="online"):
 
         return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
-    
+    # wrong method getting all value incorrect and repeated 
     def calculate_total_no_of_student_for_offline_program(self,offering_mode="offline"):
 
         return get_total_no_of_student_by_program(program=self,offering_mode=offering_mode)
    
-    def calculate_total_student_enrollments(self):
-        
-        return get_all_student_enrollments_by_program(program=self)
+    
 
     def __str__(self):
         return f'{self.temp_id}-{self.name}'
@@ -246,6 +254,7 @@ class CourseOffering(BaseModel):
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_course_offering(course_offering=self)
 
+    # dont use this method 
     def calculate_total_no_of_student(self):
         # Assuming you have a reverse relationship from Program to ProgramOffering named 'program_offerings'
         return self.student.count()
@@ -255,15 +264,28 @@ class CourseOffering(BaseModel):
         # print("Students from Program Offering:", students)
         return students
     
+    
+    
+    def calculate_total_student_enrollments(self):
+        
+        return get_all_student_enrollments_by_course_offering(course_offering=self)
+    
+    def list_program_offering(self):
+        student_enrollments=self.student_enrollments.all()
+        program_offerings_list = set()  # Use a set to store unique course offerings
+        for student_enrollment in student_enrollments:
+            program_offering = student_enrollment.program_offering
+            program_offerings_list.add(program_offering)  # Add each course offering to the set
+        
+        # Convert the set back to a list if necessary
+        program_offerings_list = list(program_offerings_list)
+
+
+        return program_offerings_list
+    
     def __str__(self):
         return f'{self.temp_id}-{self.course.name}'
-    
-    
-# class StudentEnrollment(BaseModel):
-#     student=models.ForeignKey(Student, verbose_name=_(""), on_delete=models.CASCADE)
-#     course_offering=models.ForeignKey(CourseOffering, verbose_name=_(""), on_delete=models.CASCADE)
-#     enrollment_status=models.BooleanField(_(""))
-#     result=models.CharField(_(""), max_length=50)
+
     
     
     
@@ -282,45 +304,38 @@ class ProgramOffering(BaseModel):
 
     def calculate_no_at_risk_student_for_last_week(self):
         return get_no_of_at_risk_students_by_program_offering(program_offering=self)
-    
-    
-    
+
     def calculate_total_student_enrollments(self):
-        
         return get_all_student_enrollments_by_program_offering(program_offering=self)
 
         
 
     def list_course_offerings(self):
-      
-            
-        # Fetch all related courses for the program
-        courses = self.program.courses.all()
+        
+        student_enrollments=self.student_enrollments.all()
+        course_offerings_list = set()  # Use a set to store unique course offerings
+        for student_enrollment in student_enrollments:
+            course_offering = student_enrollment.course_offering
+            course_offerings_list.add(course_offering)  # Add each course offering to the set
+        
+        # Convert the set back to a list if necessary
+        course_offerings_list = list(course_offerings_list)
 
-        # Initialize an empty list to store course offerings
-        course_offerings_list = []
-
-        # Iterate over each course and collect course offerings
-        for course in courses:
-            # Fetch course offerings for the current course and extend the list
-            course_offerings = course.course_offerings.all()
-            course_offerings_list.extend(course_offerings)
 
         return course_offerings_list
     
+    
     # this method is incorrect , it will calculate all student based on course Offering no on program offring 
     def calculate_total_no_of_student(self):
-        
         total_students=set()
-        
         student_enrollments=self.student_enrollments.all()
-        
         for student_enrollment in student_enrollments:
             total_students.add(student_enrollment.student)
 
         return total_students
      
     
+    # dont use ths method anymore
     def get_all_students(self):
         students = self.student.all()
         # print("Students from Program Offering:", students)

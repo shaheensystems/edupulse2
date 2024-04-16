@@ -131,7 +131,7 @@ class StudentAdmin(admin.ModelAdmin):
         'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered','fund_source'
         )
     list_filter = (
-        'international_student','student__campus','course_offerings__course','program_offering__program','fund_source',
+        'international_student','student__campus','course_offerings__course','program_offering__program','fund_source','temp_id'
     )
 
     ordering = (
@@ -140,23 +140,19 @@ class StudentAdmin(admin.ModelAdmin):
     search_fields = ('student','joining_date','international_student','remark',
         'enrolled_course','email_id','enrollment_status','passport_number',
         'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered',)
+    
     inlines=[ProgramOfferingInline,CourseOfferingInline]
 
-    def get_programs_offered(self, obj):
-        # print(obj.student.first_name)
-        programs_offered = obj.program_offering.all()
-        # print('program_offered:',programs_offered)
 
-        # for program in programs_offered:
-        #     print("prog object:",program.program.name)
+    def get_programs_offered(self, obj):
+        programs_offered = obj.program_offering.all()
+  
     
         return ', '.join([str(program.program.name) for program in programs_offered])
 
     def get_courses_offered(self, obj):
-        # courses_offered = obj.course_offering.through.objects.filter(student=obj)
+
         courses_offered = obj.course_offerings.all()
-        # print("student name:",obj.student.first_name)
-        # print( f"course name:", {str(course.course.name) for course in courses_offered})
 
         return ', '.join([str(course.course.name) for course in courses_offered])
 

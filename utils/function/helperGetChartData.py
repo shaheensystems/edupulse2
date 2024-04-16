@@ -163,7 +163,8 @@ def get_chart_data_attendance_report(attendances):
         from report.models import WeeklyReport
         absent_attendances_only=attendances.exclude(is_present='present')
         weekly_reports_absent_students=WeeklyReport.objects.filter(sessions__in=absent_attendances_only)
-        weekly_reports_absent_students_not_engaged=weekly_reports_absent_students.filter(Q(engagement='not engaged')|Q(engagement='na')|Q(engagement='n/a'))
+        # weekly_reports_absent_students_not_engaged=weekly_reports_absent_students.filter(Q(engagement='not engaged')|Q(engagement='na')|Q(engagement='n/a'))
+        weekly_reports_absent_students_not_engaged=weekly_reports_absent_students.filter(Q(engagement='not engaged'))
         # print("student count for attendance report all:",attendances.count())
         # print("student count for attendance report engagement:",absent_attendances_only.count())
         # print("student count for attendance report action:",weekly_reports_absent_students_not_engaged.count())

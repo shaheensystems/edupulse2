@@ -199,7 +199,7 @@
             <div class='mt-5 border-b-2 border-gray-300'>
 
               {% if attendances|length > 0 %}
-                  {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Overall Attendance'  chart2_title='Overall Average Engagement Rate Blended'  chart3_title='Absent Engagement Analysis'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
+                  {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Overall Attendance'  chart2_title='Absent Engagement Analysis'  chart3_title='Action Engagement Analysis'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
                     {% include 'components/dashboard/student_attendance_engagement_action_report.html' %}
                   {% endwith %}
                 {% else %}
@@ -262,7 +262,7 @@
                             </div>
                             <div class=" bg-red-600 text-center py-2" style="width: {{ program.attendance_percentage.present }};" >
                                 <span class="text-xs ">{{ program.attendance_percentage.present }}</span>
-                            </div>
+                            </div> 
                         {% else %}
                             <div class=" bg-blue-200 text-center py-2" style="width: 100%;">
                               <span class="text-xs "> No attendnace </span>
