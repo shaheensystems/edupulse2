@@ -53,3 +53,30 @@ ASSESSMENT_CHOICE=[
         ('failed','FAILED'),
         ('re-sit','RE-SIT'),
     ]
+
+
+
+# color choice list for models and css 
+ATTENDANCE_COLOR_CHOICE = {
+    'present': 'bg-green-500',
+    'absent': 'bg-red-500',
+    'informed absent': 'bg-yellow-500',
+    'tardy': 'bg-blue-500'
+}
+LOCALITY_COLOR_CHOICE = {
+    'domestic': 'bg-green-500',
+    'international': 'bg-red-500',
+}
+FINAL_STATUS_COLOR_CHOICE = {
+    'domestic': 'bg-green-500',
+    'international': 'bg-red-500',
+}
+ENGAGEMENT_COLOR_CHOICE = {
+     'na': 'bg-gray-500',
+    'on track canvas': 'bg-blue-500',
+    'on track assessment': 'bg-green-500',
+    'on track learning activity': 'bg-yellow-500',
+    'on track blended': 'bg-purple-500',
+    'not engaged': 'bg-red-500'
+}
+

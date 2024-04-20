@@ -1,0 +1,32 @@
+
+        <table id="id_data_table_student_count"  class="w-full rounded-lg  border-gray-400">
+          <thead class='rounded-lg border-2'>
+              <tr class='bg-gray-200'>
+                  <th class="px-4 py-2 text-left" id='pl_id_student_count_table_title'>{{table_button_name}}</th>
+                  <th class="px-4 py-2 text-center ">Student Count</th>
+                  <th class="px-4 py-2 text-center ">Enrollment Count</th>
+              </tr>
+          </thead>
+          <tbody class='border-2'>
+            
+              
+              {% for data in table_data %}
+              <tr class='w-full'>
+                  <td class="border px-4 py-2 text-left w-2/3">{{ data.title }}</td>
+                  <td class="border px-4 py-2 text-center">{{ data.student_count }}</td>
+                  <td class="border px-4 py-2 text-center">{{ data.enrollment_count }}</td>
+              </tr>
+            
+              {% endfor %}
+              
+          </tbody>
+        
+          <!-- Last row for totals -->
+            <tfoot class="">
+              <tr>
+                  <td class="py-2 px-4"></td>
+                  <td class="py-2 px-4 font-semibold text-center" id="id_total_students_{{ data.title|lower }}"></td>
+                  <td class="py-2 px-4 font-semibold text-center" id="id_total_enrollments_{{ data.title|lower }}"></td>
+              </tr>
+            </tfoot>
+      </table>

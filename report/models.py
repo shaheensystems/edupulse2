@@ -5,18 +5,19 @@ from program.models import ProgramOffering, CourseOffering
 from django.utils import timezone
 from django.db import models
 from datetime import date
+from django.db.models import Count, F
+
+
 
 from utils.function.BaseValues_List import ATTENDANCE_CHOICE, ENGAGEMENT_CHOICE, ACTION_CHOICE, FOLLOW_UP_CHOICE, PERFORMANCE_CHOICE, ASSESSMENT_CHOICE
 
+
+    
+    
 class Attendance(BaseModel):
-    # ATTENDANCE_CHOICE=[
-    #     ('present','Present'),
-    #     ('absent','Absent'),
-    #     ('informed absent','Informed Absent'),
-    #     ('tardy','Tardy'),
-    # ]
-    # this table can be access by teacher for each course and each student to mark attendance
+    
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True,related_name='attendances')
+    
     # program offering will not connect with attendance
     program_offering = models.ForeignKey(ProgramOffering, on_delete=models.CASCADE, null=True, blank=True,related_name='attendances')
     
@@ -26,9 +27,41 @@ class Attendance(BaseModel):
     remark=models.TextField(null=True,blank=True,max_length=255)
     weekly_reports = models.ManyToManyField('WeeklyReport', related_name='attendances')
 
-
+    
+    
+    def get_week_no(self):
+        start_date=self.course_offering.start_date
+        week_no = (self.attendance_date - start_date).days // 7 + 1
+        
+        return week_no
+    
+   
+    def get_session_no(self):
+        # Get the attendance date
+        attendance_date = self.attendance_date
+        
+        # Filter attendances for the same week
+        attendances_same_week = self.course_offering.attendances.filter(attendance_date__week=attendance_date.isocalendar()[1],student=self.student)
+        # Sort the attendances by attendance date
+        attendances_same_week = attendances_same_week.order_by('attendance_date')
+        
+        
+      
+        print("attendance in same week .....",attendances_same_week)
+        for a in attendances_same_week:
+           print(f"attendance date :{a.attendance_date} for student {a.student}:{a.student.student.temp_id}")
+ 
+        # Iterate through the attendances to find the session number
+        session_no = 0
+        for i, attendance in enumerate(attendances_same_week):
+            if attendance == self:
+                session_no = i + 1  # Session number is 1-indexed
+                break
+        
+        return session_no
+    
     class Meta:
-        unique_together = ('student', 'program_offering', 'course_offering','attendance_date')
+        unique_together = ('student', 'course_offering','attendance_date')
 
     def __srt__(self):
         return f"{self.student} - {self.course_offering} - {self.attendance_date}-{self.is_present}"

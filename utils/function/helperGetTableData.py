@@ -1,3 +1,5 @@
+from django.db.models import Q,F,Count
+
 def get_table_data_student_and_enrollment_count_by_programs(programs):
     table_data_student_and_enrollment_count_by_programs=[]
     enrollment_list=[]
@@ -128,3 +130,41 @@ def get_table_data_student_and_enrollment_count_by_lecturer_through_course_offer
     
     
     return table_data_student_and_enrollment_count_by_campus_through_course_offerings
+
+
+def get_table_data_student_attendance_details_by_programs(programs):
+    table_data_student_attendance_details_by_programs=[]
+    for program in programs:
+            from report.models import Attendance
+            
+            students =set(program.calculate_total_student_enrollments())
+            
+            attendances=Attendance.objects.select_related('student').filter(student__in =students).distinct()
+            attendance_counts = attendances.values('is_present').annotate(count=Count('is_present'))
+            
+            total_attendance=attendances.count()
+            
+            attendance_percentage={}
+            
+            attendance_status=False
+            
+            for attendance_count in attendance_counts:
+                attendance_cat= attendance_count['is_present']
+                # if attendance_cat=='informed absent':
+                #     attendance_cat="informed_absent"
+                count=attendance_count['count']
+                if count>0:
+                    attendance_status=True
+                percentage=(count*100)/total_attendance
+                attendance_percentage[attendance_cat]="{:.2%}".format(percentage/100)
+            
+            sorted_attendance_percentage = dict(sorted(attendance_percentage.items()))
+                
+            table_data_student_attendance_details_by_programs.append(
+                    {
+                    'data':program,
+                    'status':attendance_status,
+                    'percentage':sorted_attendance_percentage
+                    }
+                )
+    return table_data_student_attendance_details_by_programs

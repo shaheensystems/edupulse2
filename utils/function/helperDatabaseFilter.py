@@ -71,6 +71,7 @@ def filter_database_based_on_current_user(request_user):
                                                             'attendances__weekly_reports',
                                                             'student__attendances__weekly_reports',
                                                             'student_enrollments__student',
+                                                            'student_enrollments__student__student__campus',
                                                             'student_enrollments__course_offering',
                                                             'staff_program_offering_relations__staff__staff'
                                                       
@@ -110,7 +111,7 @@ def filter_database_based_on_current_user(request_user):
         'student__student_enrollments__program_offering',
         'course_offering__student_enrollments',
         'course_offering__student_enrollments__student',
-        'course_offering__course__program__program_offering',
+        'course_offering__course__program__program_offerings',
         'sessions',
         'sessions__course_offering__course__program',
         
@@ -313,8 +314,8 @@ def default_start_and_end_date():
     default_end_date=end_date
     
 
-    print("Start Date of Current Quarter:", start_date.strftime('%Y-%m-%d'))
-    print("End Date of Current Quarter:", end_date.strftime('%Y-%m-%d'))
+    print("default Start Date of Current Quarter:", start_date.strftime('%Y-%m-%d'))
+    print("default End Date of Current Quarter:", end_date.strftime('%Y-%m-%d'))
     
     # default_end_date = datetime(2024, 3, 31).strftime('%Y-%m-%d')
 
@@ -328,10 +329,14 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
         start_date = default_start_date
     if not end_date:
         end_date=default_end_date
+    
+    
+    
         
     
     # filter data according to start and end date 
     if start_date and end_date:
+        print(f"Start date :{start_date} and end date :{end_date} by date filter form ")
 
         if program_offerings_for_current_user is not None :
             program_offerings_for_current_user=program_offerings_for_current_user.filter(

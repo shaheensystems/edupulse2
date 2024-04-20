@@ -78,6 +78,7 @@ class Program(BaseModel):
     
     def calculate_total_student_enrollments(self,offering_mode='all'):
         return get_all_student_enrollments_by_program(program=self,offering_mode=offering_mode)
+        
     
     def calculate_total_student_enrollments_for_online_program(self,offering_mode='online'):
         return get_all_student_enrollments_by_program(program=self,offering_mode=offering_mode)

@@ -25,21 +25,28 @@
                   </div>
                   
                   <div class="flex flex-row  justify-end  mt-2 ">
-                          <select name="week" id="id_week" class="form-select border-2 border-gray-200 text-xs text-gray-500">
+                          <select name="week" id="week-dropdown" class="form-select border-2 border-gray-200 text-xs text-gray-500">
                           <option value="" class=''>Week</option>
                         
-                              <option class='text-black ' value="session_1">Week 1 </option>
-                              <option class='text-black ' value="session_1">Week 2 </option>
+                              <option class='text-black ' value="1">Week 1 </option>
+                              <option class='text-black ' value="2">Week 2 </option>
+                              <option class='text-black ' value="3">Week 3 </option>
+                              <option class='text-black ' value="4">Week 4 </option>
+                              <option class='text-black ' value="5">Week 5 </option>
+                              <option class='text-black ' value="6">Week 6 </option>
+                              <option class='text-black ' value="7">Week 7 </option>
+                              <option class='text-black ' value="8">Week 8 </option>
+                              <option class='text-black ' value="9">Week 9 </option>
                           
                         
                       </select>
                   </div>
                   <div class="flex flex-row  justify-end  mt-2 ">
-                          <select name="sessiion" id="id_session" class="form-select border-2 border-gray-200 text-xs text-gray-500">
+                          <select name="sessiion" id="session-dropdown" class="form-select border-2 border-gray-200 text-xs text-gray-500">
                           <option value="" class=''>Session</option>
                         
-                              <option class='text-black ' value="session_1">Session 1 </option>
-                              <option class='text-black ' value="session_1">Session 2 </option>
+                              <option class='text-black ' value="1">Session 1 </option>
+                              <option class='text-black ' value="2">Session 2 </option>
                           
                         
                       </select>
@@ -79,27 +86,64 @@
 </section>
 <script>
   $(document).ready(function (){
+        var selectedProgramId =localStorage.getItem('selectedProgramId')
+        var selectedWeekNo =localStorage.getItem('selectedWeekNo')
+        var selectedSessionNo =localStorage.getItem('selectedSessionNo')
+        if(selectedProgramId){
+          console.log("proram from  drop down selected ",selectedProgramId)
+          $('#program-dropdown').val(selectedProgramId)
+        }
+        if(selectedWeekNo){
+          console.log("week number drop down selected ",selectedWeekNo)
+          $('#week-dropdown').val(selectedWeekNo)
+        }
+        if(selectedSessionNo){
+          console.log("session from  drop down selected ",selectedSessionNo)
+          $('#session-dropdown').val(selectedSessionNo)
+        }
+        
+        //when program selected 
         $('#program-dropdown').change(function() {
           var programId = $(this).val();
+          
           console.log("Program ID selected :",programId)
-          updateChartData(programId);
+          localStorage.setItem('selectedProgramId',programId)
+          updateChartData();
       });
+      //when week selected 
+      $('#week-dropdown').change(function(){
+        var weekNo=$(this).val()
+        console.log("Week number selected :",weekNo)
+        localStorage.setItem("selectedWeekNo",weekNo)
+        updateChartData();
+      })
+      $('#session-dropdown').change(function(){
+        var sessionNo=$(this).val()
+        console.log("Session number selected :",sessionNo)
+        localStorage.setItem("selectedSessionNo",sessionNo)
+        updateChartData();
+      })
+
+      //when session selected
+
         // Function to update chart data
-        function updateChartData(programId) {
+        function updateChartData() {
           $.ajax({
-              url: '/',
+            
+              url: '{% url "dashboard" %}',
               method: 'GET',
               data: {
-                  program_id: programId
+                  program_id: localStorage.getItem('selectedProgramId'),
+                  week_no: localStorage.getItem('selectedWeekNo'),
+                  session_no: localStorage.getItem('selectedSessionNo')
               },
               success: function(response) {
                   // Update chart data based on the response
-                  updateChart('attendance-chart', response.chart_data_attendance_report_attendance);
-                  updateChart('engagement-chart', response.chart_data_attendance_report_engagement);
-                  updateChart('action-chart', response.chart_data_attendance_report_action);
+                  $('#dashboard-attendance-engagement-action-container').html(response.html_content);
                   
                   // Display a success message or handle other actions
-                  console.log(response.message);
+                  console.log("Status code :",response.status);
+                  
               },
               error: function(xhr, status, error) {
                   // Handle errors
@@ -107,15 +151,14 @@
               }
           });
       }
-       // Function to update a chart
-       function updateChart(chartId, newData) {
-        // Code to update the chart using your chart library (e.g., Chart.js, Highcharts, etc.)
-        // Example:
-        // var chart = new Chart(document.getElementById(chartId), { ... });
-        // chart.data = newData;
-        // chart.update();
-    }
 
+      // Call updateChartData() if selected values are available on page load
+       // if(selectedProgramId && selectedWeekNo && selectedSessionNo) {
+        //  console.log("Update chart data function load data on first reload ")
+        //  updateChartData();
+      //}
+
+    
 
 
   })

@@ -1,0 +1,72 @@
+<section class='flex justify-center flex-col'>
+<div class ='flex w-1/2  min-w-[700px] flex-row flex-wrap gap-1 justify-center '>
+    {% comment %} {{pl_student_count_table_data}} {% endcomment %}
+
+    {% with pl_student_count_table_data=pl_student_count_table_data %}
+      {% include "components/dashboard/program_leader/components/pl_student_count_table.html" %}
+    
+    {% endwith %}
+
+  </div>
+
+
+   <div class ='flex w-1/2 p-4 min-w-[800px] flex-col justify-center '   >
+    
+    {% with title='Program wise Attendnace - Enrollments' sub_title_choice=attendance_choice data=pl_program_wise_attendance_detail_data student_count_table_title="Campus"  %}
+      {% include "components/dashboard/program_leader/components/pl_student_count_barChart.html" %}
+  
+    {% endwith %}
+   
+  </div> 
+  <script>
+    $(document).ready(function() {
+        // Event handler for button click
+        $('button[id^="id_data_table_button_"]').click(function() {
+            var buttonId = $(this).attr('id');
+            var tableId = $(this).attr('id').replace('id_data_table_button_', 'id_data_table_');
+            // Remove 'text-white bg-blue-100' classes from all buttons
+            $('button[id^="id_data_table_button_"]').removeClass('bg-blue-400 text-white').addClass('bg-gray-100 text-blue-400');
+            $(this).removeClass('bg-gray-100 text-blue-400').addClass('bg-blue-400 text-white');
+                    
+            console.log("button clicked for table data with tableId:",buttonId)
+            
+            // Make AJAX request to fetch data
+            $.ajax({
+                url: '{% url "dashboard-testing" %}',  // Replace '/api/data' with your actual API endpoint
+                method: 'GET',
+                dataType: 'json',
+                data: {
+                    pl_data_table_button_id:buttonId,
+                    pl_id_student_count_table_title:$('#pl_id_student_count_table_title').val()
+                },
+                success: function(response) {
+                    // Update the DOM with fetched data
+
+                    $('#id_student_count_table_container').html(response.html_content_table);
+                    $('#id_student_count_barChart_container').html(response.html_content_barChart);
+
+                    //$(this).removeClass('bg-gray-100 text-blue-400').addClass('bg-blue-400 text-white');
+
+                    //update button color highlight for filter button in barChart data 
+                    $('#id_pl_student_count_barChart_filter_btn_attendance').removeClass('bg-gray-200 text-gray-600').addClass('bg-blue-400 text-white')
+              
+                    // Display a success message or handle other actions
+                    console.log("student coutn table data updated and Status code :",response.status);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        });
+
+           //Event Habdler for filter Button click 
+      
+         
+       
+        
+    });
+    
+</script>
+
+
+</section>

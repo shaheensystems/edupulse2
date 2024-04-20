@@ -1,0 +1,121 @@
+{% comment %} <section class='flex flex-row flex-wrap w-full'> {% endcomment %}
+<section class='flex   flex-col' id='id_student_count_barChart_container'> 
+    <span class='text-left font-semibold text-black text-md '> {{ title }} </span>
+            <ul class ='flex flex-row gap-4 '>
+
+                {% for key, value  in sub_title_choice.items %}
+                        <li > 
+                            <span class="inline-block w-3 h-3 rounded-full  {{ value }} "></span>
+                            {{key}}
+                        <li>
+                {% endfor %}
+            </ul>
+            <div class='mt-10 flex xl:flex-row  flex-col flex-wrap justify-start gap-4 '>
+                <div class='flex flex-col gap-4 min-w-[600px] bg-green-200 '>
+                        {% for data in data %}
+    
+                        
+                            <div class='w-full flex flex-row  '>
+                            <div class='w-1/5 align-middle items-center justify-end flex   text-right pr-2'>{{data.data.temp_id}} </div>
+                            
+                            <div class="w-4/5 flex flex-row border-1  border-gray-500" title="
+                            {% for percentage_key, percentage_value in data.percentage.items %}
+                                {{percentage_key}}:{{percentage_value}}
+                            {% endfor %}
+                            ">
+                                {% if data.status %}
+                                    
+                                    {% for percentage_key, percentage_value in data.percentage.items %}
+                                            <div style="width: {{ percentage_value }}"  class="text-center py-2 min-w-[10px]
+                                            {% for key,value in sub_title_choice.items %}
+                                                {% if key == percentage_key %}
+                                                    {{ value }}
+                                                {% endif %}
+                                            {% endfor %}
+                                            " >
+                                                <span class="text-xs">{{ percentage_value }}</span>
+                                            </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class=" bg-blue-200 text-center py-2" style="width: 100%;">
+                                    <span class="text-xs "> No attendnace </span>
+                                    </div>
+                                
+                                    
+                                {% endif %}
+                                
+                            </div>
+
+                            </div>
+                            
+                        
+                        {% endfor %} 
+                        <div class="flex flex-row justify-between w-4/5 self-end  ">
+                            <span class="text-xs ">0%</span>
+                            <span class="text-xs ">50%</span>
+                            <span class="text-xs ">100%</span>
+                        </div>
+                
+                
+                </div>
+                <!-- Filter Section -->
+                <div class='xl:ml-10 flex 2xl:flex-col flex-row  2xl:gap-0 '>
+                    <div>
+                        <!-- default page load highlighted attenance filter bg-blue-400 text-white-->
+                        <button class="border border-gray-600 bg-blue-400 text-white px-4 py-2  mb-2 " id='id_pl_student_count_barChart_filter_btn_attendance'>Attendnace</button>
+                    </div>
+                    <div>
+                        <button class="border border-gray-600 bg-gray-200 text-gray-600 px-4 py-2  mb-2" id='id_pl_student_count_barChart_filter_btn_final_status'>Final Status</button>
+                    </div>
+                    <div>
+                        <button class="border border-gray-600 bg-gray-200 text-gray-600 px-4 py-2  mb-2" id='id_pl_student_count_barChart_filter_btn_locality'>Locality</button>
+                    </div>
+                    <div>
+                        <button class="border border-gray-600 bg-gray-200 text-gray-600 px-4 py-2  mb-2" id='id_pl_student_count_barChart_filter_btn_engagement'>Engagement</button>
+                    </div>
+                </div>
+
+
+            </div>
+                
+<script>
+    $(document).ready(function(){
+      //event handler for changing barChart data 
+      $('button[id^="id_pl_student_count_barChart_filter_btn_"]').click(function(){
+        
+        var buttonId=$(this).attr('id');
+        var table_title_value='{{student_count_table_title}}';
+       //var table_title_value = $('#pl_id_student_count_table_title').val();
+        console.log("Filter Button clicked for student count barChart by id :",buttonId);
+        console.log("Student Count table Titie :",table_title_value);
+        
+        $.ajax({
+            url:'{% url 'dashboard-testing' %}',
+            method:'GET',
+            dataType:'json',
+            data:{
+                pl_student_count_barChart_id:buttonId,
+                student_count_table_title:'{{student_count_table_title}}'
+            },
+            success: function(response){
+                //update barChart data 
+                console.log("updating data");
+                $('#id_student_count_barChart_container').html(response.html_content_barChart);
+                $('button[id^="id_pl_student_count_barChart_filter_btn_"]').removeClass('bg-blue-400 text-white').addClass('bg-gray-200 text-gray-600');
+                $('#' + buttonId).removeClass('bg-gray-200 text-gray-600').addClass('bg-blue-400 text-white');
+                console.log("student barchart data updated and Status code :",response.status);
+
+            },
+            error :function(xhr,status,error){
+                console.error('Error fetching data :',error);
+            }
+        })
+    });
+
+    
+    })
+
+
+</script>
+
+</section>
