@@ -11,22 +11,22 @@
                 {% endfor %}
             </ul>
             <div class='mt-10 flex xl:flex-row  flex-col flex-wrap justify-start gap-4 '>
-                <div class='flex flex-col gap-4 min-w-[600px] bg-green-200 '>
+                <div class='flex flex-col gap-4 min-w-[600px]  '>
                         {% for data in data %}
     
                         
                             <div class='w-full flex flex-row  '>
                             <div class='w-1/5 align-middle items-center justify-end flex   text-right pr-2'>{{data.data.temp_id}} </div>
                             
-                            <div class="w-4/5 flex flex-row border-1  border-gray-500" title="
+                            <div class="w-4/5 flex flex-row border-1  border-gray-500 bg-yellow-500" title="
                             {% for percentage_key, percentage_value in data.percentage.items %}
-                                {{percentage_key}}:{{percentage_value}}
+                               {{percentage_key}}:{{percentage_value}}
                             {% endfor %}
                             ">
                                 {% if data.status %}
                                     
                                     {% for percentage_key, percentage_value in data.percentage.items %}
-                                            <div style="width: {{ percentage_value }}"  class="text-center py-2 min-w-[10px]
+                                            <div style="width: {{ percentage_value }}"  class="text-center py-2 text-xs min-w-[40px]  
                                             {% for key,value in sub_title_choice.items %}
                                                 {% if key == percentage_key %}
                                                     {{ value }}
@@ -37,7 +37,7 @@
                                             </div>
                                     {% endfor %}
                                 {% else %}
-                                    <div class=" bg-blue-200 text-center py-2" style="width: 100%;">
+                                    <div class=" bg-blue-200 text-center py-2 text-xs" style="width: 100%;">
                                     <span class="text-xs "> No attendnace </span>
                                     </div>
                                 
