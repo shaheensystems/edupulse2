@@ -72,7 +72,7 @@ FINAL_STATUS_COLOR_CHOICE = {
     'international': 'bg-red-500',
 }
 ENGAGEMENT_COLOR_CHOICE = {
-     'na': 'bg-gray-500',
+    'na': 'bg-gray-500',
     'on track canvas': 'bg-blue-500',
     'on track assessment': 'bg-green-500',
     'on track learning activity': 'bg-yellow-500',

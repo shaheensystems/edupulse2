@@ -155,8 +155,11 @@ def get_total_no_of_student_by_course_offerings(course_offerings):
 
 def get_total_unique_no_of_student_by_course_offerings(course_offerings):
     students=set()
-    for course_offering in course_offerings:
-        st_in_course_offering=course_offering.student.all()
-        students.update(st_in_course_offering)
-    
-    return students
+    if course_offerings:
+        for course_offering in course_offerings:
+            st_in_course_offering=course_offering.student.all()
+            students.update(st_in_course_offering)
+        
+        return students
+
+    return None

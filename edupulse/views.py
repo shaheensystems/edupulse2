@@ -191,7 +191,7 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
                     bar_chart_data=[]
                     chart_title='Student table Data not available '
                     
-                chart_subtitle_choice=dict(sorted(ATTENDANCE_COLOR_CHOICE.items()))
+                chart_subtitle_choice=dict(sorted(FINAL_STATUS_COLOR_CHOICE.items()))
                 
                 
             elif pl_student_count_barChart_id=='id_pl_student_count_barChart_filter_btn_locality':
@@ -209,7 +209,7 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
                     bar_chart_data=[]
                     chart_title='Student table Data not available '
                     
-                chart_subtitle_choice=dict(sorted(ATTENDANCE_COLOR_CHOICE.items()))
+                chart_subtitle_choice=dict(sorted(LOCALITY_COLOR_CHOICE.items()))
                 
                 
                 
@@ -229,7 +229,7 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
                     bar_chart_data=[]
                     chart_title='Student table Data not available '
                     
-                chart_subtitle_choice=dict(sorted(ATTENDANCE_COLOR_CHOICE.items()))
+                chart_subtitle_choice=dict(sorted(ENGAGEMENT_COLOR_CHOICE.items()))
                 
                 
                 
@@ -357,26 +357,38 @@ class DashboardView(TemplateView):
         # Construct the query for blended and micro cred offerings
         blended_query = Q(student_enrollments__course_offering__offering_mode='micro cred') | \
                 Q(student_enrollments__course_offering__offering_mode='blended')
-        blended_students=students.filter(blended_query)
-        blended_students=students.exclude(Q(student_enrollments__course_offering__offering_mode = 'online') )
-        online_students=students.filter(Q(student_enrollments__course_offering__offering_mode = 'online') )
-
+        if students:
+            blended_students=students.filter(blended_query)
+            blended_students=students.exclude(Q(student_enrollments__course_offering__offering_mode = 'online') )
+            online_students=students.filter(Q(student_enrollments__course_offering__offering_mode = 'online') )
+        else:
+            blended_students=None
+            online_students=None
+            
+        if blended_students :
+            context['total_students_in_blended_course_offerings']=set(blended_students)
+        else:
+            context['total_students_in_blended_course_offerings']=None
         
-        context['total_students_in_blended_course_offerings']=set(blended_students)
-        context['total_students_in_online_course_offerings']=set(online_students)
+        if online_students:
+            context['total_students_in_online_course_offerings']=set(online_students)
+        else:
+            context['total_students_in_online_course_offerings']=None
 
         
         enrolled_students=[]
         enrolled_students_for_blended_course_offerings=[]
         enrolled_students_for_online_course_offerings=[]
-        for co in course_offerings_for_current_user:
-            for r in co.student_enrollments.all():
-                new_student=r.student
-                if co.offering_mode=='online':
-                    enrolled_students_for_online_course_offerings.append(new_student)
-                else:
-                    enrolled_students_for_blended_course_offerings.append(new_student)
-                enrolled_students.append(new_student)
+        if course_offerings_for_current_user:
+            
+            for co in course_offerings_for_current_user:
+                for r in co.student_enrollments.all():
+                    new_student=r.student
+                    if co.offering_mode=='online':
+                        enrolled_students_for_online_course_offerings.append(new_student)
+                    else:
+                        enrolled_students_for_blended_course_offerings.append(new_student)
+                    enrolled_students.append(new_student)
                 # print(enrolled_students)
         
         
