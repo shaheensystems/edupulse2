@@ -368,7 +368,9 @@ class StaffProgramOfferingRelations(BaseModel):
     program_offering=models.ForeignKey(ProgramOffering, verbose_name='program_offering', on_delete=models.PROTECT,related_name='staff_program_offering_relations')
     
     students_by_campus = models.CharField(verbose_name='campus', max_length=100, choices=CAMPUS_CHOICES, default='all')
-
+    class Meta:
+        # Define unique together constraint
+        unique_together = ('staff', 'program_offering')
 class StaffProgramRelations(BaseModel):
     CAMPUS_CHOICES = [(campus.id, campus.name) for campus in Campus.objects.all()]
     CAMPUS_CHOICES.append(('all', 'All'))  # Append the 'all' choice
@@ -378,4 +380,6 @@ class StaffProgramRelations(BaseModel):
     
     students_by_campus = models.CharField(verbose_name='campus', max_length=100, choices=CAMPUS_CHOICES, default='all')
     
-    
+    class Meta:
+        # Define unique together constraint
+        unique_together = ('staff', 'program')

@@ -51,23 +51,30 @@ def get_all_student_enrollments_by_program(program,offering_mode):
 
 
 def get_all_student_enrollments_by_program_offering(program_offering):
-    total_enrolled_students = []
+    # code increase my query  by 1800
+    from report.models import StudentEnrollment
+    from customUser.models import Student
+    # from django.db.models import Count
     student_enrollments=program_offering.student_enrollments.all()
-    
-    
-    
+    # student_enrollments_by_model_import=StudentEnrollment.objects.select_related('program_offering','student').filter(program_offering=program_offering)
+    #  # Convert querysets to lists for comparison
+    # student_enrollments_list = list(student_enrollments)
+    # student_enrollments_by_model_import_list = list(student_enrollments_by_model_import)
+
+    # # Compare the lists
+    # if student_enrollments_list == student_enrollments_by_model_import_list:
+    #     print("Student enrollment fetched the same result by program offering")
+    # else:
+    #     print("Student enrollment did not fetch the same result by program offering")
+    total_enrolled_students = []
     for student_enrollment in student_enrollments:
         enrolled_student=student_enrollment.student
         total_enrolled_students.append(enrolled_student)
     
-    # print(f"Student Enrollment by Program Offering {program_offering} : Enrollment object {len(student_enrollments)} , student Enrollment :{len(total_enrolled_students)} and student count {len(set(total_enrolled_students))}")  
-    #     print(f"Student enrolled in program offering {program_offering}: { enrolled_student}")
-        
-    # print(f"Total Enrolled students by program Offering {program_offering} :{len(total_enrolled_students)}")
-    # print(f"Total Enrolled students by program Offering {program_offering} :{len(set(total_enrolled_students))}")
-    
-    
+    # return enrolled_students
     return total_enrolled_students
+   
+    
 
 def get_all_student_enrollments_by_course_offering(course_offering):
     total_enrolled_students = []
@@ -159,7 +166,5 @@ def get_total_unique_no_of_student_by_course_offerings(course_offerings):
         for course_offering in course_offerings:
             st_in_course_offering=course_offering.student.all()
             students.update(st_in_course_offering)
-        
-        return students
-
-    return None
+    
+    return students

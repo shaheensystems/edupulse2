@@ -38,7 +38,10 @@ from utils.function.helperGetChartData import get_chart_data_program_offerings_s
 
 from utils.function.helperDatabaseFilter import filter_database_based_on_current_user,get_online_offline_program,default_start_and_end_date,filter_data_based_on_date_range
 from utils.function.helperAttendance import get_students_attendance_report_by_students
-from utils.function.helperGetTableData import get_table_data_student_and_enrollment_count_by_programs,get_table_data_student_and_enrollment_count_by_campus_through_program_offerings, get_table_data_student_and_enrollment_count_by_lecturer_through_course_offerings,get_table_data_student_attendance_details_by_programs
+from utils.function.helperGetTableData import get_table_data_student_and_enrollment_count_by_programs,get_table_data_student_and_enrollment_count_by_campus_through_program_offerings, get_table_data_student_and_enrollment_count_by_lecturer_through_course_offerings,\
+    get_barChart_data_student_attendance_details_by_programs,get_barChart_data_student_at_risk_status_by_programs,\
+    get_barChart_data_student_by_locality_by_programs,get_barChart_data_student_engagement_status_by_programs,\
+    get_barChart_data_student_attendance_details_by_campuses,get_barChart_data_student_at_risk_status_by_campuses
 # def home(request):
     
 #     return render(request,'index.html')
@@ -73,8 +76,10 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
         context['pl_student_count_button_list']=['Campus','Program','Lecturer']
         context['pl_campus_wise_student_count_table_data']=pl_campus_wise_student_count_table_data
         context['pl_student_count_table_data']=pl_student_count_table_data
-        pl_program_wise_attendance_detail_data =get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+        pl_program_wise_attendance_detail_data =get_barChart_data_student_attendance_details_by_programs(programs_for_current_user)
+        pl_campus_wise_attendance_detail_data=get_barChart_data_student_attendance_details_by_campuses(campuses=campuses,program_offerings=program_offerings_for_current_user)
         context['pl_program_wise_attendance_detail_data']=pl_program_wise_attendance_detail_data
+        context['pl_campus_wise_attendance_detail_data']=pl_campus_wise_attendance_detail_data
         context['attendance_choice']=dict(sorted(ATTENDANCE_COLOR_CHOICE.items()))
         return context
     
@@ -107,22 +112,23 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
             if pl_data_table_button_id=='id_data_table_button_campus':
                 table_button_name="Campus"
                 program_offerings_for_current_user = context.get('program_offerings_for_current_user')
+                campuses = context.get('campuses')
                 table_data=get_table_data_student_and_enrollment_count_by_campus_through_program_offerings(program_offerings=program_offerings_for_current_user)
                 programs_for_current_user = context.get('programs_for_current_user')
-                bar_chart_attendance_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                bar_chart_attendance_data=get_barChart_data_student_attendance_details_by_campuses(campuses=campuses,program_offerings=program_offerings_for_current_user)
                 chart_title='Campus wise Attendance - Enrollments'
             elif pl_data_table_button_id=='id_data_table_button_program':
                 table_button_name="Program"
                 programs_for_current_user = context.get('programs_for_current_user')
                 table_data=get_table_data_student_and_enrollment_count_by_programs(programs=programs_for_current_user)
-                bar_chart_attendance_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                bar_chart_attendance_data=get_barChart_data_student_attendance_details_by_programs(programs_for_current_user)
                 chart_title='Program wise Attendance - Enrollments'
             elif pl_data_table_button_id=='id_data_table_button_lecturer':
                 table_button_name="Lecturer"
                 course_offerings_for_current_user=context.get('course_offerings_for_current_user')
                 table_data=get_table_data_student_and_enrollment_count_by_lecturer_through_course_offerings(course_offerings=course_offerings_for_current_user)
                 programs_for_current_user = context.get('programs_for_current_user')
-                bar_chart_attendance_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                bar_chart_attendance_data=get_barChart_data_student_attendance_details_by_programs(programs_for_current_user)
                 chart_title='Lecturer wise Attendance - Enrollments'     
             else:
                 table_button_name=""
@@ -159,14 +165,16 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
         
             if pl_student_count_barChart_id=='id_pl_student_count_barChart_filter_btn_attendance':
                 programs_for_current_user = context.get('programs_for_current_user')
+                program_offerings_for_current_user = context.get('program_offerings_for_current_user')
+                campuses = context.get('campuses')
                 if table_button_name=='Campus':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_attendance_details_by_campuses(campuses=campuses,program_offerings=program_offerings_for_current_user)
                     chart_title='Campus wise Attendance - Enrollments'
                 elif table_button_name=='Program':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_attendance_details_by_programs(programs_for_current_user)
                     chart_title='Program wise Attendance - Enrollments'
                 elif table_button_name=='Lecturer':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_attendance_details_by_programs(programs_for_current_user)
                     chart_title='Lecturer wise Attendance - Enrollments'
                 else:
                     bar_chart_data=[]
@@ -178,14 +186,17 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
                 
             elif pl_student_count_barChart_id=='id_pl_student_count_barChart_filter_btn_final_status':
                 programs_for_current_user = context.get('programs_for_current_user')
+                program_offerings_for_current_user = context.get('program_offerings_for_current_user')
+                campuses = context.get('campuses')
                 if table_button_name=='Campus':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_at_risk_status_by_campuses(campuses=campuses,program_offerings=program_offerings_for_current_user)
+                    chart_title='Program wise Completion Status'
                     chart_title='Campus wise Completion Status'
                 elif table_button_name=='Program':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_at_risk_status_by_programs(programs_for_current_user)
                     chart_title='Program wise Completion Status'
                 elif table_button_name=='Lecturer':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_at_risk_status_by_programs(programs_for_current_user)
                     chart_title='Lecturer wise Completion Status'
                 else:
                     bar_chart_data=[]
@@ -197,13 +208,13 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
             elif pl_student_count_barChart_id=='id_pl_student_count_barChart_filter_btn_locality':
                 programs_for_current_user = context.get('programs_for_current_user')
                 if table_button_name=='Campus':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_by_locality_by_programs(programs_for_current_user)
                     chart_title='Campus wise Student Region'
                 elif table_button_name=='Program':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_by_locality_by_programs(programs_for_current_user)
                     chart_title='Program wise Student Region'
                 elif table_button_name=='Lecturer':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_by_locality_by_programs(programs_for_current_user)
                     chart_title='Lecturer wise Student Region'
                 else:
                     bar_chart_data=[]
@@ -217,13 +228,13 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
             elif pl_student_count_barChart_id=='id_pl_student_count_barChart_filter_btn_engagement':
                 programs_for_current_user = context.get('programs_for_current_user')
                 if table_button_name=='Campus':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_engagement_status_by_programs(programs_for_current_user)
                     chart_title='Campus wise Engagement Status'
                 elif table_button_name=='Program':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_engagement_status_by_programs(programs_for_current_user)
                     chart_title='Program wise Engagement Status'
                 elif table_button_name=='Lecturer':    
-                    bar_chart_data=get_table_data_student_attendance_details_by_programs(programs_for_current_user)
+                    bar_chart_data=get_barChart_data_student_engagement_status_by_programs(programs_for_current_user)
                     chart_title='Lecturer wise Engagement Status'
                 else:
                     bar_chart_data=[]
@@ -264,7 +275,7 @@ class DashboardTestView(LoginRequiredMixin,TemplateView):
         
         return JsonResponse({'error': 'Program ID not provided'}, status=400)
         
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin,TemplateView):
     template_name = 'index.html'
 
     def get_context_data(self, **kwargs):

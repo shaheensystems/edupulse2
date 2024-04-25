@@ -1,18 +1,18 @@
-<section class='flex justify-center flex-col'>
-<div class ='flex w-1/2  min-w-[700px] flex-row flex-wrap gap-1 justify-center '>
-    {% comment %} {{pl_student_count_table_data}} {% endcomment %}
+<section class='flex justify-center flex-row flex-wrap'>
+  <div class ='flex w-1/2  min-w-[700px] flex-row flex-wrap gap-1 justify-center '>
+      {% comment %} {{pl_student_count_table_data}} {% endcomment %}
 
-    {% with pl_student_count_table_data=pl_student_count_table_data %}
-      {% include "components/dashboard/program_leader/components/pl_student_count_table.html" %}
-    
-    {% endwith %}
+      {% with pl_student_count_table_data=pl_student_count_table_data %}
+        {% include "components/dashboard/program_leader/components/pl_student_count_table.html" %}
+      
+      {% endwith %}
 
-  </div>
+    </div>
 
 
    <div class ='flex w-1/2 p-4 min-w-[800px] flex-col justify-center '   >
     
-    {% with title='Program wise Attendnace - Enrollments' sub_title_choice=attendance_choice data=pl_program_wise_attendance_detail_data student_count_table_title="Campus"  %}
+    {% with title='Program wise Attendnace - Enrollments' sub_title_choice=attendance_choice data=pl_campus_wise_attendance_detail_data student_count_table_title="Campus"  %}
       {% include "components/dashboard/program_leader/components/pl_student_count_barChart.html" %}
   
     {% endwith %}
@@ -29,6 +29,8 @@
             $(this).removeClass('bg-gray-100 text-blue-400').addClass('bg-blue-400 text-white');
                     
             console.log("button clicked for table data with tableId:",buttonId)
+            $('#id_student_count_table_container').html('<div class="h-[300px] flex justify-center items-center">Loading...</div>');
+            $('#id_student_count_barChart_container').html('<div class="h-[300px] flex justify-center items-center">Loading...</div>');
             
             // Make AJAX request to fetch data
             $.ajax({

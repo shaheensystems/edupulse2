@@ -118,7 +118,7 @@ class WeeklyReport(BaseModel):
     login_in_on_canvas=models.BooleanField(default=False, blank=True,null=True)
     # at_risk Status
     assessment_status=models.CharField( choices=ASSESSMENT_CHOICE, max_length=255,null=True,blank=True,default="n/a")
-    at_risk=models.BooleanField(default=None,null=True,blank=True)
+    at_risk=models.BooleanField(default=False,null=True,blank=True)
     
     def get_week_number(self):
         start_date=self.course_offering.start_date

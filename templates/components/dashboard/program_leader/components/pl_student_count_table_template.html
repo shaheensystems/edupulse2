@@ -11,8 +11,8 @@
             
               
               {% for data in table_data %}
-              <tr class='w-full'>
-                  <td class="border px-4 py-2 text-left w-2/3">{{ data.title }}</td>
+              <tr class='w-full '>
+                  <td class="border px-4 py-2 text-left w-2/3 ">{{ data.title }}</td>
                   <td class="border px-4 py-2 text-center">{{ data.student_count }}</td>
                   <td class="border px-4 py-2 text-center">{{ data.enrollment_count }}</td>
               </tr>
@@ -25,8 +25,26 @@
             <tfoot class="">
               <tr>
                   <td class="py-2 px-4"></td>
-                  <td class="py-2 px-4 font-semibold text-center" id="id_total_students_{{ data.title|lower }}"></td>
-                  <td class="py-2 px-4 font-semibold text-center" id="id_total_enrollments_{{ data.title|lower }}"></td>
+                  <td class="py-2 px-4 font-semibold text-center" id="id_total_students_count"></td>
+                  <td class="py-2 px-4 font-semibold text-center" id="id_total_enrollments_count"></td>
               </tr>
             </tfoot>
+            <script>
+                $(document).ready(function() {
+                    let totalStudents = 0;
+                    let totalEnrollments = 0;
+                    
+                    // Iterate over each row in the table
+                    $('#id_data_table_student_count tbody tr').each(function() {
+                        let studentCount = parseInt($(this).find('td:eq(1)').text()) || 0;
+                        let enrollmentCount = parseInt($(this).find('td:eq(2)').text()) || 0;
+                        totalStudents += studentCount;
+                        totalEnrollments += enrollmentCount;
+                    });
+            
+                    // Update totals in the footer
+                    $('#id_total_students_count').text(totalStudents);
+                    $('#id_total_enrollments_count').text(totalEnrollments);
+                });
+            </script>
       </table>

@@ -1,11 +1,11 @@
 {% comment %} <section class='flex flex-row flex-wrap w-full'> {% endcomment %}
-<section class='flex   flex-col' id='id_student_count_barChart_container'> 
+<section class='flex   flex-col bg-gray-100' id='id_student_count_barChart_container'> 
     <span class='text-left font-semibold text-black text-md '> {{ title }} </span>
             <ul class ='flex flex-row gap-4 '>
-
+                {% comment %} {{sub_title_choice}} {% endcomment %}
                 {% for key, value  in sub_title_choice.items %}
                         <li > 
-                            <span class="inline-block w-3 h-3 rounded-full  {{ value }} "></span>
+                            <span class="inline-block w-3 h-3 rounded-full  {{ value }} "> </span>
                             {{key}}
                         <li>
                 {% endfor %}
@@ -16,9 +16,11 @@
     
                         
                             <div class='w-full flex flex-row  '>
-                            <div class='w-1/5 align-middle items-center justify-end flex   text-right pr-2'>{{data.data.temp_id}} </div>
+                            <div class='w-1/5 align-middle items-center justify-end flex   text-right pr-2'>{{ data.data.temp_id }}</div>
                             
-                            <div class="w-4/5 flex flex-row border-1  border-gray-500 bg-yellow-500" title="
+                            <div class="w-4/5 flex flex-row border-1  border-gray-500 bg-orange-500  "
+                            
+                            " title="
                             {% for percentage_key, percentage_value in data.percentage.items %}
                                {{percentage_key}}:{{percentage_value}}
                             {% endfor %}
@@ -88,6 +90,8 @@
        //var table_title_value = $('#pl_id_student_count_table_title').val();
         console.log("Filter Button clicked for student count barChart by id :",buttonId);
         console.log("Student Count table Titie :",table_title_value);
+        console.log("updating data....");
+        $('#id_student_count_barChart_container').html('<div class="h-[300px] flex justify-center items-center">Loading...</div>');
         
         $.ajax({
             url:'{% url 'dashboard-testing' %}',
@@ -99,10 +103,11 @@
             },
             success: function(response){
                 //update barChart data 
-                console.log("updating data");
+                console.log("data uploading....");
                 $('#id_student_count_barChart_container').html(response.html_content_barChart);
                 $('button[id^="id_pl_student_count_barChart_filter_btn_"]').removeClass('bg-blue-400 text-white').addClass('bg-gray-200 text-gray-600');
                 $('#' + buttonId).removeClass('bg-gray-200 text-gray-600').addClass('bg-blue-400 text-white');
+                
                 console.log("student barchart data updated and Status code :",response.status);
 
             },

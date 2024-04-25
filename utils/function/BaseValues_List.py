@@ -68,11 +68,11 @@ LOCALITY_COLOR_CHOICE = {
     'international': 'bg-red-500',
 }
 FINAL_STATUS_COLOR_CHOICE = {
-    'domestic': 'bg-green-500',
-    'international': 'bg-red-500',
+    'at risk': 'bg-red-500',
+    'on track': 'bg-green-500',
 }
 ENGAGEMENT_COLOR_CHOICE = {
-    'na': 'bg-gray-500',
+    'na': 'bg-orange-500',
     'on track canvas': 'bg-blue-500',
     'on track assessment': 'bg-green-500',
     'on track learning activity': 'bg-yellow-500',

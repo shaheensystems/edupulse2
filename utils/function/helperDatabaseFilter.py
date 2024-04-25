@@ -73,6 +73,8 @@ def filter_database_based_on_current_user(request_user):
                                                             'student_enrollments__student',
                                                             'student_enrollments__student__student__campus',
                                                             'student_enrollments__course_offering',
+                                                            'student_enrollments__course_offering__student_enrollments',
+                                                            'student_enrollments__course_offering__student_enrollments__student__student',
                                                             'staff_program_offering_relations__staff__staff'
                                                       
 
@@ -85,7 +87,8 @@ def filter_database_based_on_current_user(request_user):
             'course__program__program_offerings',
             'staff_course_offering_relations',
             'staff_course_offering_relations__staff',
-            'student_enrollments__student'
+            'student_enrollments__student',
+            'student_enrollments__student__student'
             # Prefetch('attendance', queryset=Attendance.objects.filter(is_present='present'), to_attr='present_attendance'),
             # Prefetch('attendance', queryset=Attendance.objects.exclude(is_present='present'), to_attr='absent_attendance')
             ).all()
@@ -98,9 +101,11 @@ def filter_database_based_on_current_user(request_user):
                                                                             'course_offerings__course__program',
                                                                             'program_offering', 
                                                                             'program_offering__program', 
+                                                                            'program_offering__student_enrollments', 
                                                                             'student_enrollments',
                                                                             'student_enrollments__course_offering',
                                                                             'student_enrollments__program_offering',
+                                                                            'student_enrollments__program_offering__student',
                                                                             'weekly_reports',
                                                                             'weekly_reports__sessions',
                                                                             ).all()
@@ -117,7 +122,9 @@ def filter_database_based_on_current_user(request_user):
         
         ).all()
     
-    campuses=Campus.objects.all()
+    campuses=Campus.objects.prefetch_related('users',
+                                             'users__student_profile'
+                                             )
 
   
 

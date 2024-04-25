@@ -76,6 +76,17 @@ class Campus(BaseModel):
     def get_total_students_by_ethnicity(self):
         return self.users.values('ethnicities__name').annotate(total=Count('ethnicities__name'))
 
+    # def calculate_total_student_enrollment(self):
+    #     from report.models import StudentEnrollment
+    #     student_enrollments=StudentEnrollment.objects.select_related('student').prefetch_related('student__student').filter(student__student__campus=self)
+    #     return student_enrollments
+    
+    def calculate_total_student_enrolled(self):
+        from report.models import StudentEnrollment
+        from customUser.models import Student
+        student_enrollments=StudentEnrollment.objects.select_related('student').prefetch_related('student__student__student_enrollments').filter(student__student__campus=self)
+        enrolled_students=Student.objects.filter(student_enrollments__in=student_enrollments)
+        return enrolled_students
     
     class Meta:
         verbose_name = "Campus"  # Set the verbose name for the singular form
