@@ -240,7 +240,7 @@ def get_attendance_percentage_by_attendances(attendances):
 
 
 
-def get_create_or_update_attendance(student_obj,course_offering_obj,attendance_date,is_present_value,week_number):
+def get_create_or_update_attendance(student_obj,course_offering_obj,attendance_date,is_present_value,week_number,session_number):
     
     from report.models import Attendance,WeeklyReport
     # print(f"Start recording attendance as per detail : {course_offering_obj}-{student_obj} on {attendance_date} is {is_present_value} for week number :{week_number}")
@@ -257,6 +257,8 @@ def get_create_or_update_attendance(student_obj,course_offering_obj,attendance_d
             course_offering=course_offering_obj,
             student=student_obj,
             attendance_date=attendance_date,
+            week_no=week_number,
+            session_no=session_number,    
             is_present=is_present_value.lower()
         )
         new_attendance.save()
@@ -267,7 +269,7 @@ def get_create_or_update_attendance(student_obj,course_offering_obj,attendance_d
         if week_number>0 :
             weekly_report , created=WeeklyReport.objects.get_or_create(
                 student=student_obj,
-                course_offering=course_offering_obj,
+                course_offering=course_offering_obj,            
                 week_number=week_number
             )
             weekly_report.save()

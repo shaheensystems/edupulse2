@@ -2,7 +2,7 @@ from django.contrib import admin
 from report.models import Attendance, CourseResult, WeeklyReport,StudentEnrollment
 
 class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ('student', 'program_offering', 'course_offering', 'is_present', 'attendance_date','get_week_no','get_session_no')
+    list_display = ('student', 'program_offering', 'course_offering', 'is_present', 'attendance_date','week_no','session_no')
     list_filter = ('is_present','student', 'program_offering', 'course_offering',  'attendance_date')
     search_fields = ('student__student__first_name', 'student__student__last_name', 'program_offering__program__name', 'course__name')
     
@@ -13,13 +13,7 @@ class AttendanceAdmin(admin.ModelAdmin):
         }),
     )
     
-    def get_week_no(self,obj):
-        return obj.get_week_no()
-    get_week_no.short_description ="Week No"
     
-    def get_session_no(self,obj):
-        return obj.get_session_no()
-    get_session_no.short_description="Session No"
     
 
 admin.site.register(Attendance, AttendanceAdmin)

@@ -356,7 +356,10 @@ class StaffCourseOfferingRelations(BaseModel):
     course_offering=models.ForeignKey(CourseOffering, verbose_name='course_offering', on_delete=models.PROTECT,related_name='staff_course_offering_relations')
     
     students_by_campus = models.CharField(verbose_name='campus', max_length=100, choices=CAMPUS_CHOICES, default='all')
-    
+    class Meta:
+        # Define unique together constraint
+        unique_together = ('staff', 'course_offering')
+        
     def __str__(self):
         return f"{self.course_offering}:{self.staff.staff} "
 

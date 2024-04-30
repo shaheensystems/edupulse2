@@ -93,11 +93,19 @@ class StaffProgramRelationInline(admin.StackedInline):
     
 
 class StaffAdmin(admin.ModelAdmin):
-    list_display=('id','staff','joining_date','designation','role','remark',"get_courses_offered","get_programs_offered")
+    list_display=('id','staff','joining_date','designation','role','remark',"get_courses_offered","get_programs_offered",'get_enrolled_students','get_students_count')
 
     inlines=[StaffProgramRelationInline,StaffCourseOfferingRelationInline,StaffProgramOfferingRelationInline]
 
+    def get_enrolled_students(self,obj):
+        enrolled_students=obj.calculate_total_student_enrolled()
+        return len(enrolled_students)
+    get_enrolled_students.short_description="Total Enrollment"
     
+    def get_students_count(self,obj):
+        enrolled_students=obj.calculate_total_student_enrolled()
+        return len(set(enrolled_students))
+    get_students_count.short_description="Total Student "
     
     # inlines=[CourseOfferingStaffInline,ProgramOfferingStaffInline]
     def get_courses_offered(self, obj):

@@ -91,10 +91,29 @@ class Staff(BaseModel):
     designation=models.CharField(max_length=255,choices=Designation_Choice,null=True,blank=True)
     role=models.CharField(max_length=255,null=True,blank=True)
     remark=models.TextField(max_length=1000,null=True,blank=True)
+    
+    
+    def set_temp_id(self,obj):
+        lecturer_name=self.staff.first_name +" "+ self.staff.last_name
+        self.temp_id=lecturer_name
+    
+    def calculate_total_student_enrolled(self):
+        from report.models import StudentEnrollment
+        from customUser.models import Student
+        student_enrollments=StudentEnrollment.objects.select_related('course_offering').prefetch_related('course_offering__staff_course_offering_relations__staff').filter(course_offering__staff_course_offering_relations__staff=self)
+        enrolled_students=Student.objects.prefetch_related('student_enrollments').filter(student_enrollments__in=student_enrollments)
+
+        return enrolled_students
+    
     class Meta:
         verbose_name = "Staff"  # Set the verbose name for the singular form
         verbose_name_plural = "Staff"
 
+    def save(self, *args, **kwargs):
+        # Set temp_id before saving
+        self.set_temp_id()
+        super().save(*args, **kwargs)
+        
     def __str__(self):
         return f"{self.staff.first_name} {self.staff.last_name} : {self.designation}"
 

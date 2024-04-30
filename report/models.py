@@ -26,42 +26,15 @@ class Attendance(BaseModel):
     attendance_date = models.DateField(default=timezone.now, null=True, blank=True)
     remark=models.TextField(null=True,blank=True,max_length=255)
     weekly_reports = models.ManyToManyField('WeeklyReport', related_name='attendances')
+    
+    # new attributes 
+    week_no=models.PositiveIntegerField()
+    session_no=models.PositiveIntegerField()
 
-    
-    
-    def get_week_no(self):
-        start_date=self.course_offering.start_date
-        week_no = (self.attendance_date - start_date).days // 7 + 1
-        
-        return week_no
-    
    
-    def get_session_no(self):
-        # Get the attendance date
-        attendance_date = self.attendance_date
-        
-        # Filter attendances for the same week
-        attendances_same_week = self.course_offering.attendances.filter(attendance_date__week=attendance_date.isocalendar()[1],student=self.student)
-        # Sort the attendances by attendance date
-        attendances_same_week = attendances_same_week.order_by('attendance_date')
-        
-        
-      
-        print("attendance in same week .....",attendances_same_week)
-        for a in attendances_same_week:
-           print(f"attendance date :{a.attendance_date} for student {a.student}:{a.student.student.temp_id}")
- 
-        # Iterate through the attendances to find the session number
-        session_no = 0
-        for i, attendance in enumerate(attendances_same_week):
-            if attendance == self:
-                session_no = i + 1  # Session number is 1-indexed
-                break
-        
-        return session_no
     
     class Meta:
-        unique_together = ('student', 'course_offering','attendance_date')
+        unique_together = ('student', 'course_offering','attendance_date','week_no','session_no')
 
     def __srt__(self):
         return f"{self.student} - {self.course_offering} - {self.attendance_date}-{self.is_present}"

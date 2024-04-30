@@ -78,59 +78,21 @@ def get_table_data_student_and_enrollment_count_by_course_offerings(course_offer
     print(f"By Course offering   Enrollment count:{len(enrollment_list)} and student count :{len(set(enrollment_list))} ")
     return table_data_student_and_enrollment_count_by_campus_through_course_offerings
 
-def get_table_data_student_and_enrollment_count_by_lecturer_through_course_offerings(course_offerings):
-    # print(f"student count by course offerings: {get_table_data_student_and_enrollment_count_by_course_offerings(course_offerings)}")
+def get_table_data_student_and_enrollment_count_by_lecturer(lecturer_qs):
     table_data_student_and_enrollment_count_by_campus_through_course_offerings=[]
-    lecturer_data=[]
-
-    for course_offering in course_offerings:
-        lecturer_objs=course_offering.staff_course_offering_relations.all()
-        lecturer_name_list=[]
-        for lecturer in lecturer_objs:
-            lecturer_name=lecturer.staff.staff.first_name+" "+lecturer.staff.staff.last_name
-            lecturer_name_list.append(lecturer_name)
-            # [{lecturer_1},{lecturer_2}]
-            
-        # print(f"lecturer name :{lecturer_name_list}")
-        
-        student_enrollment=course_offering.calculate_total_student_enrollments()
-        # print(f"Student Enrollment from course offering : {student_enrollment}")
-        # Convert the list to a tuple before using it as a key
-        lecturer_name_tuple = tuple(lecturer_name_list)
-        
-        # Check if the lecturer already exists in the lecturer_data list
-        lecturer_exists = False
-        
-        for lecturer in lecturer_data:
-            if lecturer['name'] == lecturer_name_tuple:
-                lecturer['enrolled_students'].extend(student_enrollment)
-                # print("enrolled students :",lecturer['enrolled_students'])
-                lecturer_exists = True
-                break
-        
-        if not lecturer_exists:
-            data = {
-                "name": lecturer_name_tuple,
-                "enrolled_students": student_enrollment
-            }
-            lecturer_data.append(data)
-    
-    for data in lecturer_data:
+    for lecturer in lecturer_qs:
         # print("Enrolled Students:",data['enrolled_students'])
+        lecturer_name = lecturer.staff.first_name +" "+ lecturer.staff.last_name
         enrollment_data={
-            'title':data['name'],
-            'student_count':  len(set(data['enrolled_students'])),     
-            'enrollment_count': len(data['enrolled_students'])
+            'title':lecturer_name,
+            'student_count':  len(set(lecturer.calculate_total_student_enrolled())),     
+            'enrollment_count': len(lecturer.calculate_total_student_enrolled())
         }
         
         table_data_student_and_enrollment_count_by_campus_through_course_offerings.append(enrollment_data)
-    # print(table_data_student_and_enrollment_count_by_campus_through_course_offerings)
-    
-    
-    
-    
+        
     return table_data_student_and_enrollment_count_by_campus_through_course_offerings
-
+    
 
 # helper function to get sorted  attendance percentage by cat "present, absent, informed absent and tardy "
 
@@ -159,6 +121,29 @@ def get_sorted_attendance_percentage_by_cat_through_students(students):
     sorted_attendance_percentage = dict(sorted(attendance_percentage.items()))
     
     return attendance_status, sorted_attendance_percentage
+
+def get_barChart_data_student_attendance_details_by_lecturer(lecturer_qs,course_offerings):
+    table_data_student_attendance_details_by_lecturer=[]
+    for lecturer in lecturer_qs:
+        
+        # student_enrollments=campus.calculate_total_student_enrollments().filter(users__student_profile__student_enrollments__program_offering__in=program_offerings)    
+        # enrolled_students=lecturer.calculate_total_student_enrolled()
+        enrolled_students=lecturer.calculate_total_student_enrolled().filter(student_enrollments__course_offering__in=course_offerings)
+        
+        students=set(enrolled_students)
+        attendance_status,sorted_attendance_percentage = get_sorted_attendance_percentage_by_cat_through_students(students=students)
+        lecturer_name = lecturer.staff.first_name +" "+ lecturer.staff.last_name
+        print(" lecturer_name:",lecturer_name)
+        table_data_student_attendance_details_by_lecturer.append(
+            
+                {
+                'data':lecturer,
+                'status':attendance_status,
+                'percentage':sorted_attendance_percentage
+                }
+            )
+        print(" table_data_student_attendance_details_by_lecturer:",table_data_student_attendance_details_by_lecturer)
+    return table_data_student_attendance_details_by_lecturer
 
 def get_barChart_data_student_attendance_details_by_campuses(campuses,program_offerings):
     table_data_student_attendance_details_by_campuses=[]
@@ -225,6 +210,25 @@ def get_sorted_at_risk_status_through_students(students):
     sorted_weekly_report_percentage=dict(sorted(weekly_report_percentage.items()))
     return weekly_report_status,sorted_weekly_report_percentage
 
+def get_barChart_data_student_at_risk_status_by_lecturer(lecturer_qs,course_offerings):
+    table_data_student_at_risk_status_by_lecturer=[]
+    for lecturer in lecturer_qs:
+        
+        # student_enrollments=campus.calculate_total_student_enrollments().filter(users__student_profile__student_enrollments__program_offering__in=program_offerings)    
+        enrolled_students=lecturer.calculate_total_student_enrolled().filter(student_enrollments__course_offering__in=course_offerings)
+        
+        students=set(enrolled_students)
+        weekly_report_status,sorted_weekly_report_percentage= get_sorted_at_risk_status_through_students(students=students)
+            
+        table_data_student_at_risk_status_by_lecturer.append(
+                    {
+                    'data':lecturer,
+                    'status':weekly_report_status,
+                    'percentage':sorted_weekly_report_percentage
+                    }
+                )
+    return table_data_student_at_risk_status_by_lecturer
+
 def get_barChart_data_student_at_risk_status_by_campuses(campuses,program_offerings):
     table_data_student_at_risk_status_by_campuses=[]
     for campus in campuses:
@@ -263,34 +267,43 @@ def get_barChart_data_student_at_risk_status_by_programs(programs):
             # print(table_data_student_at_risk_status_by_programs)
     return table_data_student_at_risk_status_by_programs
 
+
+def get_sorted_student_by_locality_through_students(students_set):
+    from customUser.models import Student   
+    # convert into query set for use filter
+    students = Student.objects.filter(id__in=[student.id for student in students_set])
+
+    students_count=students.values('international_student').annotate(international_student_count=Count('international_student'))
+    # print("student Count:",students_count)
+    total_students_count=students.count()
+    students_count_percentage={}
+    students_status=False
+    for students in students_count:
+        students_cat=students['international_student']
+        if students_cat == True:
+            students_cat="international"
+        elif students_cat == False:
+            students_cat="domestic"
+        else :
+            students_cat="unknown"
+        count=students['international_student_count']
+        if count >0:
+            students_status=True
+        percentage=(count*100)/total_students_count
+        students_count_percentage[students_cat]="{:.2%}".format(percentage/100)
+        
+    sorted_student_count_percentage=dict(sorted(students_count_percentage.items()))  
+    
+    return students_status,sorted_student_count_percentage
+
 def get_barChart_data_student_by_locality_by_programs(programs):
     table_data_student_by_locality_by_programs=[]
     for program in programs:
-            from report.models import WeeklyReport
-            from customUser.models import Student            
+       
             students_set =set(program.calculate_total_student_enrollments())
-            students = Student.objects.filter(id__in=[student.id for student in students_set])
+            
+            students_status,sorted_student_count_percentage=get_sorted_student_by_locality_through_students(students_set=students_set)
 
-            students_count=students.values('international_student').annotate(international_student_count=Count('international_student'))
-            total_students_count=students.count()
-            students_count_percentage={}
-            students_status=False
-            for students in students_count:
-                students_cat=students['international_student']
-                if students_cat == True:
-                    students_cat="international"
-                elif students_cat == False:
-                    students_cat="domestic"
-                else :
-                    students_cat="unknown"
-                count=students['international_student_count']
-                if count >0:
-                    students_status=True
-                percentage=(count*100)/total_students_count
-                students_count_percentage[students_cat]="{:.2%}".format(percentage/100)
-                
-            sorted_student_count_percentage=dict(sorted(students_count_percentage.items()))  
-  
             table_data_student_by_locality_by_programs.append(
                     {
                     'data':program,
@@ -301,37 +314,72 @@ def get_barChart_data_student_by_locality_by_programs(programs):
             # print(table_data_student_by_locality_by_programs)
     return table_data_student_by_locality_by_programs
 
+def get_barChart_data_student_by_locality_by_lecturer(lecturer_qs,course_offerings):
+    table_data_student_by_locality_by_lecturer=[]
+    for lecturer in lecturer_qs:
+        
+        # student_enrollments=campus.calculate_total_student_enrollments().filter(users__student_profile__student_enrollments__program_offering__in=program_offerings)    
+        enrolled_students=lecturer.calculate_total_student_enrolled().filter(student_enrollments__course_offering__in=course_offerings)
+        
+        students_set=set(enrolled_students)
+        students_status,sorted_student_count_percentage=get_sorted_student_by_locality_through_students(students_set=students_set)
+   
+        table_data_student_by_locality_by_lecturer.append(
+                    {
+                    'data':lecturer,
+                    'status':students_status,
+                    'percentage':sorted_student_count_percentage
+                    }
+                )
+    return table_data_student_by_locality_by_lecturer
+
+def get_barChart_data_student_by_locality_by_campuses(campuses,program_offerings):
+    table_data_student_by_locality_by_campuses=[]
+    for campus in campuses:
+        
+        # student_enrollments=campus.calculate_total_student_enrollments().filter(users__student_profile__student_enrollments__program_offering__in=program_offerings)    
+        enrolled_students=campus.calculate_total_student_enrolled().filter(student_enrollments__program_offering__in=program_offerings)
+        
+        students_set=set(enrolled_students)
+        students_status,sorted_student_count_percentage=get_sorted_student_by_locality_through_students(students_set=students_set)
+   
+        table_data_student_by_locality_by_campuses.append(
+                    {
+                    'data':campus,
+                    'status':students_status,
+                    'percentage':sorted_student_count_percentage
+                    }
+                )
+    return table_data_student_by_locality_by_campuses
+
+def get_sorted_student_by_engagement_through_students(students_set):
+    from report.models import WeeklyReport
+    students=students_set
+    weekly_reports=WeeklyReport.objects.select_related('student').filter(student__in=students).distinct()
+    weekly_report_count=weekly_reports.values('engagement').annotate(engagement_count=Count('engagement'))
+    total_weekly_reports=weekly_reports.count()
+    # print('weekly_report_count:',weekly_report_count)
+    # print('total_weekly_reports:',total_weekly_reports)
+    
+    weekly_report_percentage={}
+    weekly_report_status=False
+    for weekly_report in weekly_report_count:
+        weekly_report_cat=weekly_report['engagement']
+       
+        count=weekly_report['engagement_count']
+        if count>0:
+            weekly_report_status=True
+        percentage=(count*100)/total_weekly_reports
+        weekly_report_percentage[weekly_report_cat]="{:.2%}".format(percentage/100)
+    sorted_weekly_report_percentage=dict(sorted(weekly_report_percentage.items()))
+    return weekly_report_status, sorted_weekly_report_percentage
+
+
 def get_barChart_data_student_engagement_status_by_programs(programs):
     table_data_student_engagement_status_by_programs=[]
     for program in programs:
-            from report.models import WeeklyReport
-            
-            students =set(program.calculate_total_student_enrollments())
-            weekly_reports=WeeklyReport.objects.select_related('student').filter(student__in=students).distinct()
-            weekly_report_count=weekly_reports.values('engagement').annotate(engagement_count=Count('engagement'))
-            total_weekly_reports=weekly_reports.count()
-            # print('weekly_report_count:',weekly_report_count)
-            # print('total_weekly_reports:',total_weekly_reports)
-            
-            weekly_report_percentage={}
-            weekly_report_status=False
-            for weekly_report in weekly_report_count:
-                weekly_report_cat=weekly_report['engagement']
-                # if weekly_report_cat == True:
-                #     weekly_report_cat = 'at risk'
-                # elif weekly_report_cat == False:
-                #     weekly_report_cat = 'on track'
-                
-                    
-                    
-                count=weekly_report['engagement_count']
-                if count>0:
-                    weekly_report_status=True
-                percentage=(count*100)/total_weekly_reports
-                weekly_report_percentage[weekly_report_cat]="{:.2%}".format(percentage/100)
-            sorted_weekly_report_percentage=dict(sorted(weekly_report_percentage.items()))
-           
-                
+            students_set =set(program.calculate_total_student_enrollments())
+            weekly_report_status, sorted_weekly_report_percentage=get_sorted_student_by_engagement_through_students(students_set)
             table_data_student_engagement_status_by_programs.append(
                     {
                     'data':program,
@@ -341,3 +389,42 @@ def get_barChart_data_student_engagement_status_by_programs(programs):
                 )
             # print('table_data_student_engagement_status_by_programs:',table_data_student_engagement_status_by_programs)
     return table_data_student_engagement_status_by_programs
+
+def get_barChart_data_student_engagement_status_by_courses(campuses,program_offerings):
+    table_data_student_engagement_status_by_campuses=[]
+    for campus in campuses:
+        
+        # student_enrollments=campus.calculate_total_student_enrollments().filter(users__student_profile__student_enrollments__program_offering__in=program_offerings)    
+        enrolled_students=campus.calculate_total_student_enrolled().filter(student_enrollments__program_offering__in=program_offerings)
+        
+        students_set=set(enrolled_students)
+        weekly_report_status, sorted_weekly_report_percentage=get_sorted_student_by_engagement_through_students(students_set)
+   
+        table_data_student_engagement_status_by_campuses.append(
+                    {
+                    'data':campus,
+                    'status':weekly_report_status,
+                    'percentage':sorted_weekly_report_percentage
+                    }
+                )
+    return table_data_student_engagement_status_by_campuses
+
+def get_barChart_data_student_engagement_status_by_lecturer(lecturer_qs,course_offerings):
+    table_data_student_engagement_status_by_lecturer=[]
+    for lecturer in lecturer_qs:
+        
+        # student_enrollments=campus.calculate_total_student_enrollments().filter(users__student_profile__student_enrollments__program_offering__in=program_offerings)    
+        enrolled_students=lecturer.calculate_total_student_enrolled().filter(student_enrollments__course_offering__in=course_offerings)
+        
+        students_set=set(enrolled_students)
+        weekly_report_status, sorted_weekly_report_percentage=get_sorted_student_by_engagement_through_students(students_set)
+   
+        table_data_student_engagement_status_by_lecturer.append(
+                    {
+                    'data':lecturer,
+                    'status':weekly_report_status,
+                    'percentage':sorted_weekly_report_percentage
+                    }
+                )
+    return table_data_student_engagement_status_by_lecturer
+

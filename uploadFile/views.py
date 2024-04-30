@@ -1092,7 +1092,9 @@ def Upload_bulk_attendance_view(request):
                                                                             course_offering_obj=course_offering_obj,
                                                                             attendance_date=attendance_date,
                                                                             is_present_value=is_present_value,
-                                                                            week_number=week_number)
+                                                                            week_number=week_number,
+                                                                            session_number=session_number
+                                                                            )
                                             
                                             
                                         else:

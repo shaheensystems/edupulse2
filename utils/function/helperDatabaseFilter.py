@@ -1,6 +1,6 @@
 from program.models import Program,Course,ProgramOffering,CourseOffering
 from report.models import Attendance,WeeklyReport
-from customUser.models import Student
+from customUser.models import Student,Staff
 from base.models import Campus
 from django.db.models import Q
 from datetime import datetime, timedelta
@@ -125,7 +125,14 @@ def filter_database_based_on_current_user(request_user):
     campuses=Campus.objects.prefetch_related('users',
                                              'users__student_profile'
                                              )
-
+    lecturer=Staff.objects.select_related('staff').prefetch_related(
+                                                                    'staff_course_offering_relations',
+                                                                    'staff_program_offering_relations',
+                                                                    'staff_program_relations',
+                                                                    'staff_course_offering_relations__course_offering',
+                                                                    'staff_program_offering_relations__program_offering',
+                                                                    'staff_program_relations__program'
+                                                                    )
   
 
     if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
@@ -150,6 +157,7 @@ def filter_database_based_on_current_user(request_user):
         courses_for_current_user=courses
         students=students
         all_programs=program_offerings_for_current_user
+        lecturer_qs_for_current_user=lecturer
 
         attendances = attendances.select_related('course_offering','program_offering','student').prefetch_related('weekly_reports').order_by('course_offering').filter(student__in=students).distinct()
         weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user).distinct()
@@ -165,12 +173,13 @@ def filter_database_based_on_current_user(request_user):
          # programs_for_current_user=None
         programs_for_current_user=programs.filter(staff_program_relations__staff__staff=request_user)
         courses_for_current_user=None
-        
+       
         # program_offerings_for_current_user=program_offerings.filter(staff_program_offering_relations__staff__staff=request_user)
         program_offerings_for_current_user=program_offerings.filter(program__in=programs_for_current_user).distinct()
         
         course_offerings_for_current_user=course_offerings.filter(course__program__program_offerings__in=program_offerings_for_current_user).distinct()
         
+        lecturer_qs_for_current_user=lecturer.filter(staff_course_offering_relations__course_offering__in=course_offerings_for_current_user).distinct()
         
         students=students.filter(student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
         # students=students.filter(student_enrollments__program_offering__in=program_offerings_for_current_user).distinct()
@@ -195,6 +204,7 @@ def filter_database_based_on_current_user(request_user):
         students=students
         attendances=attendances
         campuses=campuses
+        lecturer_qs_for_current_user=None
         program_offerings_for_current_user=program_offerings.filter(staff_program_offering_relations__staff__staff=request_user)
         course_offerings_for_current_user=course_offerings.filter(staff_course_offering_relations__staff__staff=request_user)
         # students=students.filter(course_offerings__teacher__staff=request_user)
@@ -221,6 +231,7 @@ def filter_database_based_on_current_user(request_user):
         all_programs=None
         weekly_reports=None
         campuses=None
+        lecturer_qs_for_current_user=None
      # Return the filtered data
     return {
         'program_offerings_for_current_user': program_offerings_for_current_user,
@@ -232,6 +243,7 @@ def filter_database_based_on_current_user(request_user):
         'all_programs': all_programs,
         'weekly_reports':weekly_reports,
         'campuses':campuses,
+        'lecturer_qs_for_current_user':lecturer_qs_for_current_user,
         
     }
 
