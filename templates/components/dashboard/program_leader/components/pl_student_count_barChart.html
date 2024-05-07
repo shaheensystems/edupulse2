@@ -99,7 +99,7 @@
         $('#id_student_count_barChart_container').html('<div class="h-[300px] flex justify-center items-center">Loading...</div>');
         
         $.ajax({
-            url:'{% url 'dashboard-testing' %}',
+            url:'{% url 'dashboard' %}',
             method:'GET',
             dataType:'json',
             data:{

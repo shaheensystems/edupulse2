@@ -25,6 +25,7 @@ class ProgramAndCourseType(models.Model):
 
 class Program(BaseModel):
     name=models.CharField(max_length=255,null=True,blank=True)
+    
     description=models.CharField(max_length=255,null=True,blank=True)
     key_components=models.CharField(max_length=255,null=True,blank=True)
     program_link = models.URLField(max_length=255, null=True, blank=True)
@@ -106,6 +107,7 @@ class Program(BaseModel):
 
 class Course(BaseModel):
     name=models.CharField(max_length=255,null=True,blank=True)
+    
     description=models.CharField(max_length=255,null=True,blank=True)
     key_components=models.CharField(max_length=255,null=True,blank=True)
     program_link = models.URLField(max_length=255, null=True, blank=True)
@@ -155,6 +157,7 @@ class CourseOffering(BaseModel):
     # ]
 
     course=models.ForeignKey(Course, verbose_name=("course"), on_delete=models.CASCADE,null=True,blank=True,related_name='course_offerings')
+    
     start_date=models.DateField( auto_now=False, auto_now_add=False)
     end_date=models.DateField( auto_now=False, auto_now_add=False)
     remark=models.TextField(max_length=255,blank=True,null=True)
@@ -293,6 +296,7 @@ class CourseOffering(BaseModel):
     
 class ProgramOffering(BaseModel):
     program=models.ForeignKey(Program, verbose_name=("program"), on_delete=models.CASCADE,null=True,blank=True,related_name="program_offerings")
+    
     start_date=models.DateField( auto_now=False, auto_now_add=False)
     end_date=models.DateField( auto_now=False, auto_now_add=False)
     remark=models.TextField(max_length=255,blank=True,null=True)
@@ -348,11 +352,10 @@ class ProgramOffering(BaseModel):
 
    
 
+CAMPUS_CHOICES = [(campus.id, campus.name) for campus in Campus.objects.all()]
+CAMPUS_CHOICES.append(('all', 'All'))  # Append the 'all' choice
 class StaffCourseOfferingRelations(BaseModel):
-    CAMPUS_CHOICES = [(campus.id, campus.name) for campus in Campus.objects.all()]
-    CAMPUS_CHOICES.append(('all', 'All'))  # Append the 'all' choice
-    
-    staff=models.ForeignKey(Staff, verbose_name='staff', on_delete=models.PROTECT, related_name='staff_course_offering_relations')
+    staff=models.ForeignKey(Staff, verbose_name='staff', on_delete=models.CASCADE, related_name='staff_course_offering_relations')
     course_offering=models.ForeignKey(CourseOffering, verbose_name='course_offering', on_delete=models.PROTECT,related_name='staff_course_offering_relations')
     
     students_by_campus = models.CharField(verbose_name='campus', max_length=100, choices=CAMPUS_CHOICES, default='all')
@@ -364,8 +367,7 @@ class StaffCourseOfferingRelations(BaseModel):
         return f"{self.course_offering}:{self.staff.staff} "
 
 class StaffProgramOfferingRelations(BaseModel):
-    CAMPUS_CHOICES = [(campus.id, campus.name) for campus in Campus.objects.all()]
-    CAMPUS_CHOICES.append(('all', 'All'))  # Append the 'all' choice
+
     
     staff=models.ForeignKey(Staff, verbose_name='staff', on_delete=models.PROTECT, related_name='staff_program_offering_relations')
     program_offering=models.ForeignKey(ProgramOffering, verbose_name='program_offering', on_delete=models.PROTECT,related_name='staff_program_offering_relations')
@@ -375,8 +377,7 @@ class StaffProgramOfferingRelations(BaseModel):
         # Define unique together constraint
         unique_together = ('staff', 'program_offering')
 class StaffProgramRelations(BaseModel):
-    CAMPUS_CHOICES = [(campus.id, campus.name) for campus in Campus.objects.all()]
-    CAMPUS_CHOICES.append(('all', 'All'))  # Append the 'all' choice
+
     
     staff=models.ForeignKey(Staff, verbose_name='staff', on_delete=models.PROTECT, related_name='staff_program_relations')
     program=models.ForeignKey(Program, verbose_name='program', on_delete=models.PROTECT,related_name='staff_program_relations')

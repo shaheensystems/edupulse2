@@ -20,7 +20,7 @@ from django.urls import path,include
 from django.conf.urls.static import static
 
 
-from .views import DashboardView, ManageAttendanceView,SaveWeeklyReportsView, DashboardTestView
+from .views import DashboardView, ManageAttendanceView,SaveWeeklyReportsView, DashboardTestView,StudentAttendanceReport
 
 urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
@@ -31,6 +31,7 @@ urlpatterns = [
   
     path('manage-attendance/', ManageAttendanceView.as_view(),name='manage-attendance'),
     path('save-weekly-reports/', SaveWeeklyReportsView.as_view(), name='save_weekly_reports'),
+    path('student-attendance-report/', StudentAttendanceReport.as_view(), name='student_attendance_report'),
     path('wc_current_programs/',include('program.urls')),
     path('attendance/',include('attendance.urls')),
     path('user/',include('customUser.urls')),

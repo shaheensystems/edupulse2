@@ -1,3 +1,4 @@
+from base.models import Campus 
 # for attendance model 
 ATTENDANCE_CHOICE=[
         ('present','Present'),

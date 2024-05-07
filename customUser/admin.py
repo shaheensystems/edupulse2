@@ -120,7 +120,7 @@ class StaffAdmin(admin.ModelAdmin):
     def get_programs_offered(self, obj):
         # print(obj.student.first_name)
         programs_offered = obj.staff_program_relations.all()
-        print('program_offered:',programs_offered)
+        # print('program_offered:',programs_offered)
         
 
         # for program in programs_offered:
@@ -134,24 +134,36 @@ class StaffAdmin(admin.ModelAdmin):
 
 class StudentAdmin(admin.ModelAdmin):
     list_display=(
-        'id','student','joining_date','international_student','remark',
+        'id','temp_id','student','joining_date','international_student','remark',
         'enrolled_course','email_id','enrollment_status','passport_number',
         'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered','fund_source'
         )
     list_filter = (
-        'international_student','student__campus','course_offerings__course','program_offering__program','fund_source','temp_id'
+        'international_student','student_enrollments__course_offering__course','student_enrollments__program_offering__program','fund_source','temp_id',
+        'student__campus'
     )
 
+    # ordering with program and course cause repeated value in list 
+    # ordering = (
+    #     'program_offering__program__name', 'id','course_offerings__course__name', 
+    # )
     ordering = (
-        'program_offering__program__name', 'id','course_offerings__course__name', 
+        'student_enrollments__program_offering__program','id' 
     )
-    search_fields = ('student','joining_date','international_student','remark',
-        'enrolled_course','email_id','enrollment_status','passport_number',
-        'visa_number','visa_expiry_date','get_programs_offered', 'get_courses_offered',)
+    search_fields = ('temp_id',)
     
     inlines=[ProgramOfferingInline,CourseOfferingInline]
 
-
+    # def get_search_results(self, request, queryset, search_term):
+    #     queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+    #     try:
+    #         # Perform a case-insensitive search on the student's name
+    #         queryset |= self.model.objects.filter(student__temp_id__icontains=search_term)
+    #     except ValueError:
+    #         # Handle the case when search_term is empty or invalid
+    #         pass
+    #     return queryset, use_distinct
+    
     def get_programs_offered(self, obj):
         programs_offered = obj.program_offering.all()
   

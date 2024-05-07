@@ -93,9 +93,15 @@ class Staff(BaseModel):
     remark=models.TextField(max_length=1000,null=True,blank=True)
     
     
-    def set_temp_id(self,obj):
-        lecturer_name=self.staff.first_name +" "+ self.staff.last_name
-        self.temp_id=lecturer_name
+    def set_temp_id(self):
+        if self.staff.first_name and self.staff.last_name:
+            
+            lecturer_name=self.staff.first_name +" "+ self.staff.last_name
+            self.temp_id=f"{self.staff.first_name} {self.staff.last_name}"
+        else:
+            if self.staff.first_name:
+                self.temp_id=f"{self.staff.first_name}"
+                
     
     def calculate_total_student_enrolled(self):
         from report.models import StudentEnrollment
@@ -115,7 +121,7 @@ class Staff(BaseModel):
         super().save(*args, **kwargs)
         
     def __str__(self):
-        return f"{self.staff.first_name} {self.staff.last_name} : {self.designation}"
+        return f"{self.staff.first_name} {self.staff.last_name}"
 
 class Student(BaseModel):
     

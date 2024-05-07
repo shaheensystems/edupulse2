@@ -123,7 +123,7 @@ def filter_database_based_on_current_user(request_user):
         ).all()
     
     campuses=Campus.objects.prefetch_related('users',
-                                             'users__student_profile'
+                                             'users__student_profile__student_enrollments__course_offering'
                                              )
     lecturer=Staff.objects.select_related('staff').prefetch_related(
                                                                     'staff_course_offering_relations',
@@ -137,14 +137,7 @@ def filter_database_based_on_current_user(request_user):
 
     if user_groups.filter(name="Head_of_School").exists() or user_groups.filter(name="Admin").exists():
         program_offerings=program_offerings
-        
-        
-        
         course_offerings=course_offerings
-        
-
-        # programs=Program.objects.all()
-        
         students=students
         # attendances=Attendance.objects.all()
         attendances=attendances
@@ -168,7 +161,7 @@ def filter_database_based_on_current_user(request_user):
         course_offerings=course_offerings
         students=students
         attendances=attendances
-        campuses=campuses
+        # campuses=campuses
 
          # programs_for_current_user=None
         programs_for_current_user=programs.filter(staff_program_relations__staff__staff=request_user)
@@ -183,13 +176,11 @@ def filter_database_based_on_current_user(request_user):
         
         students=students.filter(student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
         # students=students.filter(student_enrollments__program_offering__in=program_offerings_for_current_user).distinct()
+
+        attendances = attendances.order_by('course_offering').filter(course_offering__in=course_offerings_for_current_user).distinct()
         
+        campuses=campuses.filter(users__student_profile__student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
         
-    
-       
-        
-        attendances = attendances.order_by('course_offering').filter(student__in=students).distinct()
-      
         all_programs=programs_for_current_user
         weekly_reports=weekly_reports.filter(course_offering__in=course_offerings_for_current_user).distinct()
         # print("initialise  program for program leader ",programs_for_current_user)
@@ -340,7 +331,7 @@ def default_start_and_end_date():
 
     return default_start_date,default_end_date
 
-def filter_data_based_on_date_range(start_date,end_date,programs_for_current_user,courses_for_current_user,program_offerings_for_current_user,course_offerings_for_current_user,attendances,weekly_reports,campuses):
+def filter_data_based_on_date_range(start_date,end_date,programs_for_current_user,courses_for_current_user,program_offerings_for_current_user,course_offerings_for_current_user,attendances,weekly_reports,campuses,lecturer_qs_for_current_user):
     # print(" programs for current user value for date filter function  ",program_offerings_for_current_user)
   
     default_start_date ,default_end_date=default_start_and_end_date()
@@ -357,14 +348,49 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
     if start_date and end_date:
         print(f"Start date :{start_date} and end date :{end_date} by date filter form ")
 
-        if program_offerings_for_current_user is not None :
-            program_offerings_for_current_user=program_offerings_for_current_user.filter(
-                   Q(start_date__gte=start_date)| Q(end_date__lte=end_date))
-        
-      
         if course_offerings_for_current_user is not None :
             course_offerings_for_current_user=course_offerings_for_current_user.filter(
-                Q(start_date__gte=start_date)|Q(end_date__lte=end_date))
+                Q(start_date__gte=start_date) & Q(start_date__lte=end_date)).distinct()
+            
+            print(f"course offerings for current user after date filter :{course_offerings_for_current_user}")
+            for co in course_offerings_for_current_user:
+                print(f"{co.start_date} :{co.end_date}" )
+        else:
+            print(f"no course offerings for current date filter: {start_date} to {end_date}")
+            
+        if program_offerings_for_current_user is not None :
+            # program_offerings_for_current_user=program_offerings_for_current_user.filter(
+            #        Q(start_date__gte=start_date)| Q(end_date__lte=end_date))
+            
+            program_offerings_for_current_user=program_offerings_for_current_user.filter(
+                   student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
+
+            print(f"program offerings for current user after date filter :{program_offerings_for_current_user}")
+            for po in program_offerings_for_current_user:
+                print(f"{po.program.name} :{po.start_date} :{po.end_date}" )
+                co_list=[]
+                for student_enrollment in po.student_enrollments.all():
+                    
+                    co = student_enrollment.course_offering
+                    if co not in  co_list:
+                        print(f"  - Course: {co.course.name}, Start Date: {co.start_date}, End Date: {co.end_date}")
+                    co_list.append(co)
+        else:
+            print(f"no program offerings for current date filter: {start_date} to {end_date}")           
+                        
+        if courses_for_current_user is not None:
+            # courses_for_current_user = courses_for_current_user.filter(
+            #                                                 Q(course_offerings__start_date__gte=start_date) 
+            #                                                 | Q(course_offerings__end_date__lte=end_date)
+            #                                             ).distinct()
+            courses_for_current_user = courses_for_current_user.filter(
+                                                            course_offerings__in=course_offerings_for_current_user
+                                                        ).distinct()
+            
+                
+        
+      
+        
         
         # all program and course need to be shown 
         if programs_for_current_user is not None:
@@ -373,9 +399,15 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
             #     for po in p.program_offerings.all():
             #         print(f"PO:{po} : start date :{po.start_date} and end date :{po.end_date}")
                     
+            # active_programs = programs_for_current_user.filter(
+            #                                                 Q(program_offerings__start_date__gte=start_date) 
+            #                                                 | Q(program_offerings__end_date__lte=end_date)
+            #                                             ).distinct()
+            # # Get the inactive programs (programs that do not match the date criteria)
+            # inactive_programs = programs_for_current_user.exclude(id__in=active_programs.values_list('id', flat=True)).distinct()
+            
             active_programs = programs_for_current_user.filter(
-                                                            Q(program_offerings__start_date__gte=start_date) 
-                                                            | Q(program_offerings__end_date__lte=end_date)
+                                                           program_offerings__student_enrollments__course_offering__in=course_offerings_for_current_user
                                                         ).distinct()
             # Get the inactive programs (programs that do not match the date criteria)
             inactive_programs = programs_for_current_user.exclude(id__in=active_programs.values_list('id', flat=True)).distinct()
@@ -384,8 +416,8 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
             active_programs_for_current_user = active_programs
 
             inactive_programs_for_current_user=inactive_programs
-            # print(" active  for current user after date filter ",active_programs_for_current_user)
-            # print(" inactive  for current user after date filter ",inactive_programs_for_current_user)
+            print(f" active  for current user after date filter {start_date} to {end_date} :{active_programs_for_current_user}")
+            print(f" inactive  for current user after date filter {start_date} to {end_date} :{inactive_programs_for_current_user}")
             # print(len(programs_for_current_user))
             # print(len(inactive_programs_for_current_user))
         else:
@@ -393,11 +425,7 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
             inactive_programs_for_current_user=None
             
 
-        if courses_for_current_user is not None:
-            courses_for_current_user = courses_for_current_user.filter(
-                                                            Q(course_offerings__start_date__gte=start_date) 
-                                                            | Q(course_offerings__end_date__lte=end_date)
-                                                        ).distinct()
+        
         
         
         if attendances is not None:
@@ -405,11 +433,27 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
                 Q(attendance_date__gte=start_date)&
                 Q(attendance_date__lte=end_date)
             ).distinct()
+            print(f" attendances for current date filter {start_date} to {end_date} , attendance count :{len(attendances)}")
             
         if weekly_reports is not None:
             # weekly_reports=weekly_reports.filter(sessions__attendance_date__gte=start_date)
             weekly_reports=weekly_reports.filter(sessions__attendance_date__range=[start_date,end_date])
-
+        if campuses is not None:
+            campuses=Campus.objects.prefetch_related('users',
+                                             'users__student_profile__student_enrollments__course_offering'
+                                             )
+            print(f" campuses before current date filter {start_date} to {end_date} :{campuses}")
+            # campuses=campuses.filter(users__student_profile__student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
+            campuses=campuses.filter(users__student_profile__student_enrollments__course_offering__in=course_offerings_for_current_user).distinct()
+       
+            # campuses=campuses
+            print(f" campuses after current date filter {start_date} to {end_date} :{campuses}")
+            
+        if lecturer_qs_for_current_user is not None:
+            lecturer_qs_for_current_user=lecturer_qs_for_current_user.filter(staff_course_offering_relations__course_offering__in=course_offerings_for_current_user).distinct()
+            print(f" lecturer_qs_for_current_user for current date filter {start_date} to {end_date} :{lecturer_qs_for_current_user}")
+            
+        
     return {
          'program_offerings_for_current_user': program_offerings_for_current_user,
         'course_offerings_for_current_user': course_offerings_for_current_user,
@@ -421,5 +465,6 @@ def filter_data_based_on_date_range(start_date,end_date,programs_for_current_use
         'weekly_reports':weekly_reports,
         'start_date':start_date,
         'end_date':end_date,
-        'campuses':campuses
+        'campuses':campuses,
+        'lecturer_qs_for_current_user':lecturer_qs_for_current_user
     }

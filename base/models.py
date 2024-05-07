@@ -16,6 +16,7 @@ pytz.timezone('Pacific/Auckland')
 class BaseModel(models.Model):
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     temp_id=models.CharField(max_length=255,null=True, blank=True)
+    alias_name=models.CharField( max_length=50, null=True, blank=True, default="")
     created_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,related_name='%(class)s_created',null=True,blank=True)
     updated_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,related_name='%(class)s_updated',null=True,blank=True)
     created_at=models.DateTimeField(auto_now_add=True,verbose_name='Created At')
@@ -62,6 +63,7 @@ class Address(BaseModel):
 
 class Campus(BaseModel):
     name=models.CharField(max_length=255,null=True,blank=True)
+    
     address=models.ForeignKey(Address,on_delete=models.PROTECT,null=True,blank=True,related_name='campuses')
 
     def get_total_users(self):
@@ -85,6 +87,7 @@ class Campus(BaseModel):
         from report.models import StudentEnrollment
         from customUser.models import Student
         student_enrollments=StudentEnrollment.objects.select_related('student').prefetch_related('student__student__student_enrollments').filter(student__student__campus=self)
+        # enrolled_students=Student.objects.prefetch_related('student_enrollments').filter(student_enrollments__in=student_enrollments)
         enrolled_students=Student.objects.filter(student_enrollments__in=student_enrollments)
         return enrolled_students
     

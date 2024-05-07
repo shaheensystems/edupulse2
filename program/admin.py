@@ -1,5 +1,5 @@
 from django.contrib import admin
-from program.models import Program, Course,ProgramOffering, CourseOffering,StaffProgramOfferingRelations,StaffProgramRelations
+from program.models import Program, Course,ProgramOffering, CourseOffering,StaffProgramOfferingRelations,StaffProgramRelations, StaffCourseOfferingRelations
 from customUser.models import Student
 from report.models import WeeklyReport
 from customUser.admin import StaffCourseOfferingRelationInline, StaffProgramRelationInline
@@ -144,10 +144,14 @@ class CourseOfferingAdmin(admin.ModelAdmin):
         return ", ".join(teacher_names) if teacher_names else "N/A"
     
     get_all_teacher.short_description="Teacher's"
+    
 class StaffProgramRelationsAdmin(admin.ModelAdmin):
     list_display=('staff','program')
     
+class StaffCourseOfferingRelationsAdmin(admin.ModelAdmin):
+    list_display=('staff','course_offering')
     
+admin.site.register(StaffCourseOfferingRelations,StaffCourseOfferingRelationsAdmin)
 admin.site.register(StaffProgramRelations,StaffProgramRelationsAdmin)
 admin.site.register(Program, ProgramAdmin)
 

@@ -211,29 +211,9 @@
                 {% endif %}
             </div>
 
-            <!--campus proram and lecture wise deatil -->
-
+            <!-- campus proram and lecture wise deatil new data  -->
             <div class='mt-5 flex  justify-center flex-row flex-wrap border-b-2 border-gray-300 '>
-                <div class ='flex w-1/2  min-w-[700px] flex-row flex-wrap gap-1 justify-start'>
-                  {% comment %} {{pl_student_count_table_data}} {% endcomment %}
-
-                  {% with pl_student_count_table_data=pl_student_count_table_data %}
-                    {% include "components/dashboard/program_leader/pl_student_count_table.html" %}
-                  
-                  {% endwith %}
-
-                </div>
-
-
-                 <div class ='flex w-1/2 p-4 min-w-[800px] flex-col '>
-                  {% with title='Program wise Attendnace - Enrollments' sub_title_choice=attendance_choice data=pl_program_wise_attendance_detail_data  %}
-                    {% include "components/dashboard/program_leader/pl_student_count_barChart.html" %}
-                
-                  {% endwith %}
-                
-                </div> 
-
-
+              {% include "components/dashboard/program_leader/pl_student_count_table_barChart.html" %}
             </div>
 
 

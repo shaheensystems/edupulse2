@@ -14,7 +14,7 @@ def get_table_data_student_and_enrollment_count_by_programs(programs):
         
         table_data_student_and_enrollment_count_by_programs.append(program_data)
     
-    print(f"By Program  Enrollment count:{len(enrollment_list)} and student count :{len(set(enrollment_list))} ")
+    # print(f"By Program  Enrollment count:{len(enrollment_list)} and student count :{len(set(enrollment_list))} ")
     return table_data_student_and_enrollment_count_by_programs
 
 
@@ -84,7 +84,7 @@ def get_table_data_student_and_enrollment_count_by_lecturer(lecturer_qs):
         # print("Enrolled Students:",data['enrolled_students'])
         lecturer_name = lecturer.staff.first_name +" "+ lecturer.staff.last_name
         enrollment_data={
-            'title':lecturer_name,
+            'title':lecturer,
             'student_count':  len(set(lecturer.calculate_total_student_enrolled())),     
             'enrollment_count': len(lecturer.calculate_total_student_enrolled())
         }
@@ -133,7 +133,7 @@ def get_barChart_data_student_attendance_details_by_lecturer(lecturer_qs,course_
         students=set(enrolled_students)
         attendance_status,sorted_attendance_percentage = get_sorted_attendance_percentage_by_cat_through_students(students=students)
         lecturer_name = lecturer.staff.first_name +" "+ lecturer.staff.last_name
-        print(" lecturer_name:",lecturer_name)
+        # print(" lecturer_name:",lecturer_name)
         table_data_student_attendance_details_by_lecturer.append(
             
                 {
@@ -142,7 +142,7 @@ def get_barChart_data_student_attendance_details_by_lecturer(lecturer_qs,course_
                 'percentage':sorted_attendance_percentage
                 }
             )
-        print(" table_data_student_attendance_details_by_lecturer:",table_data_student_attendance_details_by_lecturer)
+        # print(" table_data_student_attendance_details_by_lecturer:",table_data_student_attendance_details_by_lecturer)
     return table_data_student_attendance_details_by_lecturer
 
 def get_barChart_data_student_attendance_details_by_campuses(campuses,program_offerings):

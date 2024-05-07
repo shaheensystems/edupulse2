@@ -892,17 +892,84 @@ def Upload_bulk_attendance_view(request):
                     # print("time_table_data:",time_table_data)
                     # check time table data:
                     for time_table in time_table_data:
-                        if time_table['sessions']:
-                            sessions_obj = set()
-                            for session in time_table['sessions'].values():  # Accessing values of the 'sessions' dictionary
-                                sessions_obj.add(session)
+                        from program.models import StaffCourseOfferingRelations
+                        from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+
+                        from customUser.models import Staff
+                        # add staff to course offering 
+                        course_offering_code=time_table['course_offering_code']
+                        lecturer_name_list=time_table['lecturer_name'].split(",")
+                        for lecturer_name in lecturer_name_list:
+                            lecturer_name=lecturer_name.strip()
+                        
+                            try:
+                                # Query for CourseOffering
+                                course_offering_obj = CourseOffering.objects.get(temp_id=course_offering_code)
+                            except ObjectDoesNotExist:
+                                print(f"Course Offering from time table is not exist f or id : {course_offering_code}: {time_table['course_offering_name']}")
+                                # Handle the case where CourseOffering with the specified temp_id does not exist
+                                # Handle this exception according to your application logic
+                            except MultipleObjectsReturned:
+                                # Handle the case where multiple CourseOffering objects have the same temp_id
+                                # Handle this exception according to your application logic
+                                print(f"Multiple Course Offering exists for course id : {course_offering_code}: {time_table['course_offering_name']}")
+                                
                             
-                            if len(time_table['sessions']) != len(sessions_obj):
-                                print(f"Error: Session days are not unique for course offering {time_table['course_offering_code']}")
-                            else:
-                                print(f"Session days are unique for course offering {time_table['course_offering_code']}")
-                        else:
-                            print(f"Error: No sessions available for course offering {time_table['course_offering_code']}")
+                            try:
+                                # Query for Staff
+                                lecturer_name_lower = lecturer_name.lower()
+                                
+                                lecturer_obj = Staff.objects.get(Q(staff__first_name__iexact=lecturer_name_lower) | Q(staff__last_name__iexact=lecturer_name_lower))
+                                
+                            except ObjectDoesNotExist:
+                                # Handle the case where Staff with the specified name does not exist
+                                # Handle this exception according to your application logic
+                                print(lecturer_name)
+                                new_user, created = NewUser.objects.get_or_create(
+                                    username=lecturer_name.lower(),
+                                    defaults={
+                                        'first_name': lecturer_name.upper(),
+                                        # Add other fields and their default values here if needed
+                                    }
+                                )
+                            
+
+                                # Set the user's password
+                                password = f'Admin@123'
+                                new_user.password = make_password(password)
+                                new_user.save()
+                                new_lecturer=Staff.objects.create(
+                                    staff=new_user,
+                                    designation='Lecturer'
+                                )
+                                new_lecturer.save()
+                                
+                                if course_offering_obj:
+                                    new_staff_course_offering_relationship_obj,created =StaffCourseOfferingRelations.objects.get_or_create(
+                                        course_offering=course_offering_obj,
+                                        staff=new_lecturer
+                                    )
+                                    new_staff_course_offering_relationship_obj.save()
+                                    
+                                
+                            except MultipleObjectsReturned:
+                                # Handle the case where multiple Staff objects have the same first or last name
+                                # Handle this exception according to your application logic
+                                print(f"Multiple teacher exists for course id : {course_offering_code}: {time_table['course_offering_name']}")
+                                
+                            
+                            
+                        # if time_table['sessions']:
+                        #     sessions_obj = set()
+                        #     for session in time_table['sessions'].values():  # Accessing values of the 'sessions' dictionary
+                        #         sessions_obj.add(session)
+                            
+                        #     if len(time_table['sessions']) != len(sessions_obj):
+                        #         print(f"Error: Session days are not unique for course offering {time_table['course_offering_code']}")
+                        #     else:
+                        #         print(f"Session days are unique for course offering {time_table['course_offering_code']}")
+                        # else:
+                        #     print(f"Error: No sessions available for course offering {time_table['course_offering_code']}")
                     
             except Exception as e:
                print(f'Error opening time table file: {e}')
@@ -914,308 +981,308 @@ def Upload_bulk_attendance_view(request):
             
             
             
-            # upload attendance 
-            try:
-                # df = pd.read_excel(obj.file_name.path)
+            # # upload attendance 
+            # try:
+            #     # df = pd.read_excel(obj.file_name.path)
     
-                # # Print the DataFrame to see the data
-                # print(df)
+            #     # # Print the DataFrame to see the data
+            #     # print(df)
 
-                with open(csv_file_path, 'r',encoding='utf-8') as f:
-                    # Adjust the parsing logic based on the text file format
-                    lines = f.readlines()
+            #     with open(csv_file_path, 'r',encoding='utf-8') as f:
+            #         # Adjust the parsing logic based on the text file format
+            #         lines = f.readlines()
 
-                    # Assuming the first section contains metadata and the second section contains data
-                    header_section = lines[:2]
-                    data_section = lines[1:]
+            #         # Assuming the first section contains metadata and the second section contains data
+            #         header_section = lines[:2]
+            #         data_section = lines[1:]
                     
-                    # print(header_section)
-                    # print("first row data :",data_section[1])
-                    header_line=data_section[0]
-                    # Split the header line by commas
-                    headers = header_line.split(';')
-                    # print("headers",headers)
+            #         # print(header_section)
+            #         # print("first row data :",data_section[1])
+            #         header_line=data_section[0]
+            #         # Split the header line by commas
+            #         headers = header_line.split(';')
+            #         # print("headers",headers)
 
-                    # Create a list to store the generated column headers
-                    column_headers = []
+            #         # Create a list to store the generated column headers
+            #         column_headers = []
 
-                    # Track the session count for each week
-                    session_counts = {}
+            #         # Track the session count for each week
+            #         session_counts = {}
 
-                    for header in headers:
+            #         for header in headers:
                         
                        
-                        if header == "Session 1" or header == "Session 2" or header == "Engagement" or header == "Action" or header == "Follow Up"  :
-                            week = header  # Extract the week number from the header
+            #             if header == "Session 1" or header == "Session 2" or header == "Engagement" or header == "Action" or header == "Follow Up"  :
+            #                 week = header  # Extract the week number from the header
                             
-                            if week not in session_counts:
-                                session_counts[week] = 0  # Initialize the session count for the week if it's not already present
-                            session_counts[week] += 1  # Increment the session count for the week
-                            # Generate the column header with the session count
-                            # print("Header :",header)
-                            # print("Week :",week)
-                            # print("Session count :",session_counts)
-                            column_headers.append(f"W{session_counts[week]} {header}")
-                        else:
-                            column_headers.append(header)
+            #                 if week not in session_counts:
+            #                     session_counts[week] = 0  # Initialize the session count for the week if it's not already present
+            #                 session_counts[week] += 1  # Increment the session count for the week
+            #                 # Generate the column header with the session count
+            #                 # print("Header :",header)
+            #                 # print("Week :",week)
+            #                 # print("Session count :",session_counts)
+            #                 column_headers.append(f"W{session_counts[week]} {header}")
+            #             else:
+            #                 column_headers.append(header)
 
-                    # Print the generated column headers
-                    # print("new column header",column_headers)            
-                    i=0
+            #         # Print the generated column headers
+            #         # print("new column header",column_headers)            
+            #         i=0
         
-                    # Create variables for each column
-                    data = {variable_name: None for variable_name in column_headers}
-                    # print("all data:",data)  
-                    # Process data rows
-                    for row in data_section[1:]:  # Skip the header row
-                        print("initial row wise data for attendance :",row)
+            #         # Create variables for each column
+            #         data = {variable_name: None for variable_name in column_headers}
+            #         # print("all data:",data)  
+            #         # Process data rows
+            #         for row in data_section[1:]:  # Skip the header row
+            #             print("initial row wise data for attendance :",row)
                         
-                        row_data = row.split(';')
-                        # print("new column header",column_headers) 
-                        print("initial row wise data for attendance after split by ;:",row_data)
+            #             row_data = row.split(';')
+            #             # print("new column header",column_headers) 
+            #             print("initial row wise data for attendance after split by ;:",row_data)
                         
-                        for header, value in zip(column_headers, row_data):
-                            header_index = column_headers.index(header)
-                            # print("header :",header)
-                            # print("value :",value)
-                            data[column_headers[header_index]] = value
+            #             for header, value in zip(column_headers, row_data):
+            #                 header_index = column_headers.index(header)
+            #                 # print("header :",header)
+            #                 # print("value :",value)
+            #                 data[column_headers[header_index]] = value
 
-                        # Print the data for debugging
+            #             # Print the data for debugging
                     
                     
-                        # print("Data W1S1:", data['W1 Session 1'])
-                        # print("Data W1S2:", data['W1 Session 2'])
-                        # print("Data W2S1:", data['W2 Session 1'])
-                        # print("Data W2S2:", data['W2 Session 2'])
-                        print("row data:",data)
+            #             # print("Data W1S1:", data['W1 Session 1'])
+            #             # print("Data W1S2:", data['W1 Session 2'])
+            #             # print("Data W2S1:", data['W2 Session 1'])
+            #             # print("Data W2S2:", data['W2 Session 2'])
+            #             print("row data:",data)
                         
-                        # process recording attendance start from here 
-                        student_id=data['Student ID']
-                        course_offering_id=data['Unit Offer Code']
-                        try:
-                            course_offering_obj=CourseOffering.objects.get(temp_id=course_offering_id)
-                        except CourseOffering.DoesNotExist:
-                            print(f"error !!! Course offering doesn't exits :{course_offering_id}")
+            #             # process recording attendance start from here 
+            #             student_id=data['Student ID']
+            #             course_offering_id=data['Unit Offer Code']
+            #             try:
+            #                 course_offering_obj=CourseOffering.objects.get(temp_id=course_offering_id)
+            #             except CourseOffering.DoesNotExist:
+            #                 print(f"error !!! Course offering doesn't exits :{course_offering_id}")
                             
                             
                         
-                        try:
-                            # student_obj = get_object_or_404(Student, temp_id=student_id)
-                            student_obj = Student.objects.get(temp_id=student_id)
+            #             try:
+            #                 # student_obj = get_object_or_404(Student, temp_id=student_id)
+            #                 student_obj = Student.objects.get(temp_id=student_id)
                             
-                        except Student.DoesNotExist:
-                            print(f"error !!! Student doesn't exits :{student_id}")
+            #             except Student.DoesNotExist:
+            #                 print(f"error !!! Student doesn't exits :{student_id}")
                             
                             
                             
-                        if course_offering_obj and student_obj:
-                            course_offering_start_date=course_offering_obj.start_date
+            #             if course_offering_obj and student_obj:
+            #                 course_offering_start_date=course_offering_obj.start_date
                             
-                            # Assuming course_offering_start_date is a datetime object
-                            # course_offering_start_date = datetime.strptime(course_offering.start_date, "%Y-%m-%d")  # Convert to datetime object if it's a string
-                            # course_offering_start_date_str = course_offering_start_date.strftime("%Y-%m-%d")
+            #                 # Assuming course_offering_start_date is a datetime object
+            #                 # course_offering_start_date = datetime.strptime(course_offering.start_date, "%Y-%m-%d")  # Convert to datetime object if it's a string
+            #                 # course_offering_start_date_str = course_offering_start_date.strftime("%Y-%m-%d")
 
-                            # Course Offering Starting Week 
-                            course_starting_week_number = course_offering_start_date.isocalendar()[1]
-                            year = course_offering_start_date.year
+            #                 # Course Offering Starting Week 
+            #                 course_starting_week_number = course_offering_start_date.isocalendar()[1]
+            #                 year = course_offering_start_date.year
 
-                            # print("Week number of the year for the course offering start date:", course_starting_week_number)
+            #                 # print("Week number of the year for the course offering start date:", course_starting_week_number)
                                         
                                         
-                            # print("CO start Date :",course_offering_obj.start_date)
-                            # print(student_id,course_offering_id)
+            #                 # print("CO start Date :",course_offering_obj.start_date)
+            #                 # print(student_id,course_offering_id)
                             
-                            # print("all data:",data) 
-                            for key, value in data.items():
-                                week_number=0
-                                session_number=0
+            #                 # print("all data:",data) 
+            #                 for key, value in data.items():
+            #                     week_number=0
+            #                     session_number=0
                                 
-                                # if key.endswith("Session 1"):
-                                if "Session" in key:
-                                    print("initial row wise data for attendance :",row)
-                                    print("row data:",data)
-                                    print("key :",key ,"and Value :",value)
+            #                     # if key.endswith("Session 1"):
+            #                     if "Session" in key:
+            #                         print("initial row wise data for attendance :",row)
+            #                         print("row data:",data)
+            #                         print("key :",key ,"and Value :",value)
                                     
-                                    # day will be calculated by Course Offering and session
-                                    # with week and session and start date we wil find the session date 
-                                    if value and value != "NA":
-                                        week_number=key.split(" ")[0][1:]
-                                        session_number=key.split(" ")[2]
-                                        # print("week Number :",week_number)
-                                        # print("session Number :",session_number)
-                                        # print(key,":",value)
+            #                         # day will be calculated by Course Offering and session
+            #                         # with week and session and start date we wil find the session date 
+            #                         if value and value != "NA":
+            #                             week_number=key.split(" ")[0][1:]
+            #                             session_number=key.split(" ")[2]
+            #                             # print("week Number :",week_number)
+            #                             # print("session Number :",session_number)
+            #                             # print(key,":",value)
                                         
-                                        # value in import sheet has to be changed 
-                                        if value == "Informed - Absent" :
-                                            is_present_value='Informed Absent'
-                                        else:
-                                            is_present_value=value
+            #                             # value in import sheet has to be changed 
+            #                             if value == "Informed - Absent" :
+            #                                 is_present_value='Informed Absent'
+            #                             else:
+            #                                 is_present_value=value
                                         
                                         
-                                        if is_present_value.lower() not in ['absent', 'present','tardy','informed absent']:
-                                            print("initial row wise data for attendance :",row)
-                                            print("row data:",data)
-                                            print("key :",key ,"and Value :",value)
+            #                             if is_present_value.lower() not in ['absent', 'present','tardy','informed absent']:
+            #                                 print("initial row wise data for attendance :",row)
+            #                                 print("row data:",data)
+            #                                 print("key :",key ,"and Value :",value)
 
-                                        # print("is Present:",is_present_value)
+            #                             # print("is Present:",is_present_value)
                                         
                                         
-                                        for data in time_table_data:
-                                            if data['course_offering_code'] == course_offering_obj.temp_id:
-                                                print("related time table  data to course offering ",data)
-                                                session_day=data["sessions"][f"session_{session_number}"]
-                                                session_day_number=days_of_week.index(session_day) + 1
+            #                             for data in time_table_data:
+            #                                 if data['course_offering_code'] == course_offering_obj.temp_id:
+            #                                     print("related time table  data to course offering ",data)
+            #                                     session_day=data["sessions"][f"session_{session_number}"]
+            #                                     session_day_number=days_of_week.index(session_day) + 1
                                             
-                                                print("session day ",session_day ,":",session_day_number)
+            #                                     print("session day ",session_day ,":",session_day_number)
                                                 
-                                        # print(course_offering_obj)
-                                        # Assuming week_number is already extracted from the key
-                                        if week_number.isdigit():
-                                            week_number = int(week_number)
+            #                             # print(course_offering_obj)
+            #                             # Assuming week_number is already extracted from the key
+            #                             if week_number.isdigit():
+            #                                 week_number = int(week_number)
                                             
-                                            # session week number is actual week number start from 1st jan to find out the exact date for attendance 
-                                            session_week_number=course_starting_week_number + week_number-1
-                                            # print("session week Number :",session_week_number)
-                                            # Determine the year and ISO week day number of the Tuesday in the given week number
+            #                                 # session week number is actual week number start from 1st jan to find out the exact date for attendance 
+            #                                 session_week_number=course_starting_week_number + week_number-1
+            #                                 # print("session week Number :",session_week_number)
+            #                                 # Determine the year and ISO week day number of the Tuesday in the given week number
                                         
                                             
-                                            iso_week_day_number = session_day_number  # Tuesday is the second day of the ISO week
-                                            # Calculate the date of the Tuesday
-                                            attendance_date = datetime.strptime(f"{year}-W{session_week_number}-{iso_week_day_number}", "%Y-W%W-%w").date()
+            #                                 iso_week_day_number = session_day_number  # Tuesday is the second day of the ISO week
+            #                                 # Calculate the date of the Tuesday
+            #                                 attendance_date = datetime.strptime(f"{year}-W{session_week_number}-{iso_week_day_number}", "%Y-W%W-%w").date()
 
-                                            print(f"Date of {session_day} in week, {session_week_number}, {attendance_date}")
+            #                                 print(f"Date of {session_day} in week, {session_week_number}, {attendance_date}")
                                             
-                                            # now record attendance in attendance model 
+            #                                 # now record attendance in attendance model 
                                             
                                                 
-                                            get_create_or_update_attendance(student_obj=student_obj,
-                                                                            course_offering_obj=course_offering_obj,
-                                                                            attendance_date=attendance_date,
-                                                                            is_present_value=is_present_value,
-                                                                            week_number=week_number,
-                                                                            session_number=session_number
-                                                                            )
+            #                                 get_create_or_update_attendance(student_obj=student_obj,
+            #                                                                 course_offering_obj=course_offering_obj,
+            #                                                                 attendance_date=attendance_date,
+            #                                                                 is_present_value=is_present_value,
+            #                                                                 week_number=week_number,
+            #                                                                 session_number=session_number
+            #                                                                 )
                                             
                                             
-                                        else:
-                                            print("Invalid week number:", week_number)
+            #                             else:
+            #                                 print("Invalid week number:", week_number)
                                             
-                                if "Engagement" in key:
-                                    print("key :",key)
+            #                     if "Engagement" in key:
+            #                         print("key :",key)
                                     
                                     
-                                    if value :
-                                        week_number=key.split(" ")[0][1:]
-                                        print("week Number :",week_number)
-                                        print("Engagement :",key,":",value)
-                                        if week_number.isdigit():
-                                            week_number = int(week_number)
-                                            if value =="NA":
-                                                value="N/A"
-                                            engagement_status=""
-                                            for choice in ENGAGEMENT_CHOICE:
-                                                if value == choice[1]:
-                                                    engagement_status=choice[0]
+            #                         if value :
+            #                             week_number=key.split(" ")[0][1:]
+            #                             print("week Number :",week_number)
+            #                             print("Engagement :",key,":",value)
+            #                             if week_number.isdigit():
+            #                                 week_number = int(week_number)
+            #                                 if value =="NA":
+            #                                     value="N/A"
+            #                                 engagement_status=""
+            #                                 for choice in ENGAGEMENT_CHOICE:
+            #                                     if value == choice[1]:
+            #                                         engagement_status=choice[0]
                                             
-                                            if engagement_status == "":
-                                                print(f"Error !!! Engagement Status value :{value} , doesn't not exits in Engagement Choice ")
-                                            else :
+            #                                 if engagement_status == "":
+            #                                     print(f"Error !!! Engagement Status value :{value} , doesn't not exits in Engagement Choice ")
+            #                                 else :
                                                 
-                                                    get_create_or_update_weekly_report(student_obj=student_obj,
-                                                                                course_offering_obj=course_offering_obj,
-                                                                                week_number=week_number,
-                                                                                engagement_status=engagement_status,
-                                                                                action_status= None,
-                                                                                follow_up_status=None
-                                                                                )
+            #                                         get_create_or_update_weekly_report(student_obj=student_obj,
+            #                                                                     course_offering_obj=course_offering_obj,
+            #                                                                     week_number=week_number,
+            #                                                                     engagement_status=engagement_status,
+            #                                                                     action_status= None,
+            #                                                                     follow_up_status=None
+            #                                                                     )
                                         
-                                        else:
-                                            print("Invalid week number for Engagement Status update :", week_number) 
+            #                             else:
+            #                                 print("Invalid week number for Engagement Status update :", week_number) 
                                             
-                                if "Action" in key:
-                                    print("key :",key)
+            #                     if "Action" in key:
+            #                         print("key :",key)
                                     
                                     
-                                    if value :
-                                        week_number=key.split(" ")[0][1:]
-                                        print("week Number :",week_number)
-                                        print("Action :",key,":",value)
-                                        if week_number.isdigit():
-                                            week_number = int(week_number)
-                                            if value =="NA":
-                                                value="N/A"
-                                            action_status=""
-                                            for choice in ACTION_CHOICE:
-                                                if value.lower() == choice[1].lower():
-                                                    action_status=choice[0]
+            #                         if value :
+            #                             week_number=key.split(" ")[0][1:]
+            #                             print("week Number :",week_number)
+            #                             print("Action :",key,":",value)
+            #                             if week_number.isdigit():
+            #                                 week_number = int(week_number)
+            #                                 if value =="NA":
+            #                                     value="N/A"
+            #                                 action_status=""
+            #                                 for choice in ACTION_CHOICE:
+            #                                     if value.lower() == choice[1].lower():
+            #                                         action_status=choice[0]
                                             
-                                            if action_status == "":
-                                                print(f"Error !!! Action Status value :{value} , doesn't not exits in Action Choice ")
-                                            else :
-                                                    print("Action status :",action_status)
-                                                    get_create_or_update_weekly_report(student_obj=student_obj,
-                                                                                course_offering_obj=course_offering_obj,
-                                                                                week_number=week_number,
-                                                                                engagement_status=None,
-                                                                                action_status= action_status,
-                                                                                follow_up_status=None
-                                                                                )
+            #                                 if action_status == "":
+            #                                     print(f"Error !!! Action Status value :{value} , doesn't not exits in Action Choice ")
+            #                                 else :
+            #                                         print("Action status :",action_status)
+            #                                         get_create_or_update_weekly_report(student_obj=student_obj,
+            #                                                                     course_offering_obj=course_offering_obj,
+            #                                                                     week_number=week_number,
+            #                                                                     engagement_status=None,
+            #                                                                     action_status= action_status,
+            #                                                                     follow_up_status=None
+            #                                                                     )
                                         
-                                        else:
-                                            print("Invalid week number for Action Status update :", week_number) 
-                                if "Follow Up" in key:
-                                    print("key :",key)
+            #                             else:
+            #                                 print("Invalid week number for Action Status update :", week_number) 
+            #                     if "Follow Up" in key:
+            #                         print("key :",key)
                                     
                                     
-                                    if value :
-                                        week_number=key.split(" ")[0][1:]
-                                        print("week Number :",week_number)
-                                        print("Follow Up :",key,":",value)
-                                        if week_number.isdigit():
-                                            week_number = int(week_number)
-                                            if value =="NA":
-                                                value="N/A"
-                                            elif value == "Warning Letter - 1":
-                                                value ='Warning Letter 1'
-                                            elif value == "Warning Letter - 2":
-                                                value ='Warning Letter 2'
+            #                         if value :
+            #                             week_number=key.split(" ")[0][1:]
+            #                             print("week Number :",week_number)
+            #                             print("Follow Up :",key,":",value)
+            #                             if week_number.isdigit():
+            #                                 week_number = int(week_number)
+            #                                 if value =="NA":
+            #                                     value="N/A"
+            #                                 elif value == "Warning Letter - 1":
+            #                                     value ='Warning Letter 1'
+            #                                 elif value == "Warning Letter - 2":
+            #                                     value ='Warning Letter 2'
                                             
-                                            follow_up_status=""
-                                            for choice in FOLLOW_UP_CHOICE:
-                                                if value.lower() == choice[1].lower():
-                                                    follow_up_status=choice[0]
+            #                                 follow_up_status=""
+            #                                 for choice in FOLLOW_UP_CHOICE:
+            #                                     if value.lower() == choice[1].lower():
+            #                                         follow_up_status=choice[0]
                                             
-                                            if follow_up_status == "":
-                                                print(f"Error !!! Follow Up Status value :{value} , doesn't not exits in Follow Up Choice ")
-                                            else :
-                                                    print("Follow Up status :",follow_up_status)
-                                                    get_create_or_update_weekly_report(student_obj=student_obj,
-                                                                                course_offering_obj=course_offering_obj,
-                                                                                week_number=week_number,
-                                                                                engagement_status=None,
-                                                                                action_status= None,
-                                                                                follow_up_status=follow_up_status
-                                                                                )
+            #                                 if follow_up_status == "":
+            #                                     print(f"Error !!! Follow Up Status value :{value} , doesn't not exits in Follow Up Choice ")
+            #                                 else :
+            #                                         print("Follow Up status :",follow_up_status)
+            #                                         get_create_or_update_weekly_report(student_obj=student_obj,
+            #                                                                     course_offering_obj=course_offering_obj,
+            #                                                                     week_number=week_number,
+            #                                                                     engagement_status=None,
+            #                                                                     action_status= None,
+            #                                                                     follow_up_status=follow_up_status
+            #                                                                     )
                                         
-                                        else:
-                                            print("Invalid week number for follow up Status update :", week_number) 
+            #                             else:
+            #                                 print("Invalid week number for follow up Status update :", week_number) 
                                         
                                     
                                         
                                             
-                                        #   
+            #                             #   
                             
-                        # i+=1
+            #             # i+=1
                         
                         
                         
-                        # if i == 20:
-                        #     break
+            #             # if i == 20:
+            #             #     break
                             
                    
                     
-            except Exception as e:
-             print(f'Error opening attendance file: {e}')
+            # except Exception as e:
+            #  print(f'Error opening attendance file: {e}')
             
             obj.activated = True
             obj.save()
