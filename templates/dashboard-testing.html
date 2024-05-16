@@ -1,474 +1,481 @@
-{% extends "base.html" %}
-{% load custom_tags %}
-{% block content %}
-    <section class='flex w-full flex-col'>
+{% extends "base.html" %} {% load custom_tags %} {% block content %}
+<section class="flex w-full flex-col">
+  <!-- User Profile Section -->
+  {% comment %} {% with current_user=current_user %} {% include
+  'components/dashboard/user_profile_FC.html' %} {% endwith %} {% endcomment %}
+  {% if request.user|user_belongs_to_group:'Teacher' %}
 
+  <!-- Course Offering Details Section -->
+  <div class="hidden">
+    {% with course_offerings=course_offerings_for_current_user
+    students=total_students_in_course_offerings_for_current_user
+    total_no_of_at_risk_student=total_students_at_risk_query_set %} {% include
+    'components/dashboard/course_offering_info_bar.html' %} {% endwith %}
+  </div>
 
-        <!-- User Profile Section -->
-        {% comment %} {% with current_user=current_user  %}
-           {% include 'components/dashboard/user_profile_FC.html' %}
-        {% endwith %} {% endcomment %}
-      
+  <div class="flex flex-row gap-4 mt-4">
+    <span class="flex flex-wrap text-gray-400 text-sm items-end px-2"
+      >Jump to :
+    </span>
+    {% for co in course_offerings_for_current_user %}
+    <a
+      href="{% url 'course_offering_detail' co.pk %}"
+      class="text-blue-400 underline underline-offset-4"
+    >
+      {{co.temp_id}}</a
+    >
+    {% endfor %}
+  </div>
 
-        {% if request.user|user_belongs_to_group:'Teacher' %}
-       
-            <!-- Course Offering Details Section -->
-            <div class='hidden'>
-            {% with course_offerings=course_offerings_for_current_user students=total_students_in_course_offerings_for_current_user total_no_of_at_risk_student=total_students_at_risk_query_set %}
-              {% include 'components/dashboard/course_offering_info_bar.html' %}
-            {% endwith %}
-          </div>
+  {% for co in course_offerings_for_current_user %} {% with co=co %} {% include
+  "components/dashboard/course_offering_report.html" %} {% endwith %} {% endfor
+  %} {% endif %}
 
-            <div class='flex flex-row gap-4 mt-4'> 
-              <span class='flex flex-wrap text-gray-400 text-sm  items-end px-2'>Jump to : </span>
-              {% for co in course_offerings_for_current_user %}
-                <a href="{% url 'course_offering_detail' co.pk %}" class='text-blue-400 underline underline-offset-4'> {{co.temp_id}}</a>
-              {% endfor %}
-            </div>
-            
-            {% for co in course_offerings_for_current_user %}
-              {% with co=co %}
-                {% include "components/dashboard/course_offering_report.html" %}
-              {% endwith %}
-            {% endfor %}
-        {% endif %}
-       
-        <!-- date Filter -->
-        
-        <div class='flex flex-col bg-gray-200 p-4'>
-        
-          <div class='flex flex-row gap-4 mb-3'>
-            <!-- Year Dropdown -->
-            <p class='bg-blue-200 px-4 py-2 rounded-lg'> Year :
-              <select id="yearDropdown" class='pl-3 pr-10 text-sm'>
-                <!-- Options will be dynamically populated by JavaScript -->
-            </select>
-            </p>
+  <!-- date Filter -->
 
-            <!-- Semester Dropdown -->
-            <p class='bg-blue-200 px-4 py-2 rounded-lg'> Duration :
-              <select id="durationTypeDropdown" class='pl-3 pr-10 text-sm' onchange="populateDurationValues()">
-                  <option value="semester">Semester</option>
-                  <option value="quarter">Quarter</option>
-                  <option value="month">Month</option>
-              </select>
-          </p>
-         <!-- Dynamic Dropdown for Semester, Quarter, or Month -->
-          <p class='bg-blue-200 px-4 py-2 rounded-lg' id="durationValueContainer">
+  <div class="flex flex-col bg-gray-200 p-4">
+    <div class="flex flex-row gap-4 mb-3">
+      <!-- Year Dropdown -->
+      <p class="bg-blue-200 px-4 py-2 rounded-lg">
+        Year :
+        <select id="yearDropdown" class="pl-3 pr-10 text-sm">
+          <!-- Options will be dynamically populated by JavaScript -->
+        </select>
+      </p>
 
-          </p>
+      <!-- Semester Dropdown -->
+      <p class="bg-blue-200 px-4 py-2 rounded-lg">
+        Duration :
+        <select
+          id="durationTypeDropdown"
+          class="pl-3 pr-10 text-sm"
+          onchange="populateDurationValues()"
+        >
+          <option value="semester">Semester</option>
+          <option value="quarter">Quarter</option>
+          <option value="month">Month</option>
+        </select>
+      </p>
+      <!-- Dynamic Dropdown for Semester, Quarter, or Month -->
+      <p
+        class="bg-blue-200 px-4 py-2 rounded-lg"
+        id="durationValueContainer"
+      ></p>
 
-            <!-- Button to trigger date selection -->
-            <button onclick="setDate()"><p class='bg-blue-200 px-4 py-2 rounded-lg'>Set Date</p> </button>
-        </div>
-          <div class='flex left-0 '>
-            <form method='get' action="{% url 'dashboard' %}" class='flex flex-row gap-4 justify-center items-center '>
-              {% csrf_token %}
-              {{ date_filter_form.as_p }}
-  
-              <button type="submit"> <p class='bg-blue-200 px-4 py-2 rounded-lg m-3'>Filter By Date </p> </button>
-            </form>
+      <!-- Button to trigger date selection -->
+      <button onclick="setDate()">
+        <p class="bg-blue-200 px-4 py-2 rounded-lg">Set Date</p>
+      </button>
+    </div>
+    <div class="flex left-0">
+      <form
+        method="get"
+        action="{% url 'dashboard' %}"
+        class="flex flex-row gap-4 justify-center items-center"
+      >
+        {% csrf_token %} {{ date_filter_form.as_p }}
 
-           
-          </div>
-          <span class='flex '>Data filtered from {{start_date}}  to {{end_date}}</span>
-        </div>
-        
+        <button type="submit">
+          <p class="bg-blue-200 px-4 py-2 rounded-lg m-3">Filter By Date</p>
+        </button>
+      </form>
+    </div>
+    <span class="flex">Data filtered from {{start_date}} to {{end_date}}</span>
+  </div>
 
-       
-     
+  {% if request.user|user_belongs_to_group:'Head_of_School' or
+  request.user|user_belongs_to_group:'Admin' %}
+  <!-- Program Offering Details Section -->
+  <div class="flex flex-col">
+    <p class="text-center text-lg font-bold mb-2">Student Enrollment Status</p>
+    <div class="w-11/12 bg-gray-100 rounded-lg">
+      <p>Vertical Progress bar</p>
 
-        {% if  request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin'    %}
-            <!-- Program Offering Details Section -->
-          <div class='flex flex-col'>
-            <p class='text-center text-lg font-bold mb-2'> Student Enrollment Status </p>
-            <div class='w-11/12 bg-gray-100 rounded-lg '>
-              <p> Vertical Progress bar </p>
-              
-              {% with data=student_attendance_percentage %}
-                {% comment %} {% include 'charts/progressBarHorizontal.html' %} {% endcomment %}
-                {% include 'charts/progressBarVertical.html' %}
-              {% endwith %}
-            </div>
-            <div class='w-11/12 bg-gray-100 rounded-lg '>
-              <p>Horizontal Progress bar </p>
-              
-              {% with data=student_attendance_percentage %}
-                {% include 'charts/progressBarHorizontal.html' %}
-                
-              {% endwith %}
-            </div>
-            
-            <div class='flex flex-row gap-2 flex-wrap justify-center '>
-              <div class='w-[32%] bg-gray-100 rounded-lg'>
-              {% comment %} {{chart_data_campus_enrollment_student}}  {% endcomment %}
-              {% comment %} {% with data=chart_data_campus_enrollment_student text='Students Enrollment By Campus' id='students_enrollment_by_campus'%}
-                {% include 'charts/barChartHorizontal.html' %}
-              {% endwith %}  {% endcomment %}
-              {% with data=chart_data_campus_enrollment_student title='Students Enrollment By Campus' id='students_enrollment_by_campus' chartType='pie' lengendDisplay='true' limitData=10 legendPosition='right' legendName='short' %}
-                {% include 'charts/chart.html' %}
-              {% endwith %}
-              
-            </div>
-            <div class='w-[33%] bg-gray-100 rounded-lg '>
-              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode' chartType='doughnut' orientation='vertical' lengendDisplay='true' limitData=10 legendPosition='bottom' legendName='short' %}
-                {% include 'charts/chart.html' %}
-              {% endwith %}
-            </div>
-            <div class='w-[33%] bg-gray-100 rounded-lg'>
-              {% with data=chart_data_student_region title='Domestic and International Students' id='students_by_country' chartType='doughnut' lengendDisplay='true' limitData=10 legendPosition='bottom' legendName='short' %}
-                {% include 'charts/chart.html' %}
-               
-              {% endwith %}
-            </div>
-           
-              <div class='w-[100%] bg-gray-100 rounded-lg'>
-                
-                {% comment %} {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program' id='program_students_enrollment2'%}
-                  {% include 'charts/barChartHorizontal.html' %}
-                {% endwith %} {% endcomment %}
-                {% with data=chart_data_programs_student_enrollment title='Students Enrollment By Program' id='program_students_enrollment2' chartType='bar' orientation='horizontal' lengendDisplay='true' limitData=10 legendPosition='right' legendName='full' %}
-                {% include 'charts/chart.html' %}
-              {% endwith %}
-              </div>
-              {% comment %} <div class='w-4/12 bg-gray-100 rounded-lg'>
-                
-                {% with data=chart_data_programs_student_enrollment text='Students Enrollment By Program test' id='test_chart'%}
-                  {% include 'charts/testchart.html' %}
-                {% endwith %}
-              </div> {% endcomment %}
-            <div class='w-[33%] bg-gray-100 rounded-lg hidden'>
-              {% with data=chart_data_offering_mode_enrollment_students title='Student Enrollment By Course Offering Mode' id='students_by_offering_mode2' chartType='pie' lengendDisplay='true' limitData=10   %}
-                {% include 'charts/chart.html' %}
-              {% endwith %}
-            </div>
-            <div class='w-4/12 bg-gray-100 rounded-lg hidden'>
-            
-              {% with data=chart_data_student_region title='Domestic and International Studnets' id='students_by_country1' chartType='bar' lengendDisplay='false' limitData=10 %}
-                {% include 'charts/chart.html' %}
-              {% endwith %}
-            </div>
-            
-          </div>
-         
-         
-          
-          {% comment %} {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user total_students_at_risk_query_set=total_students_at_risk_query_set  %}
-              {% include 'components/dashboard/program_offering_info_bar.html' %}
-            {% endwith %}
-         {% endcomment %}
-         {% comment %} {{programs_for_current_user|length}}
-         {{active_programs_for_current_user|length}} {% endcomment %}
-            {% with active_programs_for_current_user=active_programs_for_current_user programs_for_current_user=programs_for_current_user online_programs=online_programs_for_current_user offline_programs=offline_programs_for_current_user  inactive_programs_for_current_user=inactive_programs_for_current_user students=students total_students_at_risk_query_set=total_students_at_risk_query_set %}
-              {% include 'components/dashboard/programs_attendance_info.html' %}
-            
-            {% endwith %}
-            
-        </div>
-        
-        {% endif %}
+      {% with data=student_attendance_percentage %} {% comment %} {% include
+      'charts/progressBarHorizontal.html' %} {% endcomment %} {% include
+      'charts/progressBarVertical.html' %} {% endwith %}
+    </div>
+    <div class="w-11/12 bg-gray-100 rounded-lg">
+      <p>Horizontal Progress bar</p>
 
+      {% with data=student_attendance_percentage %} {% include
+      'charts/progressBarHorizontal.html' %} {% endwith %}
+    </div>
 
-        {% if  request.user|user_belongs_to_group:'Program_Leader'  %}
-            <!--New Attendnace Engagement Action Report -->
-            <!-- Student and enrollment status -->
-            <div class='flex flex-row gap-10 justify-start  text-gray-400 font-normal px-5'>
-              <div class='flex flex-col'>
-                  <span class='flex flex-row '>
-                    <span> Total Students blended :</span>
-                    <span>{{total_students_in_blended_course_offerings |length}}</span>
-                  </span>
-                  <span class='flex flex-row'>
-                    <span>Total Student Online :</span>
-                    <span>{{total_students_in_online_course_offerings |length}}</span>
-                  </span>
-              </div>
-              <div>
-                <span class='flex flex-row '>
-                  <span> Total Enrollment blended :</span>
-                  <span>{{total_enrollment_in_blended_course_offerings |length}}</span>
-                </span>
-                <span>
-                  <span>Total Enrollment Online :</span>
-                  <span>{{total_enrollment_in_online_course_offerings |length}}</span>
-                </span>
-              </div>
-              
-            </div>
-            <!--Attendnace Engagement Action report (by Vivian)-->
-            <div class='mt-5 border-b-2 border-gray-300' >
+    <div class="flex flex-row gap-2 flex-wrap justify-center">
+      <div class="w-[32%] bg-gray-100 rounded-lg">
+        {% comment %} {{chart_data_campus_enrollment_student}} {% endcomment %}
+        {% comment %} {% with data=chart_data_campus_enrollment_student
+        text='Students Enrollment By Campus'
+        id='students_enrollment_by_campus'%} {% include
+        'charts/barChartHorizontal.html' %} {% endwith %} {% endcomment %} {%
+        with data=chart_data_campus_enrollment_student title='Students
+        Enrollment By Campus' id='students_enrollment_by_campus' chartType='pie'
+        lengendDisplay='true' limitData=10 legendPosition='right'
+        legendName='short' %} {% include 'charts/chart.html' %} {% endwith %}
+      </div>
+      <div class="w-[33%] bg-gray-100 rounded-lg">
+        {% with data=chart_data_offering_mode_enrollment_students title='Student
+        Enrollment By Course Offering Mode' id='students_by_offering_mode'
+        chartType='doughnut' orientation='vertical' lengendDisplay='true'
+        limitData=10 legendPosition='bottom' legendName='short' %} {% include
+        'charts/chart.html' %} {% endwith %}
+      </div>
+      <div class="w-[33%] bg-gray-100 rounded-lg">
+        {% with data=chart_data_student_region title='Domestic and International
+        Students' id='students_by_country' chartType='doughnut'
+        lengendDisplay='true' limitData=10 legendPosition='bottom'
+        legendName='short' %} {% include 'charts/chart.html' %} {% endwith %}
+      </div>
 
-              {% if attendances|length > 0 %}
-              <div id='dashboard-attendance-engagement-action-container'>
-                  {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Overall Attendance'  chart2_title='Absent Engagement Analysis'  chart3_title='Action Engagement Analysis'  chart1_id='attendance-chart' chart2_id='engagement-chart'  chart3_id='action-chart' %}
-                    {% include 'components/dashboard/student_attendance_engagement_action_report.html' %}
-                  {% endwith %}
-              </div>
-                {% else %}
-                  <div class='bg-gray-200 p-4'>
-                    <p> No students found for students attendance report </p>
-                  </div>
-                {% endif %}
-            </div>
-
-            <!--campus proram and lecture wise deatil -->
-           
-            {% comment %} <div class='mt-5 flex  justify-center flex-row flex-wrap border-b-2 border-gray-300 '>
-                <div class ='flex w-1/2  min-w-[700px] flex-row flex-wrap gap-1 justify-start'>
-                  {% with pl_student_count_table_data=pl_student_count_table_data %}
-                    {% include "components/dashboard/program_leader/pl_student_count_table.html" %}
-                  {% endwith %}
-
-                </div>
-
-                 <div class ='flex w-1/2 p-4 min-w-[800px] flex-col '>
-                  {% with title='Program wise Attendnace - Enrollments' sub_title_choice=attendance_choice data=pl_program_wise_attendance_detail_data  %}
-                    {% include "components/dashboard/program_leader/pl_student_count_barChart.html" %}
-                  {% endwith %}
-                </div> 
-            </div> {% endcomment %}
-            
-
-             <!-- campus proram and lecture wise deatil new data  -->
-            <div class='mt-5 flex  justify-center flex-row flex-wrap border-b-2 border-gray-300 '>
-                    {% include "components/dashboard/program_leader/pl_student_count_table_barChart.html" %}
-            </div>
-
-            
-
-
-            <!-- Program Offering Details Section -->
-          
-          {% comment %} {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
-            {% include 'components/dashboard/program_offering_info_bar.html' %}
-          {% endwith %} {% endcomment %}
-          
-          
-          {% comment %} {% if chart_data_offering_mode_enrollment_students %}
-            {% with data=chart_data_offering_mode_enrollment_students text='Students Enrollment' id='students_enrollment'%}
-              {% include 'charts/barChartHorizontal.html' %}
-            {% endwith %}
-          {% endif %} {% endcomment %}
-          
-
-          {% comment %} {% with program_offerings=program_offerings_for_current_user students=total_students_in_program_offerings_for_current_user  %}
-            {% include 'components/dashboard/program_offering_attendance_info.html' %}
-          {% endwith %} {% endcomment %}
-
-        {% endif %}
-
-        
-          <!-- Trends Section -->
-        {% with  students=students  %}
-          {% include 'components/dashboard/trends.html' %}
-        {% endwith %}
-       
-
-          <!-- Alerts and Messages Section -->
-        {% with  students=students  %}
-          {% include 'components/dashboard/alerts_messages.html' %}
-        {% endwith %}
-         
-        {% if  request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin' or request.user|user_belongs_to_group:'Teacher'   %}
-              <!-- Student Performance Pie Chart Section -->
-            {% comment %} {{attendances|length}} {% endcomment %}
-            {% if attendances|length > 0 %}
-              {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Attendance'  chart2_title='Engagement'  chart3_title='Action'  chart1_id='attendance' chart2_id='engagement'  chart3_id='action' %}
-                {% include 'components/dashboard/student_performance_pieChart_flow.html' %}
-              {% endwith %}
-            {% else %}
-              <div class='bg-gray-200 p-4'>
-                <p> No students found for students attendance report </p>
-              </div>
-            {% endif %}
-            
-        
-        {% endif %}
-
-     {% comment %} <p>Total Program Offerings :  {{program_offerings.count}}</p>
-     <p>Total course Offerings :  {{course_offerings.count}}</p>
-     <p>Total Studnets :  {{students.count}}</p> {% endcomment %}
-     
-     {% comment %} <p>Studnets Enrollment  :  {{chart_data_course_offering_student_enrollment}}</p> {% endcomment %}
-
-    {% comment %} <h1> Dashboard </h1> {% endcomment %}
-    <section class='flex flex-row flex-wrap gap-2 items-center'>
-      {% comment %} chart to choose 
-      chartType:pie,line,bar,doughnut,polarArea
+      <div class="w-[100%] bg-gray-100 rounded-lg">
+        {% comment %} {% with data=chart_data_programs_student_enrollment
+        text='Students Enrollment By Program'
+        id='program_students_enrollment2'%} {% include
+        'charts/barChartHorizontal.html' %} {% endwith %} {% endcomment %} {%
+        with data=chart_data_programs_student_enrollment title='Students
+        Enrollment By Program' id='program_students_enrollment2' chartType='bar'
+        orientation='horizontal' lengendDisplay='true' limitData=10
+        legendPosition='right' legendName='full' %} {% include
+        'charts/chart.html' %} {% endwith %}
+      </div>
+      {% comment %}
+      <div class="w-4/12 bg-gray-100 rounded-lg">
+        {% with data=chart_data_programs_student_enrollment text='Students
+        Enrollment By Program test' id='test_chart'%} {% include
+        'charts/testchart.html' %} {% endwith %}
+      </div>
       {% endcomment %}
-      {% if request.user|user_belongs_to_group:'Admin' %} 
-        <div class='w-4/12 bg-gray-100 rounded-lg'>
-          {% with data=chart_data_campus_enrollment_student title='Student Enrollment Count By Campus' id='students_by_campus' chartType='pie' lengendDisplay='false' limitData=10 %}
-            {% include 'charts/chart.html' %}
-          {% endwith %}
-        </div>
-
-        <div class='w-5/12 bg-gray-100 rounded-lg'>
-          {% with data=chart_data_campus_enrollment_staff title='Staff Count By Campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' limitData=10 %}
-            {% include 'charts/chart.html' %}
-          {% endwith %}
-        </div>
-        <div class='w-7/12 bg-gray-100 rounded-lg'>
-          {% comment %} bar Chart Horizonal {% endcomment %}
-          {% with data=chart_data_course_offering_student_enrollment text='Students Enrollment' id='students_enrollment'%}
-            {% include 'charts/barChartHorizontal.html' %}
-          {% endwith %}
-          </div>
-  
-  
-       <div class='w-5/12 bg-gray-100 rounded-lg'>
-  
-        {% with data=chart_data_campus_enrollment_student title='Staff Appointment By campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' %}
-          {% include 'charts/chart.html' %}
-        {% endwith %}
-        </div>
-       <div class='w-5/12 bg-gray-100 rounded-lg'>
-  
-        {% with data=chart_data_campus_enrollment_student title='Staff Appointment By campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' %}
-          {% include 'charts/chart.html' %}
-        {% endwith %}
-        </div>
-  
-       <div class='w-5/12 bg-gray-100 rounded-lg'>
-  
-        {% with data=chart_data_course_offering_student_enrollment text='Students Enrollment' id='students_enrollment'%}
-          {% include 'charts/barChartVertical.html' %}
-        {% endwith %}
-        </div>
-  
-        <div class='w-5/12 bg-gray-100 rounded-lg'> 
-        {% with data=chart_data_course_offering_student_enrollment text='Students Enrollment' id='students_enrollment'%}
-          {% include 'charts/pieChart.html' %}
-        {% endwith %}
-        </div>
-        <div class='w-5/12  bg-gray-100 rounded-lg'>
-  
-        {% with data=chart_data_course_offering_student_enrollment text='Students Enrollment' id='students_enrollment'%}
-          {% include 'charts/doughnutChart.html' %}
+      <div class="w-[33%] bg-gray-100 rounded-lg hidden">
+        {% with data=chart_data_offering_mode_enrollment_students title='Student
+        Enrollment By Course Offering Mode' id='students_by_offering_mode2'
+        chartType='pie' lengendDisplay='true' limitData=10 %} {% include
+        'charts/chart.html' %} {% endwith %}
+      </div>
+      <div class="w-4/12 bg-gray-100 rounded-lg hidden">
+        {% with data=chart_data_student_region title='Domestic and International
+        Studnets' id='students_by_country1' chartType='bar'
+        lengendDisplay='false' limitData=10 %} {% include 'charts/chart.html' %}
         {% endwith %}
       </div>
-    
-      <div class='w-5/12 bg-gray-100 rounded-lg'>
-        
-        {% with data=chart_data_course_offering_student_enrollment text='Students Enrollment' id='students_enrollment'%}
-        {% include 'charts/lineChart.html' %}
-        {% endwith %}
-      </div>
+    </div>
 
-      {% endif %}
-     
+    {% comment %} {% with program_offerings=program_offerings_for_current_user
+    students=total_students_in_program_offerings_for_current_user
+    total_students_at_risk_query_set=total_students_at_risk_query_set %} {%
+    include 'components/dashboard/program_offering_info_bar.html' %} {% endwith
+    %} {% endcomment %} {% comment %} {{programs_for_current_user|length}}
+    {{active_programs_for_current_user|length}} {% endcomment %} {% with
+    active_programs_for_current_user=active_programs_for_current_user
+    programs_for_current_user=programs_for_current_user
+    online_programs=online_programs_for_current_user
+    offline_programs=offline_programs_for_current_user
+    inactive_programs_for_current_user=inactive_programs_for_current_user
+    students=students
+    total_students_at_risk_query_set=total_students_at_risk_query_set %} {%
+    include 'components/dashboard/programs_attendance_info.html' %} {% endwith
+    %}
+  </div>
 
-     
+  {% endif %} {% if request.user|user_belongs_to_group:'Program_Leader' %}
+  <!--New Attendnace Engagement Action Report -->
+  <!-- Student and enrollment status -->
+  <div
+    class="flex flex-row gap-10 justify-start text-gray-400 font-normal px-5"
+  >
+    <div class="flex flex-col">
+      <span class="flex flex-row">
+        <span> Total Students blended :</span>
+        <span>{{total_students_in_blended_course_offerings |length}} </span>
+      </span>
+      <span class="flex flex-row">
+        <span>Total Student Online :</span>
+        <span>{{total_students_in_online_course_offerings |length}}</span>
+      </span>
+    </div>
+    <div>
+      <span class="flex flex-row">
+        <span> Total Enrollment blended :</span>
+        <span>{{total_enrollment_in_blended_course_offerings |length}}</span>
+      </span>
+      <span>
+        <span>Total Enrollment Online :</span>
+        <span>{{total_enrollment_in_online_course_offerings |length}}</span>
+      </span>
+    </div>
+  </div>
+  <!--Attendnace Engagement Action report (by Vivian)-->
+  <div class="mt-5 border-b-2 border-gray-300">
+    {% if attendances|length > 0 %}
+    <div id="dashboard-attendance-engagement-action-container">
+      {% with title="Student Performace"
+      chart1_data=chart_data_attendance_report_attendance
+      chart2_data=chart_data_attendance_report_engagement
+      chart3_data=chart_data_attendance_report_action chart1_title='Overall
+      Attendance' chart2_title='Absent Engagement Analysis' chart3_title='Action
+      Engagement Analysis' chart1_id='attendance-chart'
+      chart2_id='engagement-chart' chart3_id='action-chart' %} {% include
+      'components/dashboard/student_attendance_engagement_action_report.html' %}
+      {% endwith %}
+    </div>
+    {% else %}
+    <div class="bg-gray-200 p-4">
+      <p>No students found for students attendance report</p>
+    </div>
+    {% endif %}
+  </div>
 
-     
+  <!--campus proram and lecture wise deatil -->
+
+  {% comment %}
+  <div
+    class="mt-5 flex justify-center flex-row flex-wrap border-b-2 border-gray-300"
+  >
+    <div
+      class="flex w-1/2 min-w-[700px] flex-row flex-wrap gap-1 justify-start"
+    >
+      {% with pl_student_count_table_data=pl_student_count_table_data %} {%
+      include "components/dashboard/program_leader/pl_student_count_table.html"
+      %} {% endwith %}
+    </div>
+
+    <div class="flex w-1/2 p-4 min-w-[800px] flex-col">
+      {% with title='Program wise Attendnace - Enrollments'
+      sub_title_choice=attendance_choice
+      data=pl_program_wise_attendance_detail_data %} {% include
+      "components/dashboard/program_leader/pl_student_count_barChart.html" %} {%
+      endwith %}
+    </div>
+  </div>
+  {% endcomment %}
+
+  <!-- campus proram and lecture wise deatil new data  -->
+  <div
+    class="mt-5 flex justify-center flex-row flex-wrap border-b-2 border-gray-300"
+  >
+    {% include
+    "components/dashboard/program_leader/pl_student_count_table_barChart.html"
+    %}
+  </div>
+
+  <!-- Program Offering Details Section -->
+
+  {% comment %} {% with program_offerings=program_offerings_for_current_user
+  students=total_students_in_program_offerings_for_current_user %} {% include
+  'components/dashboard/program_offering_info_bar.html' %} {% endwith %} {%
+  endcomment %} {% comment %} {% if chart_data_offering_mode_enrollment_students
+  %} {% with data=chart_data_offering_mode_enrollment_students text='Students
+  Enrollment' id='students_enrollment'%} {% include
+  'charts/barChartHorizontal.html' %} {% endwith %} {% endif %} {% endcomment %}
+  {% comment %} {% with program_offerings=program_offerings_for_current_user
+  students=total_students_in_program_offerings_for_current_user %} {% include
+  'components/dashboard/program_offering_attendance_info.html' %} {% endwith %}
+  {% endcomment %} {% endif %}
+
+  <!-- Trends Section -->
+  {% with students=students %} {% include 'components/dashboard/trends.html' %}
+  {% endwith %}
+
+  <!-- Alerts and Messages Section -->
+  {% with students=students %} {% include
+  'components/dashboard/alerts_messages.html' %} {% endwith %} {% if
+  request.user|user_belongs_to_group:'Head_of_School' or
+  request.user|user_belongs_to_group:'Admin' or
+  request.user|user_belongs_to_group:'Teacher' %}
+  <!-- Student Performance Pie Chart Section -->
+  {% comment %} {{attendances|length}} {% endcomment %} {% if attendances|length
+  > 0 %} {% with title="Student Performace"
+  chart1_data=chart_data_attendance_report_attendance
+  chart2_data=chart_data_attendance_report_engagement
+  chart3_data=chart_data_attendance_report_action chart1_title='Attendance'
+  chart2_title='Engagement' chart3_title='Action' chart1_id='attendance'
+  chart2_id='engagement' chart3_id='action' %} {% include
+  'components/dashboard/student_performance_pieChart_flow.html' %} {% endwith %}
+  {% else %}
+  <div class="bg-gray-200 p-4">
+    <p>No students found for students attendance report</p>
+  </div>
+  {% endif %} {% endif %} {% comment %}
+  <p>Total Program Offerings : {{program_offerings.count}}</p>
+  <p>Total course Offerings : {{course_offerings.count}}</p>
+  <p>Total Studnets : {{students.count}}</p>
+  {% endcomment %} {% comment %}
+  <p>Studnets Enrollment : {{chart_data_course_offering_student_enrollment}}</p>
+  {% endcomment %} {% comment %}
+  <h1>Dashboard</h1>
+  {% endcomment %}
+  <section class="flex flex-row flex-wrap gap-2 items-center">
+    {% comment %} chart to choose chartType:pie,line,bar,doughnut,polarArea {%
+    endcomment %} {% if request.user|user_belongs_to_group:'Admin' %}
+    <div class="w-4/12 bg-gray-100 rounded-lg">
+      {% with data=chart_data_campus_enrollment_student title='Student
+      Enrollment Count By Campus' id='students_by_campus' chartType='pie'
+      lengendDisplay='false' limitData=10 %} {% include 'charts/chart.html' %}
+      {% endwith %}
+    </div>
+
+    <div class="w-5/12 bg-gray-100 rounded-lg">
+      {% with data=chart_data_campus_enrollment_staff title='Staff Count By
+      Campus' id='staff_by_campus' chartType='bar' lengendDisplay='true'
+      limitData=10 %} {% include 'charts/chart.html' %} {% endwith %}
+    </div>
+    <div class="w-7/12 bg-gray-100 rounded-lg">
+      {% comment %} bar Chart Horizonal {% endcomment %} {% with
+      data=chart_data_course_offering_student_enrollment text='Students
+      Enrollment' id='students_enrollment'%} {% include
+      'charts/barChartHorizontal.html' %} {% endwith %}
+    </div>
+
+    <div class="w-5/12 bg-gray-100 rounded-lg">
+      {% with data=chart_data_campus_enrollment_student title='Staff Appointment
+      By campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' %}
+      {% include 'charts/chart.html' %} {% endwith %}
+    </div>
+    <div class="w-5/12 bg-gray-100 rounded-lg">
+      {% with data=chart_data_campus_enrollment_student title='Staff Appointment
+      By campus' id='staff_by_campus' chartType='bar' lengendDisplay='true' %}
+      {% include 'charts/chart.html' %} {% endwith %}
+    </div>
+
+    <div class="w-5/12 bg-gray-100 rounded-lg">
+      {% with data=chart_data_course_offering_student_enrollment text='Students
+      Enrollment' id='students_enrollment'%} {% include
+      'charts/barChartVertical.html' %} {% endwith %}
+    </div>
+
+    <div class="w-5/12 bg-gray-100 rounded-lg">
+      {% with data=chart_data_course_offering_student_enrollment text='Students
+      Enrollment' id='students_enrollment'%} {% include 'charts/pieChart.html'
+      %} {% endwith %}
+    </div>
+    <div class="w-5/12 bg-gray-100 rounded-lg">
+      {% with data=chart_data_course_offering_student_enrollment text='Students
+      Enrollment' id='students_enrollment'%} {% include
+      'charts/doughnutChart.html' %} {% endwith %}
+    </div>
+
+    <div class="w-5/12 bg-gray-100 rounded-lg">
+      {% with data=chart_data_course_offering_student_enrollment text='Students
+      Enrollment' id='students_enrollment'%} {% include 'charts/lineChart.html'
+      %} {% endwith %}
+    </div>
+
+    {% endif %}
+
     <section>
-      {% comment %} <script>
+      {% comment %}
+      <script>
+        // Populate year dropdown on page load
+        window.onload = function () {
+          populateDropdown("yearDropdown", 2020, 2024);
 
-           // Populate year dropdown on page load
-            window.onload = function () {
-              populateDropdown('yearDropdown', 2020, 2024);
-              
-               // Set default values for duration type and quarter
-              document.getElementById('yearDropdown').value=new Date().getFullYear()
-              document.getElementById('durationTypeDropdown').value = 'quarter';
-              setDefaultQuarter();
-              // Initial population for duration values
-              populateDurationValues();
-          };
+          // Set default values for duration type and quarter
+          document.getElementById("yearDropdown").value =
+            new Date().getFullYear();
+          document.getElementById("durationTypeDropdown").value = "quarter";
+          setDefaultQuarter();
+          // Initial population for duration values
+          populateDurationValues();
+        };
 
-          function populateDurationValues() {
-            //console.log("drop drown creation started")
-            var durationType = document.getElementById('durationTypeDropdown').value;
-            var durationValueContainer = document.getElementById('durationValueContainer');
-            var dropdownId = durationType + 'Dropdown';
-            
-            // Clear previous options
-            durationValueContainer.innerHTML = '';
-            // Create a new dropdown element
-            var dropdown = document.createElement('select');
-            dropdown.id = dropdownId;
-            dropdown.className = 'pl-3 pr-10 text-sm';
-            
-            //console.log("console:",durationType, "with id :",dropdownId)
-            // Append the dropdown to the container
-            durationValueContainer.appendChild(dropdown);  
-            // Populate dropdown options based on duration type
-            if (durationType === 'semester') {
-                populateDropdown(dropdownId, 1, 2);
-            } else if (durationType === 'quarter') {
-                populateDropdown(dropdownId, 1, 4);
-            } else if (durationType === 'month') {
-                populateDropdown(dropdownId, 1, 12);
-            }
-            setDate()
+        function populateDurationValues() {
+          //console.log("drop drown creation started")
+          var durationType = document.getElementById(
+            "durationTypeDropdown"
+          ).value;
+          var durationValueContainer = document.getElementById(
+            "durationValueContainer"
+          );
+          var dropdownId = durationType + "Dropdown";
 
-            }
+          // Clear previous options
+          durationValueContainer.innerHTML = "";
+          // Create a new dropdown element
+          var dropdown = document.createElement("select");
+          dropdown.id = dropdownId;
+          dropdown.className = "pl-3 pr-10 text-sm";
 
-            function populateDropdown(dropdownId, start, end) {
-              //console.log("ID :",dropdownId)
-              var dropdown = document.getElementById(dropdownId);
-      
-              for (var i = start; i <= end; i++) {
-                  var option = document.createElement('option');
-                  option.value = i;
-                  option.text = i;
-                  dropdown.add(option);
-              }
-              
+          //console.log("console:",durationType, "with id :",dropdownId)
+          // Append the dropdown to the container
+          durationValueContainer.appendChild(dropdown);
+          // Populate dropdown options based on duration type
+          if (durationType === "semester") {
+            populateDropdown(dropdownId, 1, 2);
+          } else if (durationType === "quarter") {
+            populateDropdown(dropdownId, 1, 4);
+          } else if (durationType === "month") {
+            populateDropdown(dropdownId, 1, 12);
           }
-          function setDate() {
-            var year = document.getElementById('yearDropdown').value;
-            var durationType = document.getElementById('durationTypeDropdown').value;
-            var durationValue = document.getElementById(durationType + 'Dropdown').value;
-    
-            // Use the selected values to set the date inputs in the form
-            var [start_date,end_date]=formatDate(year, durationType, durationValue, 1).split(' to ');
-            document.getElementById('id_start_date').value = start_date;
-            document.getElementById('id_end_date').value = end_date;
-           
+          setDate();
         }
-    
+
+        function populateDropdown(dropdownId, start, end) {
+          //console.log("ID :",dropdownId)
+          var dropdown = document.getElementById(dropdownId);
+
+          for (var i = start; i <= end; i++) {
+            var option = document.createElement("option");
+            option.value = i;
+            option.text = i;
+            dropdown.add(option);
+          }
+        }
+        function setDate() {
+          var year = document.getElementById("yearDropdown").value;
+          var durationType = document.getElementById(
+            "durationTypeDropdown"
+          ).value;
+          var durationValue = document.getElementById(
+            durationType + "Dropdown"
+          ).value;
+
+          // Use the selected values to set the date inputs in the form
+          var [start_date, end_date] = formatDate(
+            year,
+            durationType,
+            durationValue,
+            1
+          ).split(" to ");
+          document.getElementById("id_start_date").value = start_date;
+          document.getElementById("id_end_date").value = end_date;
+        }
+
         function formatDate(year, durationType, durationValue, day) {
-    
-            if (durationType === 'semester') {
-               
-                var startMonth = (durationValue - 1) * 6 + 1;
-                var endMonth = startMonth + 5;
-            } else if (durationType === 'quarter') {
-              
-                var startMonth = (durationValue - 1) * 3 + 1;
-                var endMonth = startMonth + 2;
-            } else if (durationType === 'month') {
-              
-                var startMonth = durationValue;
-                var endMonth = durationValue;
-            }
-            
-            return `${year}-${padZero(startMonth)}-${padZero(day)} to ${year}-${padZero(endMonth)}-${getDaysInMonth(year, endMonth)}`;
+          if (durationType === "semester") {
+            var startMonth = (durationValue - 1) * 6 + 1;
+            var endMonth = startMonth + 5;
+          } else if (durationType === "quarter") {
+            var startMonth = (durationValue - 1) * 3 + 1;
+            var endMonth = startMonth + 2;
+          } else if (durationType === "month") {
+            var startMonth = durationValue;
+            var endMonth = durationValue;
+          }
+
+          return `${year}-${padZero(startMonth)}-${padZero(
+            day
+          )} to ${year}-${padZero(endMonth)}-${getDaysInMonth(year, endMonth)}`;
         }
-    
+
         function padZero(value) {
-            return value.toString().padStart(2, '0');
+          return value.toString().padStart(2, "0");
         }
-    
+
         function getDaysInMonth(year, month) {
-            return new Date(year, month, 0).getDate();
+          return new Date(year, month, 0).getDate();
         }
         function setDefaultQuarter() {
           var currentMonth = new Date().getMonth() + 1;
           var defaultQuarter = Math.ceil(currentMonth / 3);
-  
+
           // Set the default quarter value in the dropdown
           //document.getElementById('quarterDropdown').value = defaultQuarter;
-          populateDurationValues();  // Populate quarter dropdown options
-          document.getElementById('quarterDropdown').value = defaultQuarter;
-      }
-
-    
-      
-     
- 
-    </script> {% endcomment %}
-   </section>
-{% endblock content %}
-    
+          populateDurationValues(); // Populate quarter dropdown options
+          document.getElementById("quarterDropdown").value = defaultQuarter;
+        }
+      </script>
+      {% endcomment %}
+    </section>
+    {% endblock content %}
+  </section>
+</section>
