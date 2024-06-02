@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% block content %}
+    <section class='flex w-full flex-col'>
+      <div>Dashboard 2New with celery </div>
+      {% if result %}
+      <p> Result : {{result}}</p>
+      {% else %}
+      <p> No Result </p>
+      {% endif %}
+     
+      <h1>end point method <br></h1>
+      <div id="result"></div>
+
+      <script>
+        function checkTaskStatus(taskId) {
+          $.ajax({
+              url: '{% url "check_task_status" %}',
+              method: 'GET',
+              data: { task_id: taskId },
+              success: function(data) {
+                  if (data.status === 'SUCCESS') {
+                      // Update the webpage content with the result
+                      $('#result').text(data.result);
+                  } else if (data.status === 'PENDING' || data.status === 'STARTED') {
+                      // Task is still running, check again after some time
+                      setTimeout(function() {
+                          checkTaskStatus(taskId);
+                      }, 1000); // Check every 1 second (adjust as needed)
+                  } else {
+                      // Handle other statuses (FAILURE, REVOKED, etc.) if necessary
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.error('Error checking task status:', error);
+              }
+          });
+      }
+      
+      $(document).ready(function() {
+          // Start checking task status when the page loads
+          var taskId = '{{ task_id }}'; // Assuming you pass task_id to the template
+          checkTaskStatus(taskId);
+      });
+      </script>
+
+      
+   </section>
+{% endblock content %}
+    

@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'report',
     'uploadFile',
     'attendance',
+    'dashboard',
+    'django_celery_results',
+    'django_celery_beat', 
 ]
 
 MIDDLEWARE = [
@@ -166,3 +169,22 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+
+# Celery Configuration Options
+CELERY_TIMEZONE = 'Pacific/Auckland'
+CELERY_BROKER_URL='redis://127.0.0.1:6379/0'
+# CELERY_RESULT_BACKEND='redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND='django-db'
+CELERY_RESULT_EXTENDED = True
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# # periodic task method 1 
+# CELERY_BEAT_SCHEDULE = {
+#     "every-10-seconds":{
+#         'task':'dashboard.tasks.periodic_task_test',
+#         'schedule':10,
+#         'args':('1111',)
+        
+#     },
+# }

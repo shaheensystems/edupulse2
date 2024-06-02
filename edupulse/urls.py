@@ -36,6 +36,7 @@ urlpatterns = [
     path('attendance/',include('attendance.urls')),
     path('user/',include('customUser.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
+    path("home/", include("dashboard.urls")),
 ]
 
 if settings.DEBUG:
