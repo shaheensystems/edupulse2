@@ -4,6 +4,7 @@ from celery import Celery
 from time import sleep
 from datetime import timedelta
 from celery.schedules import crontab
+
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'edupulse.settings')
 
@@ -28,6 +29,31 @@ def debug_task(self):
 def add(x,y):
     sleep(10)
     return x+y
+
+@app.task
+def delete_all_periodic_tasks(name="delete all periodic task"):
+    from django_celery_beat.models import PeriodicTask, PeriodicTasks
+    # Find the periodic task by name and delete it
+    tasks_to_delete = PeriodicTask.objects.all()
+    deleted_count = tasks_to_delete.delete()[0]  # Get the number of deleted tasks
+    PeriodicTasks.update_changed()  # Notify celery beat about the changes
+    print(f"Deleted {deleted_count} tasks")
+    
+@app.task
+def delete_all_tasks(name='delete all task result '):
+    from django_celery_results.models import TaskResult
+    # Find the periodic task by name and delete it
+    tasks_to_delete = TaskResult.objects.all()
+    deleted_count = tasks_to_delete.delete()[0]  # Get the number of deleted tasks
+   
+    print(f"Deleted {deleted_count} tasks")
+    
+app.conf.beat_schedule = {
+    'every-1-min': {
+        'task': 'edupulse.celery.delete_all_tasks',  # Ensure this matches the actual task path
+        'schedule': 60,  # Run every 60 seconds
+    },
+}
 
 # # periodic task method 2 
 # app.conf.beat_schedule ={
