@@ -23,3 +23,6 @@ def periodic_task_test2():
  
     return x
  
+@shared_task(name='student_attendance_engagement_action_report_generation_task')
+def student_attendance_engagement_action_report_generation():
+    return 

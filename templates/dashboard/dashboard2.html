@@ -20,8 +20,10 @@
               data: { task_id: taskId },
               success: function(data) {
                   if (data.status === 'SUCCESS') {
+
                       // Update the webpage content with the result
                       $('#result').text(data.result);
+                      
                   } else if (data.status === 'PENDING' || data.status === 'STARTED') {
                       // Task is still running, check again after some time
                       setTimeout(function() {
