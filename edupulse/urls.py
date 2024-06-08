@@ -26,7 +26,7 @@ urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path('admin/', admin.site.urls),
     path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
-    path('',DashboardView.as_view(), name='dashboard'),
+    path('',DashboardView.as_view(), name='dashboard2'),
     path('test/',DashboardTestView.as_view(), name='dashboard-testing'),
   
     path('manage-attendance/', ManageAttendanceView.as_view(),name='manage-attendance'),
@@ -36,7 +36,7 @@ urlpatterns = [
     path('attendance/',include('attendance.urls')),
     path('user/',include('customUser.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
-    path("home/", include("dashboard.urls")),
+    path("dashboard/", include("dashboard.urls")),
 ]
 
 if settings.DEBUG:

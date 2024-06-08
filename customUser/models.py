@@ -106,7 +106,7 @@ class Staff(BaseModel):
     def calculate_total_student_enrolled(self):
         from report.models import StudentEnrollment
         from customUser.models import Student
-        student_enrollments=StudentEnrollment.objects.select_related('course_offering').prefetch_related('course_offering__staff_course_offering_relations__staff').filter(course_offering__staff_course_offering_relations__staff=self)
+        student_enrollments=StudentEnrollment.objects.select_related('course_offering','student').prefetch_related('course_offering__staff_course_offering_relations__staff').filter(course_offering__staff_course_offering_relations__staff=self)
         enrolled_students=Student.objects.prefetch_related('student_enrollments').filter(student_enrollments__in=student_enrollments)
 
         return enrolled_students

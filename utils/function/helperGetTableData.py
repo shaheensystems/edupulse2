@@ -20,10 +20,10 @@ def get_table_data_student_and_enrollment_count_by_programs(programs):
 
 def get_table_data_student_and_enrollment_count_by_campus_through_program_offerings(program_offerings):
     total_student_enrollments=[]
-        
-    for program_offering in program_offerings:
-        student_enrollment=program_offering.calculate_total_student_enrollments()
-        total_student_enrollments.extend(student_enrollment)
+    if program_offerings:
+        for program_offering in program_offerings:
+            student_enrollment=program_offering.calculate_total_student_enrollments()
+            total_student_enrollments.extend(student_enrollment)
     
     table_data_student_and_enrollment_count_by_campus_through_program_offerings=[]
         # Initialize a dictionary to store enrollments grouped by campus
@@ -150,9 +150,17 @@ def get_barChart_data_student_attendance_details_by_campuses(campuses,program_of
     for campus in campuses:
         
         # student_enrollments=campus.calculate_total_student_enrollments().filter(users__student_profile__student_enrollments__program_offering__in=program_offerings)    
-        enrolled_students=campus.calculate_total_student_enrolled().filter(student_enrollments__program_offering__in=program_offerings)
+        # enrolled_students=campus.calculate_total_student_enrolled().filter(student_enrollments__program_offering__in=program_offerings)
+        if program_offerings is not None:
+            enrolled_students = campus.calculate_total_student_enrolled().filter(student_enrollments__program_offering__in=program_offerings)
+        else:
+            # Handle the case when program_offerings is None
+            from customUser.models import Student
+            enrolled_students = Student.objects.none()
+        
         
         students=set(enrolled_students)
+        
         attendance_status,sorted_attendance_percentage = get_sorted_attendance_percentage_by_cat_through_students(students=students)
             
         table_data_student_attendance_details_by_campuses.append(

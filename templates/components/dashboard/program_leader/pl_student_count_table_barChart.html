@@ -34,6 +34,7 @@
             
             // Make AJAX request to fetch data
             $.ajax({
+                //url: '{% url "dashboard" %}',  // Replace '/api/data' with your actual API endpoint
                 url: '{% url "dashboard" %}',  // Replace '/api/data' with your actual API endpoint
                 method: 'GET',
                 dataType: 'json',
@@ -53,7 +54,8 @@
                     $('#id_pl_student_count_barChart_filter_btn_attendance').removeClass('bg-gray-200 text-gray-600').addClass('bg-blue-400 text-white')
               
                     // Display a success message or handle other actions
-                    console.log("student coutn table data updated and Status code :",response.status);
+                    console.log("student count table data updated and Status code :",response.status);
+                    console.log("student count table data updated and Status code :",response.html_content_table);
                 },
                 error: function(xhr, status, error) {
                     console.error('Error fetching data:', error);

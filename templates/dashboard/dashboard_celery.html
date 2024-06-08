@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% block content %}
+    <section class='flex w-full flex-col'>
+      <div>Dashboard 2New with celery </div>
+      {% if result %}
+      <p> Result : {{result}}</p>
+      <p> Result ID : {{task_id}}</p>
+      {% else %}
+      <p> No Result </p>
+      {% endif %}
+     
+      <h1>end point method <br></h1>
+      <div id="result"></div>
+      <br>
+      <p>chart Data</p>
+
+        {% if result_attendance_report %}
+        <p> Result : {{result_attendance_report}}</p>
+        <p> Result ID : {{result_attendance_report_task_id}}</p>
+        {% else %}
+        <p> No Result </p>
+        {% endif %}
+    
+      <div id="id_student_attendance_engagement_action_report_data_container"></div>
+      temp:<div id="id_temp"></div>
+
+      <script>
+        
+        function checkTaskStatus(taskId) {
+          $.ajax({
+              url: '{% url "check_task_status" %}',
+              method: 'GET',
+              data: { task_id: taskId },
+              success: function(data) {
+                  if (data.status === 'SUCCESS') {
+
+                      // Update the webpage content with the result
+                      console.log("method1 :",data)
+                      $('#result').text(data.result);
+                      
+                  } else if (data.status === 'PENDING' || data.status === 'STARTED') {
+                      // Task is still running, check again after some time
+                      setTimeout(function() {
+                          checkTaskStatus(taskId);
+                      }, 1000); // Check every 1 second (adjust as needed)
+                  } else {
+                      // Handle other statuses (FAILURE, REVOKED, etc.) if necessary
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.error('Error checking task status:', error);
+              }
+          });
+      }
+        function checkTaskStatusAttendanceReport(attendanceReportTaskId) {
+          $.ajax({
+              url: '{% url "check_status_attendance_status_report_chart_data" %}',
+              method: 'GET',
+              data: { result_attendance_report_task_id: attendanceReportTaskId },
+              success: function(data) {
+                  if (data.status === 'SUCCESS') {
+
+                      // Update the webpage content with the result
+                      console.log("method2 :",data)
+                      $('#id_student_attendance_engagement_action_report_data_container').text(data.result);
+                      $('#id_temp').text(data.result);
+                      
+                  } else if (data.status === 'PENDING' || data.status === 'STARTED') {
+                      // Task is still running, check again after some time
+                      setTimeout(function() {
+                        checkTaskStatusAttendanceReport(attendanceReportTaskId);
+                      }, 1000); // Check every 1 second (adjust as needed)
+                  } else {
+                      // Handle other statuses (FAILURE, REVOKED, etc.) if necessary
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.error('Error checking task status:', error);
+              }
+          });
+      }
+     
+      
+        
+      
+      $(document).ready(function() {
+          // Start checking task status when the page loads
+          var taskId = '{{ task_id }}'; // Assuming you pass task_id to the template
+          checkTaskStatus(taskId);
+
+          var attendanceReportTaskId = '{{ result_attendance_report_task_id }}';
+          checkTaskStatusAttendanceReport(attendanceReportTaskId);
+          
+      });
+      </script>
+
+      
+   </section>
+{% endblock content %}
+    

@@ -121,7 +121,7 @@ def filter_database_based_on_current_user(request_user):
     )
     attendances = (
         Attendance.objects.select_related(
-            "course_offering", "program_offering", "student"
+            "course_offering", "program_offering", "student",'student__student'
         )
         .prefetch_related("weekly_reports")
         .all()

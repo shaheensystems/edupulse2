@@ -740,8 +740,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 programs=programs_for_current_user
             )
         )
-        pl_campus_wise_student_count_table_data = get_table_data_student_and_enrollment_count_by_campus_through_program_offerings(
+        pl_campus_wise_student_count_table_data = (
+            get_table_data_student_and_enrollment_count_by_campus_through_program_offerings(
             program_offerings=program_offerings_for_current_user
+        )
         )
         pl_lecturer_wise_student_count_table_data = (
             get_table_data_student_and_enrollment_count_by_lecturer(
