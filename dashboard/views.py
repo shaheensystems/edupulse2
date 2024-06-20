@@ -594,13 +594,19 @@ class LoadCourseOfferingDataAjaxView(View):
             return JsonResponse({'error': 'CourseOffering not found'}, status=404)
         
         session_no = self.get_cached_session_no(request)
+        week_no = self.get_cached_week_no(request)
         
-        calculate_student_attendance_percentage,calculate_student_attendance_chart_data = self.filter_data(course_offering=course_offering, session_no=session_no)
-
+        calculate_student_attendance_percentage,calculate_student_attendance_chart_data = self.filter_data(course_offering=course_offering,week_no=week_no, session_no=session_no)
+        
+        week_and_session_no_choices=self.get_session_and_week_choices_by_course_offering(course_offering=course_offering)
+        
+        print("session no choice :",week_and_session_no_choices)
+        
         html = render_to_string('components/dashboard/course_offering_report.html', {
             'co': course_offering,
             'calculate_student_attendance_percentage':calculate_student_attendance_percentage,
             'calculate_student_attendance_chart_data':calculate_student_attendance_chart_data,
+            'week_and_session_no_choices':week_and_session_no_choices,
         }, request)
         
         return JsonResponse({'html': html})
@@ -610,51 +616,78 @@ class LoadCourseOfferingDataAjaxView(View):
         course_offering_id = kwargs.get('pk')
         course_offering = get_object_or_404(CourseOffering, pk=course_offering_id)
         
-        session_no = request.POST.get('session_no')
+       
+        # Retrieve the JSON data from request.POST
+        week_and_session_no_str = request.POST.get('session_no')
+        
+        # Parse the JSON string to a Python dictionary
+        week_and_session_no = json.loads(week_and_session_no_str)
+        print(" data for filter received from ajax request :",week_and_session_no)
+        
+        week_no=week_and_session_no['week']
+        session_no=week_and_session_no['session']
+        
         self.cache_session_no(request, session_no)
-        calculate_student_attendance_percentage,calculate_student_attendance_chart_data = self.filter_data(course_offering=course_offering, session_no=session_no)
+        self.cache_week_no(request, week_no)
+        calculate_student_attendance_percentage,calculate_student_attendance_chart_data = self.filter_data(course_offering=course_offering,week_no=week_no, session_no=session_no)
 
+        week_and_session_no_choices=self.get_session_and_week_choices_by_course_offering(course_offering=course_offering)
         
         
         html = render_to_string('components/dashboard/course_offering_report.html', {
             'co': course_offering,
             'calculate_student_attendance_percentage':calculate_student_attendance_percentage,
             'calculate_student_attendance_chart_data':calculate_student_attendance_chart_data,
+            'week_and_session_no_choices':week_and_session_no_choices,
         }, request)
         
         return JsonResponse({'html': html})
 
-    def filter_data(self, course_offering, session_no):
-        cache_key = f'course_offering_data_{course_offering.pk}_{session_no}'
+    def get_session_and_week_choices_by_course_offering(self,course_offering):
+        week_and_session_no_choices = [
+        {
+        "value": {"week": attendance['week_no'], "session": attendance['session_no']},
+        "text": f"W {attendance['week_no']}: S {attendance['session_no']}"
+        }
+        for attendance in course_offering.attendances.filter(course_offering__isnull=False).values('session_no', 'week_no').distinct()
+        ]
+        return week_and_session_no_choices
+        
+    def filter_data(self, course_offering,week_no, session_no):
+        cache_key = f'course_offering_data_{course_offering.pk}_{week_no}_{session_no}'
         cached_data = cache.get(cache_key)
         if cached_data:
             return cached_data
         
-        if session_no is not None:
+        if session_no is not None and week_no is not None:
             calculate_student_attendance_percentage=self.calculate_student_attendance_percentage(
             course_offering=course_offering,
-            session_no=session_no
+            session_no=session_no,
+            week_no=week_no
              )
             calculate_student_attendance_chart_data=self.calculate_student_attendance_chart_data(
                 course_offering=course_offering,
-                session_no=session_no
+                session_no=session_no,
+                week_no=week_no
              )
             
         else:
             calculate_student_attendance_percentage=self.calculate_student_attendance_percentage(
             course_offering=course_offering,
-            session_no=None
+            session_no=None,
+            week_no=None,
              )
             calculate_student_attendance_chart_data=self.calculate_student_attendance_chart_data(
                 course_offering=course_offering,
-                session_no=None
+                session_no=None,
+                week_no=None,
              )
         # Store calculated data in cache
         cache.set(cache_key, (calculate_student_attendance_percentage, calculate_student_attendance_chart_data), timeout=None)
 
         return calculate_student_attendance_percentage,calculate_student_attendance_chart_data
     
-    def calculate_student_attendance_percentage(self,course_offering,session_no):
+    def calculate_student_attendance_percentage(self,course_offering,session_no,week_no):
         attendances=course_offering.attendances.all()
         if session_no is not None:
             attendances=attendances.filter(session_no=session_no)
@@ -677,10 +710,10 @@ class LoadCourseOfferingDataAjaxView(View):
             'informed_absent_percentage':informed_absent_percentage ,
             'absent_percentage':absent_percentage ,
         }
-    def calculate_student_attendance_chart_data(self,course_offering,session_no):
+    def calculate_student_attendance_chart_data(self,course_offering,session_no,week_no):
         attendances=course_offering.attendances.all()
-        if session_no is not None:
-            attendances=attendances.filter(session_no=session_no)
+        if session_no is not None and week_no is not None:
+            attendances=attendances.filter(session_no=session_no,week_no=week_no)
             
         if attendances:
             chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
@@ -690,10 +723,18 @@ class LoadCourseOfferingDataAjaxView(View):
     def get_cached_session_no(self, request):
         # Retrieve selected session number from cache
         return cache.get(f'selected_session_no_{request.user.id}')
+    
+    def get_cached_week_no(self, request):
+        # Retrieve selected session number from cache
+        return cache.get(f'selected_week_no_{request.user.id}')
 
     def cache_session_no(self, request, session_no):
         # Cache selected session number
         cache.set(f'selected_session_no_{request.user.id}', session_no, timeout=None)
+        
+    def cache_week_no(self, request, week_no):
+        # Cache selected session number
+        cache.set(f'selected_week_no_{request.user.id}', week_no, timeout=None)
         
         
 class FilterAttendancesAjaxView(View):

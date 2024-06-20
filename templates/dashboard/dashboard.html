@@ -94,8 +94,9 @@
           var formData = new FormData(form[0]);
           var url = form.data('url');
           var selectedSessionValue=$(this).closest('.filterForm .selected_session_value').val()
+          var selectionValue = JSON.parse(selectedSessionValue);
           var courseOfferingId = form.attr('id').split('_')[1];
-          console.log(" on change filter method for course offering , co id : ",courseOfferingId, "url :", url, " filter value :",selectedSessionValue);
+          console.log(" on change filter method for course offering , co id : ",courseOfferingId, "url :", url, " filter value :",selectionValue);
   
           $.ajax({
             type: 'POST',
@@ -103,16 +104,17 @@
             data: formData,
             processData: false,
             contentType: false,
+            dataType:'json',
             headers: {
               'X-CSRFToken': '{{ csrf_token }}'
             },
             success: function(data) {
 
-              console.log("Selection value for co id: ", courseOfferingId, " ,selection value: ", selectedSessionValue);
-              localStorage.setItem('selected_session_no_'+courseOfferingId, selectedSessionValue);
+              console.log("Selection value for co id: ", courseOfferingId, " ,selection value: ", selectionValue);
+              localStorage.setItem('selected_session_no_'+courseOfferingId, selectionValue);
 
               $('#filteredData_' + courseOfferingId).html(data.html);
-              $('#session_no_' + courseOfferingId).val(selectedSessionValue);
+              $('#session_no_' + courseOfferingId).val(JSON.stringify(selectionValue));
 
             },
             error: function(error) {
