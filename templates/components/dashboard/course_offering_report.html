@@ -7,8 +7,8 @@
         <!-- AJAX form for filtering -->
         <form id="filterForm_{{ co.id }}" class="filterForm" method="post" data-url="{% url 'load_course_offering_data' co.pk %}">
           {% csrf_token %}
-          <label for="session_no_{{ co.id }}">Select Session:</label>
-          <select id="session_no_{{ co.id }}"  name="session_no">
+          <label for="session_no_{{ co.id }}" > Select Session: </label>
+          <select id="session_no_{{ co.id }}" class='selected_session_value' name ="session_no">
             <option value="">Select Session</option>
             <option value=1>Week 1: Session 1</option>
             <option value=2>Week 1: Session 2</option>
