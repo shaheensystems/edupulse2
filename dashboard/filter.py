@@ -2,7 +2,7 @@ import django_filters
 from django import forms
 from django_filters import widgets as filters_widgets
 from report.models import Attendance
-from program.models import Program
+from program.models import Program, CourseOffering
 
 class TailwindChoiceWidget(forms.Select):
     def __init__(self, attrs=None, choices=()):
@@ -46,3 +46,22 @@ class AttendanceEngagementReportFilter(django_filters.FilterSet):
     class Meta:
         model=Attendance
         fields=['course_offering__student_enrollments__program_offering__program','week_no','session_no']
+
+
+class CourseOfferingAttendanceFilterForTeacher(django_filters.FilterSet):
+    session_no_choices = [
+        (attendance['session_no'], f"Week {attendance['week_no']}: Session {attendance['session_no']}")
+        for attendance in Attendance.objects.filter(course_offering__isnull=False).values('session_no', 'week_no').distinct()
+    ]
+
+    attendances__session_no = django_filters.ChoiceFilter(
+        widget=django_filters.widgets.LinkWidget(attrs={'class': 'form-control'}),
+        choices=session_no_choices,
+        empty_label="Select Session"
+    )
+
+    class Meta:
+        model = CourseOffering
+        fields = ['attendances__session_no']
+        
+    

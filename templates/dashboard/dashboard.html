@@ -2,31 +2,114 @@
 {% load custom_tags %}
 {% block content %}
     <section class='flex w-full flex-col'>
-      <div>Dashboard </div>
-      {% if  request.user|user_belongs_to_group:'Program_Leader'  %}
-      <div class='mt-5 border-b-2 border-gray-300' >
-
-        {% if attendances|length > 0 %}
-        <!-- Student Attendnace engagement report Chart-->
-        <div id='dashboard-attendance-engagement-action-container'>
-         
-            {% with title="Student Performace" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Overall Attendance'  chart2_title='Absent Engagement Analysis'  chart3_title='Action Engagement Analysis'  chart1_id='attendance-chart' chart2_id='engagement-chart'  chart3_id='action-chart' %}
-              {% include 'components/dashboard/student_attendance_engagement_action_report_new.html' %}
-            {% endwith %}
-        </div>
-          {% else %}
-            <div class='bg-gray-200 p-4'>
-              <p> No students found for students attendance report </p>
-            </div>
-          {% endif %}
-      </div> 
-      <!-- Student count Table -->
-      <div class='mt-5 flex  justify-center flex-row flex-wrap border-b-2 border-gray-300 '>
-        {% include "components/dashboard/program_leader/pl_student_count_table_barChart.html" %}
+      
+      {% if request.user|user_belongs_to_group:'Teacher' %}
+       
+      <div class='flex flex-row gap-4 mt-4 w-full'> 
+        <span class='flex flex-wrap text-gray-400 text-sm items-end px-2'>Jump to : </span>
+        {% for co in course_offerings_for_current_user %}
+          <a href="{% url 'course_offering_detail' co.pk %}" class='text-blue-400 underline underline-offset-4'>{{ co.temp_id }}</a>
+        {% endfor %}
       </div>
+      Total Course offerings: {{ course_offerings_for_current_user|length }}
+
+      {% for co in course_offerings_for_current_user %}
+        <div class="course-offering-report-container w-full" id="course_offering_{{ co.id }}">
+          <div class="course-offering-content w-full">
+            <p>Loading...</p>
+          </div>
+        </div>
+      {% endfor %}
 
       {% endif %}
-      
-   </section>
+
+      {% if request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin' %}
+      <div class='mt-5 border-b-2 border-gray-300'>
+        <div id='dashboard-attendance-engagement-action-container'>
+          {% with title="Student Performance" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Overall Attendance'  chart2_title='Absent Engagement Analysis'  chart3_title='Action Engagement Analysis'  chart1_id='attendance-chart' chart2_id='engagement-chart'  chart3_id='action-chart' %}
+            {% include 'components/dashboard/student_attendance_engagement_action_report_new.html' %}
+          {% endwith %}
+        </div>
+      </div> 
+
+      <div class='mt-5 flex justify-center flex-row flex-wrap border-b-2 border-gray-300'>
+        {% include "components/dashboard/program_leader/pl_student_count_table_barChart.html" %}
+      </div>
+      {% endif %}
+    </section>
+
+    <script>
+      $(document).ready(function() {
+        // Function to save selected dropdown value to local storage
+        function saveSelectedValue(courseOfferingId) {
+          var selectedValue = $('#session_no_' + courseOfferingId).val();
+          localStorage.setItem('selected_session_no_' + courseOfferingId, selectedValue);
+        }
+  
+        // Event listener for dropdown change
+        $('#session_no_{{ co.id }}').change(function() {
+          console.log("saving session value ....")
+          saveSelectedValue();
+        });
+        
+  
+        // Load selected value from local storage on page load
+        var selectedValue = localStorage.getItem('selected_session_no_{{ co.id }}');
+        if (selectedValue) {
+          $('#session_no_{{ co.id }}').val(selectedValue);
+        }
+  
+        function loadCourseOfferingData(courseOfferingId) {
+          $.ajax({
+            url: '/dashboard/load_course_offering_data/' + courseOfferingId + '/',
+            success: function(data) {
+              if (data.error) {
+                console.error('Error:', data.error);
+                $('#course_offering_' + courseOfferingId + ' .course-offering-content').html('<p>Error loading data</p>');
+              } else {
+                $('#course_offering_' + courseOfferingId + ' .course-offering-content').html(data.html);
+                var newSelectedValue = $('#session_no_{{ co.id }}').val();
+                localStorage.setItem('selected_session_no_{{ co.id }}', newSelectedValue);
+              }
+            },
+            error: function(xhr, status, error) {
+              console.error('Failed to load course offering data:', status, error);
+              $('#course_offering_' + courseOfferingId + ' .course-offering-content').html('<p>Error loading data</p>');
+            }
+          });
+        }
+  
+        $('.course-offering-report-container').each(function() {
+          var courseOfferingId = $(this).attr('id').split('_')[2];
+          loadCourseOfferingData(courseOfferingId);
+        });
+  
+        // Event delegation for dynamically loaded content
+        $('body').on('change', '.filterForm select', function() {
+          var form = $(this).closest('.filterForm');
+          var formData = new FormData(form[0]);
+          var url = form.data('url');
+          var courseOfferingId = form.attr('id').split('_')[1];
+  
+          $.ajax({
+            type: 'POST',
+            url: url,
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+              $('#filteredData_' + courseOfferingId).html(data.html);
+              var newSelectedValue = $('#session_no_{{ co.id }}').val();
+              localStorage.setItem('selected_session_no_{{ co.id }}', newSelectedValue);
+            },
+            error: function(error) {
+              console.error('Error:', error);
+            }
+          });
+        });
+      });
+    </script>
 {% endblock content %}
-    

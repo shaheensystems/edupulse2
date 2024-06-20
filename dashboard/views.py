@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from edupulse.celery import add
 from dashboard.tasks import sub,sub2
 
@@ -11,6 +11,7 @@ from program.models import Program, ProgramOffering,Course,CourseOffering
 from customUser.models import Staff, Campus
 import json
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Q
 
 from utils.function.helperGetChartData import get_chart_data_attendance_report
 from utils.function.helperGetTableData import (
@@ -30,8 +31,10 @@ from utils.function.helperGetTableData import (
     get_barChart_data_student_by_locality_by_lecturer,
     get_barChart_data_student_engagement_status_by_lecturer,
 )
-
-from dashboard.filter import AttendanceEngagementReportFilter
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from dashboard.filter import AttendanceEngagementReportFilter,CourseOfferingAttendanceFilterForTeacher
 from django.db.models import Prefetch,Count
 from django.template.loader import render_to_string
 from django.http import HttpRequest, JsonResponse
@@ -47,6 +50,11 @@ from utils.function.BaseValues_List import (
     FINAL_STATUS_COLOR_CHOICE,
     ENGAGEMENT_COLOR_CHOICE,
 )
+# import logging
+from django.shortcuts import get_object_or_404
+
+# logger = logging.getLogger(__name__)
+
 
 # Create your views here.
 
@@ -60,7 +68,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         program_type = self.request.GET.get('program_type')
         
         # Filter the Attendance and Program models based on the GET parameters
-        attendance_data = Attendance.objects.select_related('student','student__student')
+        attendances = Attendance.objects.select_related('student','student__student')
         # connection.queries.clear()
 
         # Prefetch student enrollments with the related student objects
@@ -68,7 +76,6 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             'student_enrollments',
             queryset=StudentEnrollment.objects.select_related('student').prefetch_related('student__student')
         )
-
         # Prefetch program offerings with the student enrollments prefetch
         programs_for_current_user = Program.objects.prefetch_related(
             Prefetch('program_offerings', queryset=ProgramOffering.objects.prefetch_related(student_enrollments_prefetch))
@@ -85,7 +92,12 @@ class DashboardView(LoginRequiredMixin,TemplateView):
        
         program_offerings_for_current_user=ProgramOffering.objects.prefetch_related('student_enrollments__student__student__campus')
         courses_for_current_user=Course.objects.all()
-        course_offerings_for_current_user=CourseOffering.objects.all()
+        
+        if self.request.user.groups.filter(name="Program_Leader").exists():
+            course_offerings_for_current_user=CourseOffering.objects.all()
+        if self.request.user.groups.filter(name="Teacher").exists():
+            course_offerings_for_current_user=CourseOffering.objects.prefetch_related('attendances')
+            
         lecturer_qs_for_current_user = Staff.objects.select_related('staff').prefetch_related(
             'staff__student_profile__student_enrollments',  # Prefetch student enrollments
             'staff__student_profile__student_enrollments__course_offering',  # Prefetch course offerings
@@ -94,14 +106,15 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         
         campuses=Campus.objects.all()
         if date:
-            attendance_data = attendance_data.filter(date=date)
+            attendances = attendances.filter(date=date)
             programs_for_current_user = programs_for_current_user.filter(date=date)
         
         if program_type:
             programs_for_current_user = programs_for_current_user.filter(type=program_type)
+       
         
         return {
-            'attendance_data': attendance_data,
+            'attendances': attendances,
             'programs_for_current_user': programs_for_current_user,
             'program_offerings_for_current_user':program_offerings_for_current_user,
             'courses_for_current_user':courses_for_current_user,
@@ -116,7 +129,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         
         # Use get_filtered_data to get combined data
         filtered_data = self.get_filtered_data()
-        attendance_data = filtered_data['attendance_data']
+        attendances = filtered_data['attendances']
         programs_for_current_user = filtered_data['programs_for_current_user']
         program_offerings_for_current_user = filtered_data['program_offerings_for_current_user']
         lecturer_qs_for_current_user = filtered_data['lecturer_qs_for_current_user']
@@ -131,29 +144,40 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         
         
         # filter forms 
+       
         
-        context['attendances']=attendance_data
+        if self.request.user.groups.filter(name="Teacher").exists():
+            # attendanceReportFilterForTeacher=CourseOfferingAttendanceFilterForTeacher(self.request.GET,queryset=course_offerings_for_current_user)
+            # course_offerings_for_current_user=attendanceReportFilterForTeacher.qs
+            # attendanceReportFilterForTeacherForm=attendanceReportFilterForTeacher.form
+            # context['attendanceReportFilterForTeacherForm']=attendanceReportFilterForTeacherForm
+            # Initialize the form with the current user's course offerings
+            
+            context['attendance_report_filter_forms'] = {
+                co: CourseOfferingAttendanceFilterForTeacher(self.request.GET, queryset=co.attendances.all()).form
+                for co in course_offerings_for_current_user
+            }
+             
+             
+        if self.request.user.groups.filter(name="Program_Leader").exists():
+            # Generate reports
+            attendance_report= self.generate_attendance_report_for_chart_data(attendances)
+            student_count_table_report=self.generate_student_count_report_for_table(programs_for_current_user=programs_for_current_user, program_offerings_for_current_user=program_offerings_for_current_user,lecturer_qs_for_current_user=lecturer_qs_for_current_user,campuses=campuses)
+           # set context data 
+            context["chart_data_attendance_report_attendance"] = attendance_report['chart_data_attendance_report_attendance']
+            context["chart_data_attendance_report_engagement"] = attendance_report['chart_data_attendance_report_engagement']
+            context["chart_data_attendance_report_action"] = attendance_report['chart_data_attendance_report_action']
+            context['attendanceReportFilterForm']=attendance_report['attendanceReportFilterForm']
+            context["pl_student_count_table_data"] = student_count_table_report['pl_student_count_table_data']
+            context["pl_campus_wise_student_count_table_data"] = student_count_table_report['pl_campus_wise_student_count_table_data']
+            context["pl_student_count_button_list"] = student_count_table_report['pl_student_count_button_list']
+            context["attendance_choice"] = student_count_table_report['attendance_choice']
+            context["pl_campus_wise_attendance_detail_data"] = student_count_table_report['pl_campus_wise_attendance_detail_data']
         
-        # Generate reports
-        attendance_report= self.generate_attendance_report_for_chart_data(attendance_data)
-        student_count_table_report=self.generate_student_count_report_for_table(programs_for_current_user=programs_for_current_user, program_offerings_for_current_user=program_offerings_for_current_user,lecturer_qs_for_current_user=lecturer_qs_for_current_user,campuses=campuses)
         
-
         
-        # set context data 
-        context["chart_data_attendance_report_attendance"] = attendance_report['chart_data_attendance_report_attendance']
-        context["chart_data_attendance_report_engagement"] = attendance_report['chart_data_attendance_report_engagement']
-        context["chart_data_attendance_report_action"] = attendance_report['chart_data_attendance_report_action']
-        context['attendanceReportFilterForm']=attendance_report['attendanceReportFilterForm']
-        
-        context['program_report'] = self.generate_program_report(programs_for_current_user)
-        context['combined_report'] = self.generate_combined_report(attendance_data, programs_for_current_user)
-        
-        context["pl_student_count_table_data"] = student_count_table_report['pl_student_count_table_data']
-        context["pl_campus_wise_student_count_table_data"] = student_count_table_report['pl_campus_wise_student_count_table_data']
-        context["pl_student_count_button_list"] = student_count_table_report['pl_student_count_button_list']
-        context["attendance_choice"] = student_count_table_report['attendance_choice']
-        context["pl_campus_wise_attendance_detail_data"] = student_count_table_report['pl_campus_wise_attendance_detail_data']
+        # common context data for all user 
+        context['attendances']=attendances
         context['programs_for_current_user']=programs_for_current_user
         context['program_offerings_for_current_user']=program_offerings_for_current_user
         context['lecturer_qs_for_current_user']=lecturer_qs_for_current_user
@@ -557,7 +581,138 @@ class DashboardView(LoginRequiredMixin,TemplateView):
                 )
 
         return JsonResponse({"error": "Program ID not provided"}, status=400)
+
+
+class LoadCourseOfferingDataAjaxView(View):
+    @method_decorator(cache_page(60 * 15))  # Cache for 15 minutes
+    def get(self, request, *args, **kwargs):
+        course_offering_id = kwargs.get('pk')
+        
+        try:
+            course_offering = get_object_or_404(CourseOffering, pk=course_offering_id)
+        except CourseOffering.DoesNotExist:
+            return JsonResponse({'error': 'CourseOffering not found'}, status=404)
+        
+        session_no = self.get_cached_session_no(request)
+        
+        calculate_student_attendance_percentage,calculate_student_attendance_chart_data = self.filter_data(course_offering=course_offering, session_no=session_no)
+
+        html = render_to_string('components/dashboard/course_offering_report.html', {
+            'co': course_offering,
+            'calculate_student_attendance_percentage':calculate_student_attendance_percentage,
+            'calculate_student_attendance_chart_data':calculate_student_attendance_chart_data,
+        }, request)
+        
+        return JsonResponse({'html': html})
     
+    @method_decorator(cache_page(60 * 15))  # Cache for 15 minutes
+    def post(self, request, *args, **kwargs):
+        course_offering_id = kwargs.get('pk')
+        course_offering = get_object_or_404(CourseOffering, pk=course_offering_id)
+        
+        session_no = request.POST.get('session_no')
+        self.cache_session_no(request, session_no)
+        calculate_student_attendance_percentage,calculate_student_attendance_chart_data = self.filter_data(course_offering=course_offering, session_no=session_no)
+
+        
+        
+        html = render_to_string('components/dashboard/course_offering_report.html', {
+            'co': course_offering,
+            'calculate_student_attendance_percentage':calculate_student_attendance_percentage,
+            'calculate_student_attendance_chart_data':calculate_student_attendance_chart_data,
+        }, request)
+        
+        return JsonResponse({'html': html})
+
+    def filter_data(self, course_offering, session_no):
+        cache_key = f'course_offering_data_{course_offering.pk}_{session_no}'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return cached_data
+        
+        if session_no is not None:
+            calculate_student_attendance_percentage=self.calculate_student_attendance_percentage(
+            course_offering=course_offering,
+            session_no=session_no
+             )
+            calculate_student_attendance_chart_data=self.calculate_student_attendance_chart_data(
+                course_offering=course_offering,
+                session_no=session_no
+             )
+            
+        else:
+            calculate_student_attendance_percentage=self.calculate_student_attendance_percentage(
+            course_offering=course_offering,
+            session_no=None
+             )
+            calculate_student_attendance_chart_data=self.calculate_student_attendance_chart_data(
+                course_offering=course_offering,
+                session_no=None
+             )
+        # Store calculated data in cache
+        cache.set(cache_key, (calculate_student_attendance_percentage, calculate_student_attendance_chart_data), timeout=None)
+
+        return calculate_student_attendance_percentage,calculate_student_attendance_chart_data
+    
+    def calculate_student_attendance_percentage(self,course_offering,session_no):
+        attendances=course_offering.attendances.all()
+        if session_no is not None:
+            attendances=attendances.filter(session_no=session_no)
+            
+        present=attendances.filter(is_present='present').count()
+        informed_absent=attendances.filter(is_present='informed absent').count()
+        absent=attendances.filter(Q(is_present='absent')|Q(is_present='tardy')).count()
+        total_attendances=attendances.count()
+        if total_attendances>0 and total_attendances == present+informed_absent+absent:
+            present_percentage=f'{(present / total_attendances) * 100:.2f}%'
+            informed_absent_percentage=f'{(informed_absent / total_attendances) * 100:.2f}%'
+            absent_percentage=f'{(absent / total_attendances) * 100:.2f}%'
+        else:
+            present_percentage=0
+            informed_absent_percentage=0
+            absent_percentage=0
+            
+        return{
+            'present_percentage':present_percentage ,
+            'informed_absent_percentage':informed_absent_percentage ,
+            'absent_percentage':absent_percentage ,
+        }
+    def calculate_student_attendance_chart_data(self,course_offering,session_no):
+        attendances=course_offering.attendances.all()
+        if session_no is not None:
+            attendances=attendances.filter(session_no=session_no)
+            
+        if attendances:
+            chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
+        else:
+            chart_data_attendance_report_attendance=None
+        return chart_data_attendance_report_attendance
+    def get_cached_session_no(self, request):
+        # Retrieve selected session number from cache
+        return cache.get(f'selected_session_no_{request.user.id}')
+
+    def cache_session_no(self, request, session_no):
+        # Cache selected session number
+        cache.set(f'selected_session_no_{request.user.id}', session_no, timeout=None)
+        
+        
+class FilterAttendancesAjaxView(View):
+    
+   
+    
+    def get(self, request, *args, **kwargs):
+        course_offering_id = kwargs.get('pk')
+        print('course_offering_id:',course_offering_id)
+        filter_instance = CourseOfferingAttendanceFilterForTeacher(
+            request.GET,
+            queryset=Attendance.objects.filter(course_offering_id=course_offering_id)
+        )
+
+        filtered_attendances = list(filter_instance.qs.values('id', 'session_no', 'week_no', 'attendance_date'))
+
+        return JsonResponse({'filtered_attendances': filtered_attendances})
+
+   
 class DashboardCeleryView(LoginRequiredMixin,TemplateView):
     template_name='dashboard/dashboard_celery.html'
 
@@ -576,6 +731,9 @@ class DashboardCeleryView(LoginRequiredMixin,TemplateView):
         
 
         return context
+
+
+    
 
 
 def check_status_attendance_status_report_chart_data(request):
