@@ -11,15 +11,10 @@
           <a href="{% url 'course_offering_detail' co.pk %}" class='text-blue-400 underline underline-offset-4'>{{ co.temp_id }}</a>
         {% endfor %}
       </div>
-      Total Course offerings: {{ course_offerings_for_current_user|length }}
-
-      {% for co in course_offerings_for_current_user %}
-        <div class="course-offering-report-container w-full" id="course_offering_{{ co.id }}">
-          <div class="course-offering-content w-full">
-            <p>Loading...</p>
-          </div>
-        </div>
-      {% endfor %}
+      {% comment %} Total Course offerings: {{ course_offerings_for_current_user|length }} {% endcomment %}
+      {% with course_offerings=course_offerings_for_current_user %}
+        {% include "components/dashboard/lecturer_view/course_offerings_detail_chart.html" %}
+      {% endwith %}
 
       {% endif %}
 
@@ -38,90 +33,5 @@
       {% endif %}
     </section>
 
-    <script>
-      $(document).ready(function() {
-       // when page load , load data of cousre offeirng for teacher View 
-       $('.course-offering-report-container').each(function() {
-        var courseOfferingId = $(this).attr('id').split('_')[2];
-        console.log("page load finish now load tecaher view cousre offering data ....");
-        loadCourseOfferingData(courseOfferingId);
-      });
-        // function to load cousre offeirng data by id 
-        function loadCourseOfferingData(courseOfferingId) {
-          $.ajax({
-            url: '/dashboard/load_course_offering_data/' + courseOfferingId + '/',
-            success: function(data) {
-              if (data.error) {
-                console.error('Error:', data.error);
-                $('#course_offering_' + courseOfferingId + ' .course-offering-content').html('<p>Error loading data</p>');
-              } else {
-                console.log("loading course offering data for co id : ",courseOfferingId);
-                $('#course_offering_' + courseOfferingId + ' .course-offering-content').html(data.html);
-                var newSelectedValue = $('#session_no_{{ co.id }}').val();
-                localStorage.setItem('selected_session_no_{{ co.id }}', newSelectedValue);
-              }
-            },
-            error: function(xhr, status, error) {
-              console.error('Failed to load course offering data:', status, error);
-              $('#course_offering_' + courseOfferingId + ' .course-offering-content').html('<p>Error loading data</p>');
-            }
-          });
-        }
-        
-        // Load selected value from local storage on page load
-        var selectedValue = localStorage.getItem('selected_session_no_{{ co.id }}');
-        if (selectedValue) {
-          $('#session_no_{{ co.id }}').val(selectedValue);
-        }
-
-         // Function to save selected dropdown value to local storage
-         function saveSelectedValue(courseOfferingId) {
-          var selectedValue = $('#session_no_' + courseOfferingId).val();
-          localStorage.setItem('selected_session_no_' + courseOfferingId, selectedValue);
-        }
-  
-        // Event listener for dropdown change
-        $('#session_no_{{ co.id }}').change(function() {
-          console.log("saving session value ....")
-          saveSelectedValue();
-        });
-        
-  
-        
-        // Event delegation for dynamically loaded content
-        $('body').on('change', '.filterForm select', function() {
-          var form = $(this).closest('.filterForm');
-          var formData = new FormData(form[0]);
-          var url = form.data('url');
-          var selectedSessionValue=$(this).closest('.filterForm .selected_session_value').val()
-          var selectionValue = JSON.parse(selectedSessionValue);
-          var courseOfferingId = form.attr('id').split('_')[1];
-          console.log(" on change filter method for course offering , co id : ",courseOfferingId, "url :", url, " filter value :",selectionValue);
-  
-          $.ajax({
-            type: 'POST',
-            url: url,
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType:'json',
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}'
-            },
-            success: function(data) {
-
-              console.log("Selection value for co id: ", courseOfferingId, " ,selection value: ", selectionValue);
-              localStorage.setItem('selected_session_no_'+courseOfferingId, selectionValue);
-
-              $('#filteredData_' + courseOfferingId).html(data.html);
-              $('#session_no_' + courseOfferingId).val(JSON.stringify(selectionValue));
-
-            },
-            error: function(error) {
-              console.error('Error:', error);
-            }
-          });
-        });
-      });
-    </script>
+    
 {% endblock content %}

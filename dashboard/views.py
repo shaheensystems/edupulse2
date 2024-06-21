@@ -602,7 +602,7 @@ class LoadCourseOfferingDataAjaxView(View):
         
         print("session no choice :",week_and_session_no_choices)
         
-        html = render_to_string('components/dashboard/course_offering_report.html', {
+        html = render_to_string('components/dashboard/lecturer_view/course_offering_report.html', {
             'co': course_offering,
             'calculate_student_attendance_percentage':calculate_student_attendance_percentage,
             'calculate_student_attendance_chart_data':calculate_student_attendance_chart_data,
@@ -634,7 +634,7 @@ class LoadCourseOfferingDataAjaxView(View):
         week_and_session_no_choices=self.get_session_and_week_choices_by_course_offering(course_offering=course_offering)
         
         
-        html = render_to_string('components/dashboard/course_offering_report.html', {
+        html = render_to_string('components/dashboard/lecturer_view/course_offering_report.html', {
             'co': course_offering,
             'calculate_student_attendance_percentage':calculate_student_attendance_percentage,
             'calculate_student_attendance_chart_data':calculate_student_attendance_chart_data,
