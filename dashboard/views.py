@@ -631,6 +631,8 @@ class LoadCourseOfferingDataAjaxView(View):
         self.cache_week_no(request, week_no)
         calculate_student_attendance_percentage,calculate_student_attendance_chart_data = self.filter_data(course_offering=course_offering,week_no=week_no, session_no=session_no)
 
+        print("filter data for calculate_student_attendance_percentage:",calculate_student_attendance_percentage)
+        print("filter data for calculate_student_attendance_chart_data:",calculate_student_attendance_chart_data)
         week_and_session_no_choices=self.get_session_and_week_choices_by_course_offering(course_offering=course_offering)
         
         
@@ -647,7 +649,7 @@ class LoadCourseOfferingDataAjaxView(View):
         week_and_session_no_choices = [
         {
         "value": {"week": attendance['week_no'], "session": attendance['session_no']},
-        "text": f"W {attendance['week_no']}: S {attendance['session_no']}"
+        "text": f"Week {attendance['week_no']} : Session {attendance['session_no']}"
         }
         for attendance in course_offering.attendances.filter(course_offering__isnull=False).values('session_no', 'week_no').distinct()
         ]
@@ -691,6 +693,8 @@ class LoadCourseOfferingDataAjaxView(View):
         attendances=course_offering.attendances.all()
         if session_no is not None:
             attendances=attendances.filter(session_no=session_no)
+        if week_no is not None:
+            attendances=attendances.filter(week_no=week_no) 
             
         present=attendances.filter(is_present='present').count()
         informed_absent=attendances.filter(is_present='informed absent').count()
@@ -714,7 +718,8 @@ class LoadCourseOfferingDataAjaxView(View):
         attendances=course_offering.attendances.all()
         if session_no is not None and week_no is not None:
             attendances=attendances.filter(session_no=session_no,week_no=week_no)
-            
+        
+         
         if attendances:
             chart_data_attendance_report_attendance,chart_data_attendance_report_engagement ,chart_data_attendance_report_action=get_chart_data_attendance_report(attendances=attendances)
         else:

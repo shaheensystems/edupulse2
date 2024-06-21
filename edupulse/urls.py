@@ -18,15 +18,18 @@ from django.contrib import admin
 from django.conf import settings
 from django.urls import path,include
 from django.conf.urls.static import static
+from dashboard.views import DashboardView
 
-
-from .views import DashboardView, ManageAttendanceView,SaveWeeklyReportsView, DashboardTestView,StudentAttendanceReport
+from . import views
+from .views import  ManageAttendanceView,SaveWeeklyReportsView, DashboardTestView,StudentAttendanceReport
 
 urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
     path('admin/', admin.site.urls),
     path('upload_file/',include('uploadFile.urls')), #namespace is the same name mentioned in urls.py file app_name 
-    path('',DashboardView.as_view(), name='dashboard2'),
+    # path('',views.DashboardView.as_view(), name='dashboard2'),
+    path('',DashboardView.as_view(), name='dashboard'),
+    
     path('test/',DashboardTestView.as_view(), name='dashboard-testing'),
   
     path('manage-attendance/', ManageAttendanceView.as_view(),name='manage-attendance'),
