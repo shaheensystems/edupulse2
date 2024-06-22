@@ -1,0 +1,10 @@
+start env : source env/bin/activate
+
+to run server : python3 manage.py runserver
+for shell terminal : python3 manage.py shell
+for tailwind css terminal : python3 manage.py tailwind start
+
+for celery worker: celery -A edupulse worker -l info
+for celery beat scheduler : celery -A edupulse beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler 
+for redis server : redis-server
+
