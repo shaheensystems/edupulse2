@@ -8,3 +8,5 @@ for celery worker: celery -A edupulse worker -l info
 for celery beat scheduler : celery -A edupulse beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler 
 for redis server : redis-server
 
+to update requirements.txt file : pip freeze > requirements.txt
+
