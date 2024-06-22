@@ -60,6 +60,7 @@ class CourseListView(LoginRequiredMixin,ListView):
         all_programs=user_data['all_programs']
         weekly_reports=user_data['weekly_reports']
         campuses=user_data['campuses']
+        lecturer_qs_for_current_user = user_data["lecturer_qs_for_current_user"]
         
         context.update(user_data)
 
@@ -72,7 +73,8 @@ class CourseListView(LoginRequiredMixin,ListView):
                                         course_offerings_for_current_user=course_offerings_for_current_user,
                                         attendances =attendances,
                                         weekly_reports=weekly_reports,
-                                        campuses=campuses)
+                                        campuses=campuses,
+                                        lecturer_qs_for_current_user=lecturer_qs_for_current_user)
             
         program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
         course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -158,6 +160,7 @@ class ProgramListView(LoginRequiredMixin,ListView):
         all_programs=user_data['all_programs']
         weekly_reports=user_data['weekly_reports']
         campuses=user_data['campuses']
+        lecturer_qs_for_current_user = user_data["lecturer_qs_for_current_user"]
         
         context.update(user_data)
 
@@ -170,7 +173,8 @@ class ProgramListView(LoginRequiredMixin,ListView):
                                         course_offerings_for_current_user=course_offerings_for_current_user,
                                         attendances =attendances,
                                         weekly_reports=weekly_reports,
-                                        campuses=campuses)
+                                        campuses=campuses,
+                                        lecturer_qs_for_current_user=lecturer_qs_for_current_user)
             
         program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
         course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -260,6 +264,7 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
         all_programs=user_data['all_programs']
         weekly_reports=user_data['weekly_reports']
         campuses=user_data['campuses']
+        lecturer_qs_for_current_user = user_data["lecturer_qs_for_current_user"]
         
         context.update(user_data)
         filtered_data_by_date_range=filter_data_based_on_date_range(
@@ -271,7 +276,8 @@ class ProgramOfferingListView(LoginRequiredMixin,ListView):
                                         course_offerings_for_current_user=course_offerings_for_current_user,
                                         attendances =attendances,
                                         weekly_reports=weekly_reports,
-                                        campuses=campuses)
+                                        campuses=campuses,
+                                        lecturer_qs_for_current_user=lecturer_qs_for_current_user)
             
         program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
         course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']
@@ -372,6 +378,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         all_programs=user_data['all_programs']
         weekly_reports=user_data['weekly_reports']
         campuses=user_data['campuses']
+        lecturer_qs_for_current_user = user_data["lecturer_qs_for_current_user"]
         
         context.update(user_data)
         filtered_data_by_date_range=filter_data_based_on_date_range(
@@ -383,7 +390,8 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
                                         course_offerings_for_current_user=course_offerings_for_current_user,
                                         attendances =attendances,
                                         weekly_reports=weekly_reports,
-                                        campuses=campuses)
+                                        campuses=campuses,
+                                        lecturer_qs_for_current_user=lecturer_qs_for_current_user)
             
         program_offerings_for_current_user=filtered_data_by_date_range['program_offerings_for_current_user']
         course_offerings_for_current_user=filtered_data_by_date_range['course_offerings_for_current_user']

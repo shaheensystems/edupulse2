@@ -80,6 +80,9 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         weekly_reports = user_data["weekly_reports"]
         campuses = user_data["campuses"]
         lecturer_qs_for_current_user = user_data["lecturer_qs_for_current_user"]
+        student_enrollments=user_data['student_enrollments']
+        
+        
         
         # Filter the Attendance and Program models based on the GET parameters
         # attendances = Attendance.objects.select_related('student','student__student')
@@ -115,12 +118,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             'staff__student_profile__student_enrollments__course_offering',  # Prefetch course offerings
             'staff__student_profile__student_enrollments__course_offering__staff_course_offering_relations__staff',  # Prefetch related staff
             )
-            enrolled_students=StudentEnrollment.objects.select_related('course_offering','student')
-            total_enrollment_in_blended_course_offerings=enrolled_students.exclude(course_offering__offering_mode='online')
-            total_enrollment_in_online_course_offerings=enrolled_students.filter(course_offering__offering_mode='online')
-            total_students_in_blended_course_offerings = total_enrollment_in_blended_course_offerings.values_list('student', flat=True).distinct()
-            total_students_in_online_course_offerings = total_enrollment_in_online_course_offerings.values_list('student', flat=True).distinct()
-            
+               
         if self.request.user.groups.filter(name="Teacher").exists():
             course_offerings_for_current_user=course_offerings_for_current_user.prefetch_related('attendances')
             
@@ -135,6 +133,11 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         if program_type:
             programs_for_current_user = programs_for_current_user.filter(type=program_type)
        
+        
+        total_enrollment_in_blended_course_offerings=student_enrollments.exclude(course_offering__offering_mode='online')
+        total_enrollment_in_online_course_offerings=student_enrollments.filter(course_offering__offering_mode='online')
+        total_students_in_blended_course_offerings = total_enrollment_in_blended_course_offerings.values_list('student', flat=True).distinct()
+        total_students_in_online_course_offerings = total_enrollment_in_online_course_offerings.values_list('student', flat=True).distinct()
         
         return {
             'attendances': attendances,
@@ -163,6 +166,10 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         course_offerings_for_current_user = filtered_data['course_offerings_for_current_user']
         courses_for_current_user = filtered_data['courses_for_current_user']
         campuses = filtered_data['campuses']
+        total_enrollment_in_blended_course_offerings = filtered_data['total_enrollment_in_blended_course_offerings']
+        total_enrollment_in_online_course_offerings = filtered_data['total_enrollment_in_online_course_offerings']
+        total_students_in_online_course_offerings = filtered_data['total_students_in_online_course_offerings']
+        total_students_in_blended_course_offerings = filtered_data['total_students_in_blended_course_offerings']
        
         
         
@@ -189,10 +196,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
              
              
         if self.request.user.groups.filter(name="Program_Leader").exists() or self.request.user.groups.filter(name="Admin").exists():
-            total_enrollment_in_blended_course_offerings = filtered_data['total_enrollment_in_blended_course_offerings']
-            total_enrollment_in_online_course_offerings = filtered_data['total_enrollment_in_online_course_offerings']
-            total_students_in_online_course_offerings = filtered_data['total_students_in_online_course_offerings']
-            total_students_in_blended_course_offerings = filtered_data['total_students_in_blended_course_offerings']
+            
             # Generate reports
             attendance_report= self.generate_attendance_report_for_chart_data(attendances)
             student_count_table_report=self.generate_student_count_report_for_table(programs_for_current_user=programs_for_current_user, program_offerings_for_current_user=program_offerings_for_current_user,lecturer_qs_for_current_user=lecturer_qs_for_current_user,campuses=campuses)
@@ -206,10 +210,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
             context["pl_student_count_button_list"] = student_count_table_report['pl_student_count_button_list']
             context["attendance_choice"] = student_count_table_report['attendance_choice']
             context["pl_campus_wise_attendance_detail_data"] = student_count_table_report['pl_campus_wise_attendance_detail_data']
-            context['total_enrollment_in_blended_course_offerings']=total_enrollment_in_blended_course_offerings
-            context['total_enrollment_in_online_course_offerings']=total_enrollment_in_online_course_offerings
-            context['total_students_in_blended_course_offerings']=total_students_in_blended_course_offerings
-            context['total_students_in_online_course_offerings']=total_students_in_online_course_offerings
+            
         
         
         # common context data for all user 
@@ -220,6 +221,10 @@ class DashboardView(LoginRequiredMixin,TemplateView):
         context['course_offerings_for_current_user']=course_offerings_for_current_user
         context['courses_for_current_user']=courses_for_current_user
         context['campuses']=campuses
+        context['total_enrollment_in_blended_course_offerings']=total_enrollment_in_blended_course_offerings
+        context['total_enrollment_in_online_course_offerings']=total_enrollment_in_online_course_offerings
+        context['total_students_in_blended_course_offerings']=total_students_in_blended_course_offerings
+        context['total_students_in_online_course_offerings']=total_students_in_online_course_offerings
         return context
 
     

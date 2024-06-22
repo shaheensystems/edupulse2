@@ -1,5 +1,5 @@
 from program.models import Program, Course, ProgramOffering, CourseOffering
-from report.models import Attendance, WeeklyReport
+from report.models import Attendance, WeeklyReport,StudentEnrollment
 from customUser.models import Student, Staff
 from base.models import Campus
 from django.db.models import Q
@@ -152,6 +152,7 @@ def filter_database_based_on_current_user(request_user):
         "staff_program_offering_relations__program_offering",
         "staff_program_relations__program",
     )
+    student_enrollments=StudentEnrollment.objects.select_related('course_offering','student')
 
     if (
         user_groups.filter(name="Head_of_School").exists()
@@ -172,7 +173,7 @@ def filter_database_based_on_current_user(request_user):
         students = students
         all_programs = program_offerings_for_current_user
         lecturer_qs_for_current_user = lecturer
-
+        student_enrollments=student_enrollments
         attendances = (
             attendances.select_related("course_offering", "program_offering", "student")
             .prefetch_related("weekly_reports")
@@ -190,6 +191,7 @@ def filter_database_based_on_current_user(request_user):
         course_offerings = course_offerings
         students = students
         attendances = attendances
+        student_enrollments=student_enrollments
         # campuses=campuses
 
         # programs_for_current_user=None
@@ -253,7 +255,7 @@ def filter_database_based_on_current_user(request_user):
         students = students.filter(
             course_offerings__staff_course_offering_relations__staff__staff=request_user
         )
-
+        student_enrollments=student_enrollments.filter(course_offering__staff_course_offering_relations__staff__staff=request_user)
         programs_for_current_user = None
         courses_for_current_user = None
         # attendances = attendances.filter(student__in=students)
@@ -267,6 +269,7 @@ def filter_database_based_on_current_user(request_user):
         weekly_reports = weekly_reports.filter(
             course_offering__in=course_offerings_for_current_user
         ).distinct()
+        lecturer_qs_for_current_user=None
 
     #    ProgramOffering.objects.filter(program__course__course_offering__teacher__staff=user)
     else:
@@ -280,6 +283,7 @@ def filter_database_based_on_current_user(request_user):
         weekly_reports = None
         campuses = None
         lecturer_qs_for_current_user = None
+        student_enrollments=None
     # Return the filtered data
     return {
         "program_offerings_for_current_user": program_offerings_for_current_user,
@@ -292,6 +296,7 @@ def filter_database_based_on_current_user(request_user):
         "weekly_reports": weekly_reports,
         "campuses": campuses,
         "lecturer_qs_for_current_user": lecturer_qs_for_current_user,
+        'student_enrollments':student_enrollments,
     }
 
 

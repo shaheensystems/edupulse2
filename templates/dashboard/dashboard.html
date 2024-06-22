@@ -2,25 +2,10 @@
 {% load custom_tags %}
 {% block content %}
     <section class='flex w-full flex-col'>
-      
-      {% if request.user|user_belongs_to_group:'Teacher' %}
-       
-      <div class='flex flex-row gap-4 mt-4 w-full'> 
-        <span class='flex flex-wrap text-gray-400 text-sm items-end px-2'>Jump to : </span>
-        {% for co in course_offerings_for_current_user %}
-          <a href="{% url 'course_offering_detail' co.pk %}" class='text-blue-400 underline underline-offset-4'>{{ co.temp_id }}</a>
-        {% endfor %}
-      </div>
-      {% comment %} Total Course offerings: {{ course_offerings_for_current_user|length }} {% endcomment %}
-      {% with course_offerings=course_offerings_for_current_user %}
-        {% include "components/dashboard/lecturer_view/course_offerings_detail_chart.html" %}
-      {% endwith %}
-
-      {% endif %}
-
-      {% if request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin' %}
-       <!-- Student and enrollment status -->
-       <div class='flex flex-row gap-10 justify-start  text-gray-400 font-normal px-5'>
+     
+      <!-- Common details for all dashbord page-->
+      <!-- Student and enrollment status -->
+      <div class='flex flex-row gap-10 justify-start  text-gray-400 font-normal px-5'>
         <div class='flex flex-col'>
             <span class='flex flex-row '>
               <span> Total Students blended :</span>
@@ -43,6 +28,24 @@
         </div>
         
       </div>
+      
+      {% if request.user|user_belongs_to_group:'Teacher' %}
+     
+      <div class='flex flex-row gap-4 mt-4 w-full'> 
+        <span class='flex flex-wrap text-gray-400 text-sm items-end px-2'>Jump to : </span>
+        {% for co in course_offerings_for_current_user %}
+          <a href="{% url 'course_offering_detail' co.pk %}" class='text-blue-400 underline underline-offset-4'>{{ co.temp_id }}</a>
+        {% endfor %}
+      </div>
+      {% comment %} Total Course offerings: {{ course_offerings_for_current_user|length }} {% endcomment %}
+      {% with course_offerings=course_offerings_for_current_user %}
+        {% include "components/dashboard/lecturer_view/course_offerings_detail_chart.html" %}
+      {% endwith %}
+
+      {% endif %}
+
+      {% if request.user|user_belongs_to_group:'Program_Leader' or request.user|user_belongs_to_group:'Head_of_School' or request.user|user_belongs_to_group:'Admin' %}
+       
       <div class='mt-5 border-b-2 border-gray-300'>
         <div id='dashboard-attendance-engagement-action-container'>
           {% with title="Student Performance" chart1_data=chart_data_attendance_report_attendance  chart2_data=chart_data_attendance_report_engagement  chart3_data=chart_data_attendance_report_action  chart1_title='Overall Attendance'  chart2_title='Absent Engagement Analysis'  chart3_title='Action Engagement Analysis'  chart1_id='attendance-chart' chart2_id='engagement-chart'  chart3_id='action-chart' %}
