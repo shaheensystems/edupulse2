@@ -367,6 +367,8 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         default_start_date ,default_end_date=default_start_and_end_date()
         start_date = default_start_date
         end_date=default_end_date
+        start_date = datetime(2020, 1, 1)
+        end_date=datetime.now()
 
         user_data=filter_database_based_on_current_user(request_user=self.request.user)
         program_offerings_for_current_user=user_data['program_offerings_for_current_user']
@@ -379,6 +381,7 @@ class CourseOfferingListView(LoginRequiredMixin,ListView):
         weekly_reports=user_data['weekly_reports']
         campuses=user_data['campuses']
         lecturer_qs_for_current_user = user_data["lecturer_qs_for_current_user"]
+        print("courses_for_current_user for course offering page:",courses_for_current_user)
         
         context.update(user_data)
         filtered_data_by_date_range=filter_data_based_on_date_range(

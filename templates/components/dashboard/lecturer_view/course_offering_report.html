@@ -1,42 +1,55 @@
 <div class="course-offering-report w-full flex flex-row  border-b-2 border-b-gray-400" id='filteredData_{{ co.id }}'>
 
   <!-- Attendance chart -->
-  <div class="flex flex-col w-1/3 p-4 border-r-2 border-gray-200">
-    <a href="{% url 'course_offering_detail' co.pk %}" class='flex text-left underline underline-offset-4 text-blue-500 mb-3'>{{ co.temp_id|upper }}</a>
-    <div class="flex flex-col">
-    
+  <div class="flex flex-col w-1/3 p-4 border-r-2 border-gray-200 justify-between">
+    <div class="flex flex-col justify-center  ">
+      <a href="{% url 'course_offering_detail' co.pk %}" class='flex text-left underline underline-offset-4 text-blue-500 mb-3'>{{ co.temp_id|upper }}</a>
+   
       <div class="flex flex-row justify-between items-center">
         <!-- AJAX form for filtering -->
-        {% if week_and_session_no_choices %}
+        
           <form id="filterForm_{{ co.id }}" class="filterForm" method="post" data-url="{% url 'load_course_offering_data' co.pk %}">
             {% csrf_token %}
             <label for="session_no_{{ co.id }}" class='hidden' > Select Session: </label>
             
-            <select id="session_no_{{ co.id }}" class='selected_session_value pr-6 pl-2 py-1 text-gray-700 border-2 border-gray-400' name ="session_no">
+            <select id="session_no_{{ co.id }}" class='selected_session_value pr-8 pl-2 py-1 text-gray-700 border-2 border-gray-400' name ="session_no">
               
-              
-              {% for choice in week_and_session_no_choices %}
-                    <option value='{"week":{{ choice.value.week }},"session":{{ choice.value.session }}}'>
-                        {{ choice.text }}
-                    </option>
-              {% endfor %}
+              {% if week_and_session_no_choices %}
+                {% for choice in week_and_session_no_choices %}
+                      <option value='{"week":{{ choice.value.week }},"session":{{ choice.value.session }}}'>
+                          {{ choice.text }}
+                      </option>
+                {% endfor %}
+              {% else %}
+                  
+                  <option value='{"week":{{ choice.value.week }},"session":{{ choice.value.session }}}'>
+                    No Attendance
+                </option>
+              {% endif %}
               
               
             </select>
           
           </form>
-        {% else %}
-          <p>No Attendance </p> 
-        {% endif %}
+       
        
        
         <div class="flex bg-gray-100 shadow-md px-4 py-1 items-center text-sm text-blue-400">Edit</div>
       </div>
      
-      <div class="mb-4 w-2/3 flex items-center content-center self-center">
-        {% with data=calculate_student_attendance_chart_data title='' id=co.id chartType='doughnut' lengendDisplay='false' limitData=10 %}
-          {% include 'charts/chart.html' %}
-        {% endwith %}
+      {% comment %} <div class="mb-4 w-2/3 flex items-center content-center self-center justify-center"> {% endcomment %}
+      <div class="mb-4 w-2/3 items-center justify-center flex content-center ">
+        {% if week_and_session_no_choices %}
+          {% with data=calculate_student_attendance_chart_data title='' id=co.id chartType='doughnut' lengendDisplay='false' limitData=10 %}
+              {% include 'charts/chart.html' %}
+          {% endwith %}
+        {% else %}
+        <div class='justify-center items-center text-center content-center self-center min-h-[300px]'>
+          No Attendance records
+        </div>
+          
+        {% endif %}
+        
       </div>
     </div>
     <div class="flex flex-row justify-between">

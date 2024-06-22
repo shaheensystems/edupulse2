@@ -625,7 +625,7 @@ class DashboardView(LoginRequiredMixin,TemplateView):
 
 
 class LoadCourseOfferingDataAjaxView(View):
-    @method_decorator(cache_page(60 * 15))  # Cache for 15 minutes
+    # @method_decorator(cache_page(60 * 15))  # Cache for 15 minutes
     def get(self, request, *args, **kwargs):
         course_offering_id = kwargs.get('pk')
         
@@ -652,7 +652,7 @@ class LoadCourseOfferingDataAjaxView(View):
         
         return JsonResponse({'html': html})
     
-    @method_decorator(cache_page(60 * 15))  # Cache for 15 minutes
+    # @method_decorator(cache_page(60 * 15))  # Cache for 15 minutes
     def post(self, request, *args, **kwargs):
         course_offering_id = kwargs.get('pk')
         course_offering = get_object_or_404(CourseOffering, pk=course_offering_id)
