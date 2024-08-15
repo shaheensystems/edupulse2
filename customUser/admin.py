@@ -153,6 +153,7 @@ class StaffAdmin(admin.ModelAdmin):
         StaffCourseOfferingRelationInline,
         StaffProgramOfferingRelationInline,
     ]
+    search_fields=['staff__first_name','staff__last_name']
 
     def get_enrolled_students(self, obj):
         enrolled_students = obj.calculate_total_student_enrolled()
